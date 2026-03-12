@@ -63,20 +63,21 @@ jobs:
           *)
             ;;
         esac | tee "$GITHUB_OUTPUT"
-    - name: Deploy
-      if: ${{steps.deploy_folder.outputs.DEPLOY_FOLDER != ''}}
-      uses: JamesIves/github-pages-deploy-action@v4
-      with:
-        folder: "pkg/emscripten/page"
-        repository-name: "fragglet/sdl-sopwith-builds"
-        token: "${{secrets.SDL_SOPWITH_LATEST_SECRET}}"
-        target-folder: "${{steps.deploy_folder.outputs.DEPLOY_FOLDER}}"
-        clean: true
-        commit-message: "Build from fragglet/sdl-sopwith@${{github.sha}} (Version ${{steps.version.outputs.VERSION}})"
-    - name: Comment PR
-      if: ${{ github.event_name == 'pull_request' }}
-      uses: thollander/actions-comment-pull-request@v3
-      with:
-        message: |
-          Thanks for your pull request! A build of your change can be found [here](https://fragglet.github.io/sdl-sopwith-builds${{steps.deploy_folder.outputs.DEPLOY_FOLDER}}/sopwith.html) for people to try.
-        pr_number: ${{steps.deploy_folder.outputs.PR_NUMBER}}
+# FIXME: Currently disabled due to permissions errors:
+#   - name: Deploy
+#     if: ${{steps.deploy_folder.outputs.DEPLOY_FOLDER != ''}}
+#     uses: JamesIves/github-pages-deploy-action@v4
+#     with:
+#       folder: "pkg/emscripten/page"
+#       repository-name: "fragglet/sdl-sopwith-builds"
+#       token: "${{secrets.SDL_SOPWITH_LATEST_SECRET}}"
+#       target-folder: "${{steps.deploy_folder.outputs.DEPLOY_FOLDER}}"
+#       clean: true
+#       commit-message: "Build from fragglet/sdl-sopwith@${{github.sha}} (Version ${{steps.version.outputs.VERSION}})"
+#   - name: Comment PR
+#     if: ${{ github.event_name == 'pull_request' }}
+#     uses: thollander/actions-comment-pull-request@v3
+#     with:
+#       message: |
+#         Thanks for your pull request! A build of your change can be found [here](https://fragglet.github.io/sdl-sopwith-builds${{steps.deploy_folder.outputs.DEPLOY_FOLDER}}/sopwith.html) for people to try.
+#       pr_number: ${{steps.deploy_folder.outputs.PR_NUMBER}}
