@@ -43,54 +43,92 @@
 
 #define X_OFFSET ((SCR_WDTH/2)-160)
 
+// If a text element has this magic string value, it is (1) drawn centered and
+// (2) replaced by a string that shows the program version.
+#define MAGIC_VERSION  "__VERSION__"
+
+struct title_element {
+	enum { TITLE_TEXT, TITLE_SYMBOL } type;
+	int color;
+	int x, y;
+	union {
+		char *text;
+		sopsym_t *sym;
+	} val;
+};
+
+static struct title_element default_elements[] = {
+	{TITLE_TEXT, 2, 18, 2, {.text="SDL"}},
+	{TITLE_TEXT, 3, 13, 4, {.text="S O P W I T H"}},
+	{TITLE_TEXT, 3, 20, 6, {.text=MAGIC_VERSION}},
+	{TITLE_TEXT, 3, 0, 9, {.text="(c) 1984, 1985, 1987"}},
+	{TITLE_TEXT, 1, 21, 9, {.text="BMB"}},
+	{TITLE_TEXT, 3, 25, 9, {.text="Compuscience"}},
+	{TITLE_TEXT, 3, 0, 10, {.text="(c) 1984-2000 David L. Clark"}},
+	{TITLE_TEXT, 3, 0, 11,
+	 {.text="(c) 2001-2024 Simon Howard, Jesse Smith"}},
+	{TITLE_TEXT, 3, 4, 12, {.text="Distributed under the"}},
+	{TITLE_TEXT, 1, 26, 12, {.text="GNU"}},
+	{TITLE_TEXT, 3, 30, 12, {.text="GPL"}},
+	{TITLE_SYMBOL, 1, 40, 180, {.sym=&symbol_plane[0].sym[0]}},
+	{TITLE_SYMBOL, 2, 130, 80, {.sym=&symbol_plane[1].sym[6]}},
+	{TITLE_SYMBOL, 2, 23, 91, {.sym=&symbol_targets[3].sym[0]}},
+	{TITLE_SYMBOL, 1, 213, 91, {.sym=&symbol_ox[0].sym[0]}},
+	{TITLE_SYMBOL, 2, 280, 165, {.sym=&symbol_pixel}},
+	{TITLE_SYMBOL, 2, 280, 170, {.sym=&symbol_pixel}},
+	{TITLE_SYMBOL, 2, 280, 175, {.sym=&symbol_pixel}},
+	{TITLE_SYMBOL, 2, 280, 180, {.sym=&symbol_pixel}},
+	{TITLE_SYMBOL, 2, 280, 185, {.sym=&symbol_pixel}},
+	{TITLE_SYMBOL, 2, 280, 190, {.sym=&symbol_pixel}},
+	{TITLE_SYMBOL, 2, 270, 160, {.sym=&symbol_plane_hit[0].sym[0]}},
+};
+
 static int title_screen_start;
 
-static void DrawTitleScreenContent(void)
+static void DrawTitleScreenText(void)
 {
-	const char *version_string;
+	struct title_element *el;
+	int i, x;
 
-	swcolor(2);
-	swposcur(18+X_OFFSET/8, 2);
-	swputs("SDL");
+	for (i = 0; i < arrlen(default_elements); ++i) {
+		el = &default_elements[i];
+		if (el->type != TITLE_TEXT) {
+			continue;
+		}
+		swcolor(el->color);
 
-	swcolor(3);
-	swposcur(13+X_OFFSET/8, 4);
-	swputs("S O P W I T H");
+		x = el->x + X_OFFSET/8;
+		if (!strcmp(el->val.text, MAGIC_VERSION)) {
+			const char *s = "Version " PACKAGE_VERSION;
+			x -= (strlen(s) + 1) / 2;
+			swposcur(x, el->y);
+			swputs(s);
+		} else {
+			swposcur(x, el->y);
+			swputs(el->val.text);
+		}
+	}
+}
 
-	version_string = "Version " PACKAGE_VERSION;
-	swposcur((40 - strlen(version_string)) / 2 + X_OFFSET / 8, 6);
-	swputs(version_string);
+static void DrawTitleScreenSymbols(void)
+{
+	struct title_element *el;
+	int i;
 
-	swcolor(3);
-	swposcur(0+X_OFFSET/8, 9);
-	swputs("(c) 1984, 1985, 1987 ");
-
-	swcolor(1);
-	swputs("BMB ");
-	swcolor(3);
-	swputs("Compuscience");
-
-	swcolor(3);
-	swposcur(0+X_OFFSET/8, 10);
-	swputs("(c) 1984-2000 David L. Clark");
-
-	swcolor(3);
-	swposcur(0+X_OFFSET/8, 11);
-	swputs("(c) 2001-2024 Simon Howard, Jesse Smith");
-
-	swcolor(3);
-	swposcur(0+X_OFFSET/8, 12);
-	swputs("    Distributed under the ");
-	swcolor(1);
-	swputs("GNU");
-	swcolor(3);
-	swputs(" GPL");
+	for (i = 0; i < arrlen(default_elements); ++i) {
+		el = &default_elements[i];
+		if (el->type != TITLE_SYMBOL) {
+			continue;
+		}
+		Vid_DispSymbol(el->x + X_OFFSET, el->y, el->val.sym,
+		               el->color);
+	}
 }
 
 void swtitln(void)
 {
 	GRNDTYPE *orground = original_level.gm_ground;
-	int i, h;
+	int i;
 
 	sound(S_TITLE, 0, NULL);
 
@@ -101,27 +139,13 @@ void swtitln(void)
 	// high score table instead.
 	i = Timer_GetMS() - title_screen_start;
 	if ((i / HIGH_SCORE_PERIOD) % 2 == 0) {
-		DrawTitleScreenContent();
+		DrawTitleScreenText();
 	} else {
 		DrawHighScoreTable();
 	}
 
 	swground(orground, 507 - X_OFFSET);
-
-	Vid_DispSymbol(40+X_OFFSET, 180, &symbol_plane[0].sym[0],
-	               FACTION_PLAYER1);
-	Vid_DispSymbol(130+X_OFFSET, 80, &symbol_plane[1].sym[6],
-	               FACTION_PLAYER2);
-	Vid_DispSymbol(23+X_OFFSET, orground[530] + 16,
-	               &symbol_targets[3].sym[0], FACTION_PLAYER2);
-	Vid_DispSymbol(213+X_OFFSET, orground[720] + 16, &symbol_ox[0].sym[0],
-	               FACTION_PLAYER1);
-	Vid_DispSymbol(270+X_OFFSET, 160, &symbol_plane_hit[0].sym[0],
-	               FACTION_PLAYER2);
-
-	for (i = 6, h=165; i; --i, h += 5) {
-		Vid_PlotPixel(280+X_OFFSET, h, 2);
-	}
+	DrawTitleScreenSymbols();
 }
 
 void swtitlf(void)
