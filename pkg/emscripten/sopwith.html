@@ -76,6 +76,49 @@
         FS.syncfs(() => {})
       }
 
+      // fetchURL is a wrapper around fetch() that returns the page text.
+      async function fetchURL(url) {
+        return fetch(url).then((response) => {
+          return response.text()
+        })
+      }
+
+      // fetchURLs is a wrapper that fetches many URLs.
+      async function fetchURLs(urls) {
+        var promises = []
+        for (const url of urls) {
+          promises.push(fetchURL(url))
+        }
+        return Promise.all(promises)
+      }
+
+      // fetchModFiles calls fetchURLs() for URLs given in page URL parameters.
+      async function fetchModFiles() {
+        var params = new URLSearchParams(window.location.search)
+        var urls = []
+        for (const [key, val] of params.entries()) {
+          if (key == "file") {
+            urls.push(val)
+          }
+        }
+        return fetchURLs(urls)
+      }
+
+      // This takes any mod files found in the modFiles array, and installs a
+      // file in the virtual filesystem for each, adding the appropriate
+      // command line arguments to the Module.arguments array so that they be
+      // loaded on game startup. The result is that it's possible to load
+      // arbitrary mod files from URLs specified using ?file=... when loading
+      // the page - as long as same origin policy allows it.
+      function installModFiles() {
+        var index = 0
+        for (const text of modFiles) {
+          var filename = "/file" + index + ".sop"
+          FS.writeFile(filename, text)
+          Module.arguments.push("-m", filename)
+        }
+      }
+
       function mountFilesystems() {
         // The Sopwith configuration file is stored in /libsdl/SDL Sopwith.
         FS.mkdir("/libsdl")
@@ -93,10 +136,11 @@
       }
 
       var Module = {
+        arguments: [],
         preRun: [function(){
           canvas.style.visibility = "visible";
           loadingElement.style.visibility = "hidden";
-        }, mountFilesystems],
+        }, mountFilesystems, installModFiles],
         onAbort: function(x) {
           programError();
         },
@@ -121,6 +165,16 @@
         event.preventDefault();
         installPrompt = event;
       });
+      var modFiles = []
+    </script>
+
+    <script type="module">
+      // This fetches any mod files referenced in URL parameters using
+      // file=... - this is enclosed in a Javascript module to allow this
+      // to be done synchronously (as await can be done at the top level
+      // of a module). This ensures that when Emscripten starts up, the
+      // files are already loaded.
+      modFiles = await fetchModFiles();
     </script>
 
     <script async type="text/javascript" src="sopwith.js"></script>
