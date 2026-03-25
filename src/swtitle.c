@@ -93,10 +93,26 @@ static int title_ground_len = 600;
 // title screen in a mod file.
 void ClearTitleScreen(void)
 {
+	static bool first_clear = true;
+	struct title_element *el;
+	int i;
+
+	if (!first_clear) {
+		for (i = 0; i < title_elements_len; ++i) {
+			el = &title_elements[i];
+			if (el->type == TITLE_TEXT) {
+				free(el->val.text);
+			}
+		}
+		free(title_elements);
+		free(title_ground);
+	}
+
 	title_elements = NULL;
 	title_elements_len = 0;
 	title_ground = NULL;
 	title_ground_len = 0;
+	first_clear = false;
 }
 
 static struct title_element *AddTitleElement(void)
@@ -123,6 +139,7 @@ void AddTitleText(char *text, int x, int y, int color)
 
 void SetTitleGround(GRNDTYPE *ground, unsigned int len)
 {
+	free(title_ground);
 	title_ground = ground;
 	title_ground_len = len;
 }
