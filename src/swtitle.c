@@ -121,6 +121,12 @@ void AddTitleText(char *text, int x, int y, int color)
 	el->val.text = text;
 }
 
+void SetTitleGround(GRNDTYPE *ground, unsigned int len)
+{
+	title_ground = ground;
+	title_ground_len = len;
+}
+
 static void DrawTitleScreenText(void)
 {
 	struct title_element *el;

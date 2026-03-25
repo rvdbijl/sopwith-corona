@@ -319,15 +319,16 @@ static void AddObject(original_ob_t *ob, struct yocton_object *yo)
 	}
 }
 
-static void SetGround(struct yocton_object *yo)
+static void SetGround(struct yocton_object *yo, GRNDTYPE **ground,
+                      unsigned int *ground_len)
 {
 	struct yocton_prop *p;
 
 	while ((p = yocton_next_prop(yo)) != NULL) {
 		yocton_check(yo, "expected prop name '_'",
 		             !strcmp(yocton_prop_name(p), "_"));
-		YOCTON_VAR_INT_ARRAY(p, "_", GRNDTYPE, cl.gm_ground,
-		                     cl.gm_max_x);
+		YOCTON_VAR_INT_ARRAY(p, "_", GRNDTYPE, *ground,
+		                     *ground_len);
 	}
 }
 
@@ -342,7 +343,8 @@ static void ProcessLevel(struct yocton_object *obj)
 			++cl.gm_num_objects;
 		});
 		YOCTON_IF_PROP(p, "ground", {
-			SetGround(yocton_prop_inner(p));
+			SetGround(yocton_prop_inner(p), &cl.gm_ground,
+			          &cl.gm_max_x);
 		});
 	}
 }
@@ -414,6 +416,15 @@ static void ProcessTitleText(struct yocton_object *obj)
 	}
 }
 
+static void ProcessTitleGround(struct yocton_object *obj)
+{
+	GRNDTYPE *ground = NULL;
+	unsigned int ground_len = 0;
+
+	SetGround(obj, &ground, &ground_len);
+	SetTitleGround(ground, ground_len);
+}
+
 static void ProcessTitle(struct yocton_object *obj)
 {
 	struct yocton_prop *p;
@@ -425,6 +436,9 @@ static void ProcessTitle(struct yocton_object *obj)
 
 		if (!strcmp(name, "text")) {
 			ProcessTitleText(yocton_prop_inner(p));
+		}
+		if (!strcmp(name, "ground")) {
+			ProcessTitleGround(yocton_prop_inner(p));
 		}
 	}
 }
