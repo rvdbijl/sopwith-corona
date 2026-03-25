@@ -14,6 +14,7 @@
 
 #include "sw.h"
 
+extern GRNDTYPE original_ground[];
 extern const GAMES original_level;
 extern GAMES custom_level;
 extern bool have_custom_level;

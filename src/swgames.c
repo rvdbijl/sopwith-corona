@@ -22,7 +22,7 @@
 #include "video.h"
 #include "yocton.h"
 
-static GRNDTYPE original_ground[] = { /* Original ground height by pixel */
+GRNDTYPE original_ground[] = { /* Original ground height by pixel */
 
 /*   0 */  199,199,199,199,199,199,199,199,199,199,199,199,199,199,199,199,
 /*  16 */  199,199,199,199,199,199,199,199,199,199,199,199,199,199,199,199,

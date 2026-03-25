@@ -84,6 +84,8 @@ static struct title_element default_elements[] = {
 };
 
 static int title_screen_start;
+static GRNDTYPE *title_ground = original_ground + 367;
+static int title_ground_len = 600;
 
 static void DrawTitleScreenText(void)
 {
@@ -127,8 +129,7 @@ static void DrawTitleScreenSymbols(void)
 
 void swtitln(void)
 {
-	GRNDTYPE *orground = original_level.gm_ground;
-	int i;
+	int i, xoff;
 
 	sound(S_TITLE, 0, NULL);
 
@@ -144,7 +145,12 @@ void swtitln(void)
 		DrawHighScoreTable();
 	}
 
-	swground(orground + 507 - X_OFFSET, 0, SCR_WDTH);
+	// The logic here ensures that the ground is correctly aligned even
+	// if the screen width is changed.
+	xoff = (SCR_WDTH - title_ground_len) / 2;
+	swground(title_ground - imin(xoff, 0),
+	         imax(xoff, 0),
+	         imin(title_ground_len, SCR_WDTH));
 	DrawTitleScreenSymbols();
 }
 
