@@ -100,15 +100,15 @@ int Vid_GetGameKeys(void)
 	return c;
 }
 
-// Draw SCR_WDTH columns of ground, starting at the given ground pointer.
-void Vid_DispGround(GRNDTYPE *gptr)
+// Draw w columns of ground, starting at the given ground pointer.
+void Vid_DispGround(GRNDTYPE *gptr, int xstart, int w)
 {
 	GRNDTYPE *g = gptr;
 	uint8_t *sptr;
 	int x, y;
 	int hr, hc, hl;
 
-	sptr = vid_vram;
+	sptr = vid_vram + xstart;
 	y = SCR_HGHT - 1;
 
 	hc = *g;
@@ -123,7 +123,7 @@ void Vid_DispGround(GRNDTYPE *gptr)
 	// height. This approach always draws the correct ground height for
 	// that column. It also correctly handles a number of corner cases:
 	// left-facing cliff, right-facing cliff, and pixel-wide bump/pillar.
-	for (x = 0; x < SCR_WDTH; ++x) {
+	for (x = 0; x < w; ++x) {
 		hr = clamp_max(*g, SCR_HGHT - 1);
 		++g;
 		if (y > hl) {
@@ -150,14 +150,14 @@ void Vid_DispGround(GRNDTYPE *gptr)
 }
 
 // sdh 28/10/2001: solid ground function
-void Vid_DispGround_Solid(GRNDTYPE * gptr)
+void Vid_DispGround_Solid(GRNDTYPE *gptr, int xstart, int w)
 {
 	GRNDTYPE *g = gptr;
 	uint8_t *sptr;
 	int x, y;
 	int gc;
 
-	for (x=0, g = gptr; x<SCR_WDTH; ++x) {
+	for (x=xstart, g = gptr; x<xstart + w; ++x) {
 		gc = clamp_max(*g, SCR_HGHT - 1);
 		++g;
 

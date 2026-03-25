@@ -97,8 +97,8 @@ void Vid_Box(int x, int y, int w, int h, int c);
 
 // draw ground
 
-extern void Vid_DispGround(GRNDTYPE *gptr);
-extern void Vid_DispGround_Solid(GRNDTYPE *gptr);
+extern void Vid_DispGround(GRNDTYPE *gptr, int xstart, int w);
+extern void Vid_DispGround_Solid(GRNDTYPE *gptr, int xstart, int w);
 
 // draw a pixel
 

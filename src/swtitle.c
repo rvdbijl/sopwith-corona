@@ -144,7 +144,7 @@ void swtitln(void)
 		DrawHighScoreTable();
 	}
 
-	swground(orground, 507 - X_OFFSET);
+	swground(orground + 507 - X_OFFSET, 0, SCR_WDTH);
 	DrawTitleScreenSymbols();
 }
 
