@@ -21,7 +21,7 @@ EXTRA_DIST = $(AUX_DIST_GEN) $(DOC_FILES) \
              icon.png \
              maps/README.md maps/original.sop maps/empty.sop \
              maps/tank_strike.sop maps/triplane.sop maps/bogey.sop \
-             maps/new_targets.sop maps/doghouse.sop
+             maps/new_targets.sop maps/doghouse.sop maps/title.sop
 
 MAINTAINERCLEANFILES = $(AUX_DIST_GEN)
 

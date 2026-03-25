@@ -19,6 +19,7 @@
 #include "sw.h"
 #include "swgames.h"
 #include "swsound.h"
+#include "swtitle.h"
 #include "video.h"
 #include "yocton.h"
 
@@ -395,6 +396,13 @@ static void ProcessSymbols(struct yocton_object *obj)
 	}
 }
 
+static void ProcessTitle(struct yocton_object *obj)
+{
+	ClearTitleScreen();
+
+	// TODO: Process inner elements of title screen.
+}
+
 void LoadCustomLevel(const char *filename)
 {
 	FILE *fs;
@@ -430,6 +438,9 @@ void LoadCustomLevel(const char *filename)
 		}
 		if (!strcmp(name, "sounds")) {
 			ProcessSounds(yocton_prop_inner(p));
+		}
+		if (!strcmp(name, "title")) {
+			ProcessTitle(yocton_prop_inner(p));
 		}
 	}
 

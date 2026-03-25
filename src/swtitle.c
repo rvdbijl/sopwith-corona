@@ -83,17 +83,29 @@ static struct title_element default_elements[] = {
 	{TITLE_SYMBOL, 2, 270, 160, {.sym=&symbol_plane_hit[0].sym[0]}},
 };
 
+static struct title_element *title_elements = default_elements;
+static int title_elements_len = arrlen(default_elements);
 static int title_screen_start;
 static GRNDTYPE *title_ground = original_ground + 367;
 static int title_ground_len = 600;
+
+// Clear all title screen elements. Starts the process of defining a new
+// title screen in a mod file.
+void ClearTitleScreen(void)
+{
+	title_elements = NULL;
+	title_elements_len = 0;
+	title_ground = NULL;
+	title_ground_len = 0;
+}
 
 static void DrawTitleScreenText(void)
 {
 	struct title_element *el;
 	int i, x;
 
-	for (i = 0; i < arrlen(default_elements); ++i) {
-		el = &default_elements[i];
+	for (i = 0; i < title_elements_len; ++i) {
+		el = &title_elements[i];
 		if (el->type != TITLE_TEXT) {
 			continue;
 		}
@@ -117,8 +129,8 @@ static void DrawTitleScreenSymbols(void)
 	struct title_element *el;
 	int i;
 
-	for (i = 0; i < arrlen(default_elements); ++i) {
-		el = &default_elements[i];
+	for (i = 0; i < title_elements_len; ++i) {
+		el = &title_elements[i];
 		if (el->type != TITLE_SYMBOL) {
 			continue;
 		}

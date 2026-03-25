@@ -20,4 +20,6 @@ extern void getgamemode(void);
 extern void swtitln(void);
 extern void swtitlf(void);
 
+void ClearTitleScreen(void);
+
 #endif
