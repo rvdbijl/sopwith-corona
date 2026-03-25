@@ -99,6 +99,28 @@ void ClearTitleScreen(void)
 	title_ground_len = 0;
 }
 
+static struct title_element *AddTitleElement(void)
+{
+	++title_elements_len;
+	title_elements = realloc(
+		title_elements,
+		title_elements_len * sizeof(struct title_element));
+	if (title_elements == NULL) {
+		abort();
+	}
+	return title_elements + title_elements_len - 1;
+}
+
+void AddTitleText(char *text, int x, int y, int color)
+{
+	struct title_element *el = AddTitleElement();
+	el->type = TITLE_TEXT;
+	el->x = x;
+	el->y = y;
+	el->color = color;
+	el->val.text = text;
+}
+
 static void DrawTitleScreenText(void)
 {
 	struct title_element *el;

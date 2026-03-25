@@ -21,5 +21,6 @@ extern void swtitln(void);
 extern void swtitlf(void);
 
 void ClearTitleScreen(void);
+void AddTitleText(char *text, int x, int y, int color);
 
 #endif

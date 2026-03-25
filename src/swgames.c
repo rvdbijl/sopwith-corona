@@ -396,11 +396,37 @@ static void ProcessSymbols(struct yocton_object *obj)
 	}
 }
 
+static void ProcessTitleText(struct yocton_object *obj)
+{
+	struct yocton_prop *p;
+	int x = 0, y = 0, color = 3;
+	char *text = NULL;
+
+	while ((p = yocton_next_prop(obj)) != NULL) {
+		YOCTON_VAR_STRING(p, "text", text);
+		YOCTON_VAR_INT(p, "x", int, x);
+		YOCTON_VAR_INT(p, "y", int, y);
+		YOCTON_VAR_INT(p, "color", int, color);
+	}
+
+	if (text != NULL) {
+		AddTitleText(text, x, y, color);
+	}
+}
+
 static void ProcessTitle(struct yocton_object *obj)
 {
+	struct yocton_prop *p;
+
 	ClearTitleScreen();
 
-	// TODO: Process inner elements of title screen.
+	while ((p = yocton_next_prop(obj)) != NULL) {
+		const char *name = yocton_prop_name(p);
+
+		if (!strcmp(name, "text")) {
+			ProcessTitleText(yocton_prop_inner(p));
+		}
+	}
 }
 
 void LoadCustomLevel(const char *filename)
