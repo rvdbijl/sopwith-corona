@@ -32,6 +32,8 @@
 
 #define TABLE_X 9
 #define TABLE_Y 1
+#define TABLE_W 23
+#define TABLE_H 13
 
 struct high_score {
 	char name[4];
@@ -289,6 +291,10 @@ void DrawHighScoreTable(void)
 		high_scores[i].score.ribbons_nr = 6;
 	}
 #endif
+
+	// Blank out background of the high scores table first:
+	Vid_Box(TABLE_X * 8 - 8, SCR_HGHT - TABLE_Y * 8 + 4,
+	        TABLE_W * 8 + 8, TABLE_H * 8, 0);
 
 	swcolor(2);
 	swposcur(TABLE_X + 3, TABLE_Y);

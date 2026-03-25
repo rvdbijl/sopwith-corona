@@ -176,6 +176,14 @@ void swtitln(void)
 	// clear the screen
 	Vid_ClearBuf();
 
+	// The logic here ensures that the ground is correctly aligned even
+	// if the screen width is changed.
+	xoff = (SCR_WDTH - title_ground_len) / 2;
+	swground(title_ground - imin(xoff, 0),
+	         imax(xoff, 0),
+	         imin(title_ground_len, SCR_WDTH));
+	DrawTitleScreenSymbols();
+
 	// We show the title screen, but after five seconds it switches to the
 	// high score table instead.
 	i = Timer_GetMS() - title_screen_start;
@@ -184,14 +192,6 @@ void swtitln(void)
 	} else {
 		DrawHighScoreTable();
 	}
-
-	// The logic here ensures that the ground is correctly aligned even
-	// if the screen width is changed.
-	xoff = (SCR_WDTH - title_ground_len) / 2;
-	swground(title_ground - imin(xoff, 0),
-	         imax(xoff, 0),
-	         imin(title_ground_len, SCR_WDTH));
-	DrawTitleScreenSymbols();
 }
 
 void swtitlf(void)
