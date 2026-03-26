@@ -48,7 +48,7 @@
 #define MAGIC_VERSION  "__VERSION__"
 
 struct title_element {
-	enum { TITLE_TEXT, TITLE_SYMBOL } type;
+	enum { TITLE_GROUND, TITLE_TEXT, TITLE_SYMBOL } type;
 	union {
 		struct {
 			int color;
@@ -60,10 +60,15 @@ struct title_element {
 			int x, y;
 			sopsym_t *sym;
 		} sym;
+		struct {
+			GRNDTYPE *ground;
+			unsigned int ground_len;
+		} ground;
 	} v;
 };
 
 static struct title_element default_elements[] = {
+	{TITLE_GROUND, {.ground={original_ground + 367, 600}}},
 	{TITLE_TEXT, {.text={2, 18, 2, "SDL"}}},
 	{TITLE_TEXT, {.text={3, 13, 4, "S O P W I T H"}}},
 	{TITLE_TEXT, {.text={3, 20, 6, MAGIC_VERSION}}},
@@ -92,32 +97,37 @@ static struct title_element default_elements[] = {
 static struct title_element *title_elements = default_elements;
 static int title_elements_len = arrlen(default_elements);
 static int title_screen_start;
-static GRNDTYPE *title_ground = original_ground + 367;
-static int title_ground_len = 600;
+
+static void FreeTitleElement(struct title_element *el)
+{
+	switch (el->type) {
+	case TITLE_TEXT:
+		free(el->v.text.text);
+		break;
+	case TITLE_GROUND:
+		free(el->v.ground.ground);
+		break;
+	default:
+		break;
+	}
+}
 
 // Clear all title screen elements. Starts the process of defining a new
 // title screen in a mod file.
 void ClearTitleScreen(void)
 {
 	static bool first_clear = true;
-	struct title_element *el;
 	int i;
 
 	if (!first_clear) {
 		for (i = 0; i < title_elements_len; ++i) {
-			el = &title_elements[i];
-			if (el->type == TITLE_TEXT) {
-				free(el->v.text.text);
-			}
+			FreeTitleElement(&title_elements[i]);
 		}
 		free(title_elements);
-		free(title_ground);
 	}
 
 	title_elements = NULL;
 	title_elements_len = 0;
-	title_ground = NULL;
-	title_ground_len = 0;
 	first_clear = false;
 }
 
@@ -143,11 +153,12 @@ void AddTitleText(char *text, int x, int y, int color)
 	el->v.text.text = text;
 }
 
-void SetTitleGround(GRNDTYPE *ground, unsigned int len)
+void AddTitleGround(GRNDTYPE *ground, unsigned int len)
 {
-	free(title_ground);
-	title_ground = ground;
-	title_ground_len = len;
+	struct title_element *el = AddTitleElement();
+	el->type = TITLE_GROUND;
+	el->v.ground.ground = ground;
+	el->v.ground.ground_len = len;
 }
 
 static void DrawTitleScreenText(void)
@@ -175,37 +186,42 @@ static void DrawTitleScreenText(void)
 	}
 }
 
-static void DrawTitleScreenSymbols(void)
+static void DrawTitleScreenElements(void)
 {
 	struct title_element *el;
-	int i;
+	int i, xoff;
 
 	for (i = 0; i < title_elements_len; ++i) {
 		el = &title_elements[i];
-		if (el->type != TITLE_SYMBOL) {
-			continue;
+		switch (el->type) {
+		case TITLE_SYMBOL:
+			Vid_DispSymbol(el->v.sym.x + X_OFFSET, el->v.sym.y,
+			               el->v.sym.sym, el->v.sym.color);
+			break;
+		case TITLE_GROUND:
+			// The logic here ensures that the ground is correctly
+			// aligned even if the screen width is changed.
+			xoff = (SCR_WDTH - (int) el->v.ground.ground_len) / 2;
+			swground(el->v.ground.ground - imin(xoff, 0),
+			         imax(xoff, 0),
+			         imin(el->v.ground.ground_len, SCR_WDTH));
+			break;
+		default:
+			break;
 		}
-		Vid_DispSymbol(el->v.sym.x + X_OFFSET, el->v.sym.y,
-		               el->v.sym.sym, el->v.sym.color);
 	}
 }
 
 void swtitln(void)
 {
-	int i, xoff;
+	int i;
 
 	sound(S_TITLE, 0, NULL);
 
 	// clear the screen
 	Vid_ClearBuf();
 
-	// The logic here ensures that the ground is correctly aligned even
-	// if the screen width is changed.
-	xoff = (SCR_WDTH - title_ground_len) / 2;
-	swground(title_ground - imin(xoff, 0),
-	         imax(xoff, 0),
-	         imin(title_ground_len, SCR_WDTH));
-	DrawTitleScreenSymbols();
+	DrawTitleScreenElements();
 
 	// We show the title screen, but after five seconds it switches to the
 	// high score table instead.

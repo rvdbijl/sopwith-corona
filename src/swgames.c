@@ -422,7 +422,7 @@ static void ProcessTitleGround(struct yocton_object *obj)
 	unsigned int ground_len = 0;
 
 	SetGround(obj, &ground, &ground_len);
-	SetTitleGround(ground, ground_len);
+	AddTitleGround(ground, ground_len);
 }
 
 static void ProcessTitle(struct yocton_object *obj)

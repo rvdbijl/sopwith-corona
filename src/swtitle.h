@@ -22,6 +22,6 @@ extern void swtitlf(void);
 
 void ClearTitleScreen(void);
 void AddTitleText(char *text, int x, int y, int color);
-void SetTitleGround(GRNDTYPE *ground, unsigned int len);
+void AddTitleGround(GRNDTYPE *ground, unsigned int len);
 
 #endif
