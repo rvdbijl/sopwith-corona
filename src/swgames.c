@@ -416,6 +416,45 @@ static void ProcessTitleText(struct yocton_object *obj)
 	}
 }
 
+static void ProcessTitleSymbol(struct yocton_object *obj)
+{
+	struct yocton_prop *p;
+	char *symname = NULL;
+	int x = 0, y = 0;
+	int frame = 0, transform = 0;
+	faction_t faction = FACTION_PLAYER1;
+	symset_t *symset;
+
+	while ((p = yocton_next_prop(obj)) != NULL) {
+		YOCTON_VAR_STRING(p, "name", symname);
+		YOCTON_VAR_INT(p, "x", int, x);
+		YOCTON_VAR_INT(p, "y", int, y);
+		YOCTON_VAR_INT(p, "frame", int, frame);
+		YOCTON_VAR_INT(p, "transform", int, transform);
+		YOCTON_VAR_ENUM(p, "faction", faction, faction_names);
+	}
+
+	yocton_check(obj, "symbol block must specify name property",
+	             symname != NULL);
+	yocton_check(obj, "transform must be in range 0-7",
+	             transform >= 0 && transform < 8);
+
+	if (yocton_have_error(obj, NULL, NULL)) {
+		return;
+	}
+
+	symset = LookupSymset(symname, frame);
+	if (symset == NULL) {
+		char buf[64];
+		snprintf(buf, sizeof(buf), "failed to lookup symbol %s frame %d",
+		         symname, frame);
+		yocton_check(obj, buf, 0);
+		return;
+	}
+
+	AddTitleSymbol(&symset->sym[transform], x, y, faction);
+}
+
 static void ProcessTitleGround(struct yocton_object *obj)
 {
 	GRNDTYPE *ground = NULL;
@@ -439,6 +478,9 @@ static void ProcessTitle(struct yocton_object *obj)
 		}
 		if (!strcmp(name, "ground")) {
 			ProcessTitleGround(yocton_prop_inner(p));
+		}
+		if (!strcmp(name, "symbol")) {
+			ProcessTitleSymbol(yocton_prop_inner(p));
 		}
 	}
 }

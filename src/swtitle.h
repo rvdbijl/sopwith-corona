@@ -23,5 +23,6 @@ extern void swtitlf(void);
 void ClearTitleScreen(void);
 void AddTitleText(char *text, int x, int y, int color);
 void AddTitleGround(GRNDTYPE *ground, unsigned int len);
+void AddTitleSymbol(sopsym_t *sym, int x, int y, faction_t faction);
 
 #endif

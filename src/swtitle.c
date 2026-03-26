@@ -56,7 +56,7 @@ struct title_element {
 			char *text;
 		} text;
 		struct {
-			int color;
+			int faction;
 			int x, y;
 			sopsym_t *sym;
 		} sym;
@@ -161,6 +161,16 @@ void AddTitleGround(GRNDTYPE *ground, unsigned int len)
 	el->v.ground.ground_len = len;
 }
 
+void AddTitleSymbol(sopsym_t *sym, int x, int y, faction_t faction)
+{
+	struct title_element *el = AddTitleElement();
+	el->type = TITLE_SYMBOL;
+	el->v.sym.sym = sym;
+	el->v.sym.x = x;
+	el->v.sym.y = y;
+	el->v.sym.faction = faction;
+}
+
 static void DrawTitleScreenText(void)
 {
 	struct title_element *el;
@@ -196,7 +206,7 @@ static void DrawTitleScreenElements(void)
 		switch (el->type) {
 		case TITLE_SYMBOL:
 			Vid_DispSymbol(el->v.sym.x + X_OFFSET, el->v.sym.y,
-			               el->v.sym.sym, el->v.sym.color);
+			               el->v.sym.sym, el->v.sym.faction);
 			break;
 		case TITLE_GROUND:
 			// The logic here ensures that the ground is correctly
