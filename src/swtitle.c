@@ -49,38 +49,44 @@
 
 struct title_element {
 	enum { TITLE_TEXT, TITLE_SYMBOL } type;
-	int color;
-	int x, y;
 	union {
-		char *text;
-		sopsym_t *sym;
-	} val;
+		struct {
+			int color;
+			int x, y;
+			char *text;
+		} text;
+		struct {
+			int color;
+			int x, y;
+			sopsym_t *sym;
+		} sym;
+	} v;
 };
 
 static struct title_element default_elements[] = {
-	{TITLE_TEXT, 2, 18, 2, {.text="SDL"}},
-	{TITLE_TEXT, 3, 13, 4, {.text="S O P W I T H"}},
-	{TITLE_TEXT, 3, 20, 6, {.text=MAGIC_VERSION}},
-	{TITLE_TEXT, 3, 0, 9, {.text="(c) 1984, 1985, 1987"}},
-	{TITLE_TEXT, 1, 21, 9, {.text="BMB"}},
-	{TITLE_TEXT, 3, 25, 9, {.text="Compuscience"}},
-	{TITLE_TEXT, 3, 0, 10, {.text="(c) 1984-2000 David L. Clark"}},
-	{TITLE_TEXT, 3, 0, 11,
-	 {.text="(c) 2001-2024 Simon Howard, Jesse Smith"}},
-	{TITLE_TEXT, 3, 4, 12, {.text="Distributed under the"}},
-	{TITLE_TEXT, 1, 26, 12, {.text="GNU"}},
-	{TITLE_TEXT, 3, 30, 12, {.text="GPL"}},
-	{TITLE_SYMBOL, 1, 40, 180, {.sym=&symbol_plane[0].sym[0]}},
-	{TITLE_SYMBOL, 2, 130, 80, {.sym=&symbol_plane[1].sym[6]}},
-	{TITLE_SYMBOL, 2, 23, 91, {.sym=&symbol_targets[3].sym[0]}},
-	{TITLE_SYMBOL, 1, 213, 91, {.sym=&symbol_ox[0].sym[0]}},
-	{TITLE_SYMBOL, 2, 280, 165, {.sym=&symbol_pixel}},
-	{TITLE_SYMBOL, 2, 280, 170, {.sym=&symbol_pixel}},
-	{TITLE_SYMBOL, 2, 280, 175, {.sym=&symbol_pixel}},
-	{TITLE_SYMBOL, 2, 280, 180, {.sym=&symbol_pixel}},
-	{TITLE_SYMBOL, 2, 280, 185, {.sym=&symbol_pixel}},
-	{TITLE_SYMBOL, 2, 280, 190, {.sym=&symbol_pixel}},
-	{TITLE_SYMBOL, 2, 270, 160, {.sym=&symbol_plane_hit[0].sym[0]}},
+	{TITLE_TEXT, {.text={2, 18, 2, "SDL"}}},
+	{TITLE_TEXT, {.text={3, 13, 4, "S O P W I T H"}}},
+	{TITLE_TEXT, {.text={3, 20, 6, MAGIC_VERSION}}},
+	{TITLE_TEXT, {.text={3, 0, 9, "(c) 1984, 1985, 1987"}}},
+	{TITLE_TEXT, {.text={1, 21, 9, "BMB"}}},
+	{TITLE_TEXT, {.text={3, 25, 9, "Compuscience"}}},
+	{TITLE_TEXT, {.text={3, 0, 10, "(c) 1984-2000 David L. Clark"}}},
+	{TITLE_TEXT,
+	 {.text={3, 0, 11, "(c) 2001-2024 Simon Howard, Jesse Smith"}}},
+	{TITLE_TEXT, {.text={3, 4, 12, "Distributed under the"}}},
+	{TITLE_TEXT, {.text={1, 26, 12, "GNU"}}},
+	{TITLE_TEXT, {.text={3, 30, 12, "GPL"}}},
+	{TITLE_SYMBOL, {.sym={1, 40, 180, &symbol_plane[0].sym[0]}}},
+	{TITLE_SYMBOL, {.sym={2, 130, 80, &symbol_plane[1].sym[6]}}},
+	{TITLE_SYMBOL, {.sym={2, 23, 91, &symbol_targets[3].sym[0]}}},
+	{TITLE_SYMBOL, {.sym={1, 213, 91, &symbol_ox[0].sym[0]}}},
+	{TITLE_SYMBOL, {.sym={2, 280, 165, &symbol_pixel}}},
+	{TITLE_SYMBOL, {.sym={2, 280, 170, &symbol_pixel}}},
+	{TITLE_SYMBOL, {.sym={2, 280, 175, &symbol_pixel}}},
+	{TITLE_SYMBOL, {.sym={2, 280, 180, &symbol_pixel}}},
+	{TITLE_SYMBOL, {.sym={2, 280, 185, &symbol_pixel}}},
+	{TITLE_SYMBOL, {.sym={2, 280, 190, &symbol_pixel}}},
+	{TITLE_SYMBOL, {.sym={2, 270, 160, &symbol_plane_hit[0].sym[0]}}},
 };
 
 static struct title_element *title_elements = default_elements;
@@ -101,7 +107,7 @@ void ClearTitleScreen(void)
 		for (i = 0; i < title_elements_len; ++i) {
 			el = &title_elements[i];
 			if (el->type == TITLE_TEXT) {
-				free(el->val.text);
+				free(el->v.text.text);
 			}
 		}
 		free(title_elements);
@@ -131,10 +137,10 @@ void AddTitleText(char *text, int x, int y, int color)
 {
 	struct title_element *el = AddTitleElement();
 	el->type = TITLE_TEXT;
-	el->x = x;
-	el->y = y;
-	el->color = color;
-	el->val.text = text;
+	el->v.text.x = x;
+	el->v.text.y = y;
+	el->v.text.color = color;
+	el->v.text.text = text;
 }
 
 void SetTitleGround(GRNDTYPE *ground, unsigned int len)
@@ -154,17 +160,17 @@ static void DrawTitleScreenText(void)
 		if (el->type != TITLE_TEXT) {
 			continue;
 		}
-		swcolor(el->color);
+		swcolor(el->v.text.color);
 
-		x = el->x + X_OFFSET/8;
-		if (!strcmp(el->val.text, MAGIC_VERSION)) {
+		x = el->v.text.x + X_OFFSET/8;
+		if (!strcmp(el->v.text.text, MAGIC_VERSION)) {
 			const char *s = "Version " PACKAGE_VERSION;
 			x -= (strlen(s) + 1) / 2;
-			swposcur(x, el->y);
+			swposcur(x, el->v.text.y);
 			swputs(s);
 		} else {
-			swposcur(x, el->y);
-			swputs(el->val.text);
+			swposcur(x, el->v.text.y);
+			swputs(el->v.text.text);
 		}
 	}
 }
@@ -179,8 +185,8 @@ static void DrawTitleScreenSymbols(void)
 		if (el->type != TITLE_SYMBOL) {
 			continue;
 		}
-		Vid_DispSymbol(el->x + X_OFFSET, el->y, el->val.sym,
-		               el->color);
+		Vid_DispSymbol(el->v.sym.x + X_OFFSET, el->v.sym.y,
+		               el->v.sym.sym, el->v.sym.color);
 	}
 }
 
