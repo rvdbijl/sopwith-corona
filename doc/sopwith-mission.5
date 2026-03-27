@@ -438,6 +438,9 @@ for symbols. The screen is 40x25 character cells.
 The color to draw the text: one of 0 (black); 1 (cyan); 2 (magenta) or 3
 (white). If not specified, the default is white. Note that the game's palette
 selection setting may change these colors.
+.PP
+If the text string is the special magic value of "__VERSION__", it is
+substituted for the program version and is drawn centered.
 .
 .SH TITLE SYMBOL
 Within a \fBtitle\fR section, a \fBsymbol\fR block draws a symbol (sprite) on
