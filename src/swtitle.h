@@ -24,5 +24,6 @@ void ClearTitleScreen(void);
 void AddTitleText(char *text, int x, int y, int color);
 void AddTitleGround(GRNDTYPE *ground, unsigned int len);
 void AddTitleSymbol(sopsym_t *sym, int x, int y, faction_t faction);
+void AddTitleLine(int x1, int y1, int x2, int y2, int color);
 
 #endif

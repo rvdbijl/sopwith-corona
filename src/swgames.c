@@ -464,6 +464,28 @@ static void ProcessTitleGround(struct yocton_object *obj)
 	AddTitleGround(ground, ground_len);
 }
 
+static void ProcessTitleLine(struct yocton_object *obj)
+{
+	struct yocton_prop *p;
+	int x1 = -1, y1 = -1, x2 = -1, y2 = -1;
+	int color = 3;
+
+	while ((p = yocton_next_prop(obj)) != NULL) {
+		YOCTON_VAR_INT(p, "x1", int, x1);
+		YOCTON_VAR_INT(p, "y1", int, y1);
+		YOCTON_VAR_INT(p, "x2", int, x2);
+		YOCTON_VAR_INT(p, "y2", int, y2);
+		YOCTON_VAR_INT(p, "color", int, color);
+	}
+
+	yocton_check(obj, "must specify x1, y1, x2 and y2 properties",
+	             x1 != -1 && x2 != -1 && y1 != -1 && y2 != -1);
+
+	if (!yocton_have_error(obj, NULL, NULL)) {
+		AddTitleLine(x1, y1, x2, y2, color);
+	}
+}
+
 static void ProcessTitle(struct yocton_object *obj)
 {
 	struct yocton_prop *p;
@@ -481,6 +503,9 @@ static void ProcessTitle(struct yocton_object *obj)
 		}
 		if (!strcmp(name, "symbol")) {
 			ProcessTitleSymbol(yocton_prop_inner(p));
+		}
+		if (!strcmp(name, "line")) {
+			ProcessTitleLine(yocton_prop_inner(p));
 		}
 	}
 }

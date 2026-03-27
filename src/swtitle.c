@@ -48,7 +48,7 @@
 #define MAGIC_VERSION  "__VERSION__"
 
 struct title_element {
-	enum { TITLE_GROUND, TITLE_TEXT, TITLE_SYMBOL } type;
+	enum { TITLE_GROUND, TITLE_TEXT, TITLE_SYMBOL, TITLE_LINE } type;
 	union {
 		struct {
 			int color;
@@ -64,6 +64,11 @@ struct title_element {
 			GRNDTYPE *ground;
 			unsigned int ground_len;
 		} ground;
+		struct {
+			int color;
+			int x1, y1;
+			int x2, y2;
+		} line;
 	} v;
 };
 
@@ -85,12 +90,12 @@ static struct title_element default_elements[] = {
 	{TITLE_SYMBOL, {.sym={2, 130, 119, &symbol_plane[1].sym[6]}}},
 	{TITLE_SYMBOL, {.sym={2, 23, 108, &symbol_targets[3].sym[0]}}},
 	{TITLE_SYMBOL, {.sym={1, 212, 108, &symbol_ox[0].sym[0]}}},
-	{TITLE_SYMBOL, {.sym={2, 280, 34, &symbol_pixel}}},
-	{TITLE_SYMBOL, {.sym={2, 280, 29, &symbol_pixel}}},
-	{TITLE_SYMBOL, {.sym={2, 280, 24, &symbol_pixel}}},
-	{TITLE_SYMBOL, {.sym={2, 280, 19, &symbol_pixel}}},
-	{TITLE_SYMBOL, {.sym={2, 280, 14, &symbol_pixel}}},
-	{TITLE_SYMBOL, {.sym={2, 280, 9, &symbol_pixel}}},
+	{TITLE_LINE, {.line={2, 280, 34, 280, 34}}},
+	{TITLE_LINE, {.line={2, 280, 29, 280, 29}}},
+	{TITLE_LINE, {.line={2, 280, 24, 280, 24}}},
+	{TITLE_LINE, {.line={2, 280, 19, 280, 19}}},
+	{TITLE_LINE, {.line={2, 280, 14, 280, 14}}},
+	{TITLE_LINE, {.line={2, 280, 9, 280, 9}}},
 	{TITLE_SYMBOL, {.sym={2, 270, 39, &symbol_plane_hit[0].sym[0]}}},
 };
 
@@ -171,6 +176,17 @@ void AddTitleSymbol(sopsym_t *sym, int x, int y, faction_t faction)
 	el->v.sym.faction = faction;
 }
 
+void AddTitleLine(int x1, int y1, int x2, int y2, int color)
+{
+	struct title_element *el = AddTitleElement();
+	el->type = TITLE_LINE;
+	el->v.line.x1 = x1;
+	el->v.line.y1 = y1;
+	el->v.line.x2 = x2;
+	el->v.line.y2 = y2;
+	el->v.line.color = color;
+}
+
 static void DrawTitleScreenText(void)
 {
 	struct title_element *el;
@@ -196,6 +212,21 @@ static void DrawTitleScreenText(void)
 	}
 }
 
+static void DrawLine(struct title_element *el)
+{
+	int x1 = el->v.line.x1, x2 = el->v.line.x2;
+	int y1 = el->v.line.y1, y2 = el->v.line.y2;
+	int cnt = imax(abs(x1 - x2), abs(y1 - y2)) + 1;
+	int i;
+
+	for (i = 0; i < cnt; ++i) {
+		int j = cnt - i;
+		int x = (x1 * i + x2 * j) / cnt;
+		int y = (y1 * i + y2 * j) / cnt;
+		Vid_PlotPixel(x, SCR_HGHT - 1 - y, el->v.line.color);
+	}
+}
+
 static void DrawTitleScreenElements(void)
 {
 	struct title_element *el;
@@ -208,6 +239,9 @@ static void DrawTitleScreenElements(void)
 			Vid_DispSymbol(el->v.sym.x + X_OFFSET,
 			               SCR_HGHT - 1 - el->v.sym.y,
 			               el->v.sym.sym, el->v.sym.faction);
+			break;
+		case TITLE_LINE:
+			DrawLine(el);
 			break;
 		case TITLE_GROUND:
 			// The logic here ensures that the ground is correctly

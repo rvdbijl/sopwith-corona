@@ -404,6 +404,9 @@ Display a symbol (sprite) on the screen. See \fBTITLE SYMBOL\fR below.
 .TP
 \fBground\fR
 Draw ground terrain on the screen. See \fBTITLE GROUND\fR below.
+.TP
+\fBline\fR
+Draw a line on the screen. See \fBTITLE LINE\fR below.
 .
 .SH TITLE TEXT
 Within a \fBtitle\fR section, a \fBtext\fR block draws text on the screen at a
@@ -514,6 +517,32 @@ in center of the screen.
 A title screen can define multiple ground patterns, and they will be drawn
 independently. However, if the game's "solid ground" option is turned on, they
 will end up overlapping, so it's probably not a good idea.
+.
+.SH TITLE LINE
+Within a \fBtitle\fR section, a \fBline\fR block draws a line between two
+screen locations. The following is an example that draws a square in the middle
+of the screen:
+.PP
+.EX
+  title {
+    line { x1: 170 y1: 90  x2: 170 y2: 70  color: 1 }
+    line { x1: 150 y1: 70  x2: 150 y2: 90  color: 2 }
+    line { x1: 150 y1: 90  x2: 170 y2: 90 }
+    line { x1: 170 y1: 70  x2: 150 y2: 70 }
+  }
+.EE
+.PP
+The following properties are recognized:
+.TP
+\fBx1\fR and \fBy1\fR
+Pixel coordinates for starting location. It is an error not to specify these.
+.TP
+\fBx2\fR and \fBy2\fR
+Pixel coordinates for end location. It is an error not to specify these.
+.TP
+\fBcolor\fR
+Color for the line; one of 0 (black); 1 (cyan); 2 (magenta) or 3 (white). If
+not specified, the default is white.
 .
 .SH SEE ALSO
 \fBsopwith\fR(6),
