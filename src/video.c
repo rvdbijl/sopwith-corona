@@ -123,7 +123,7 @@ void Vid_DispGround(GRNDTYPE *gptr, int xstart, int w)
 	// height. This approach always draws the correct ground height for
 	// that column. It also correctly handles a number of corner cases:
 	// left-facing cliff, right-facing cliff, and pixel-wide bump/pillar.
-	for (x = 0; x < w; ++x) {
+	for (x = 0; x < w - 1; ++x) {
 		hr = clamp_max(*g, SCR_HGHT - 1);
 		++g;
 		if (y > hl) {
@@ -147,6 +147,12 @@ void Vid_DispGround(GRNDTYPE *gptr, int xstart, int w)
 		hc = hr;
 		++sptr;
 	}
+
+	// The above loop always looks one entry ahead, but we never want to
+	// read beyond the end of the ground array. So the above loop doesn't
+	// draw the furthest-right pixel; we do that here.
+	sptr += (y - hc) * (int) vid_pitch;
+	*sptr ^= 0x3;
 }
 
 // sdh 28/10/2001: solid ground function
