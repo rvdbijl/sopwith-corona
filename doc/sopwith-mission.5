@@ -25,6 +25,10 @@ graphical modifications to the game. See \fBSYMBOLS SECTION\fR below.
 \fBsounds\fR
 This section allows the game's music to be replaced. See \fBSOUNDS SECTION\fR
 below.
+.TP
+\fBtitle\fR
+This section allows the game's title screen to be replaced. See \fBTITLE
+SECTION\fR below.
 .SH LEVEL SECTION
 The \fBlevel\fR section allows a complete new level to be defined. At present
 only a single level can be defined, although this may change in the future.
@@ -386,6 +390,131 @@ scale, but this is believed to have been a mistake and notes are now assumed
 to be in the more common C major scale. This does, however, mean that tunes
 from DOS .exe hacks will play differently; any A or B notes will need to be
 shifted down one octave to convert to the C major scale.
+.SH TITLE SECTION
+The \fBtitle\fR section allows the game's title screen to be replaced.
+Defining an empty \fBtitle\fR block produces an empty title screen; you then
+include sub-blocks to build up the new title screen. The following sub-block
+types are supported:
+.TP
+\fBtext\fR
+Draw a text string on the screen. See \fBTITLE TEXT\fR below.
+.TP
+\fBsymbol\fR
+Display a symbol (sprite) on the screen. See \fBTITLE SYMBOL\fR below.
+.TP
+\fBground\fR
+Draw ground terrain on the screen. See \fBTITLE GROUND\fR below.
+.
+.SH TITLE TEXT
+Within a \fBtitle\fR section, a \fBtext\fR block draws text on the screen at a
+defined location. The following is a simple example title screen that just
+prints "Hello, world!" in the middle of the screen:
+.PP
+.EX
+  title {
+    text {
+      text: "Hello, world!"
+      x: 13
+      y: 9
+    }
+  }
+.EE
+.PP
+The following properties are recognized:
+.TP
+\fBtext\fR
+The text string to show.
+.TP
+\fBx\fR and \fBy\fR
+Coordinates for where to draw the text. If not specified, (0, 0) is used, which
+is the top-left of the screen. Note that these are in character cell positions;
+each character is 8x8 pixels. This is different to the pixel coordinates used
+for symbols. The screen is 40x25 character cells.
+.TP
+\fBcolor\fR
+The color to draw the text: one of 0 (black); 1 (cyan); 2 (magenta) or 3
+(white). If not specified, the default is white. Note that the game's palette
+selection setting may change these colors.
+.
+.SH TITLE SYMBOL
+Within a \fBtitle\fR section, a \fBsymbol\fR block draws a symbol (sprite) on
+the screen at a defined location. The following is an example of a title screen
+that just draws a plane in the middle of the screen.
+.PP
+.EX
+  title {
+    symbol {
+      name: swplnsym
+      frame: 0
+      x: 152
+      y: 75
+      transform: 0
+      faction: PLAYER1
+    }
+  }
+.EE
+.PP
+The following properties are recognized:
+.TP
+\fBname\fR
+Name of the symbol to draw. Valid values are the same names described in the
+\fBSYMBOLS SECTION\fR section above. It is an error not to specify a name.
+.TP
+\fBframe\fR
+Frame number to draw. Frame numbers are the same as those described in the
+\fBSYMBOLS SECTION\fR section above. If not specified, frame 0 is drawn.
+.TP
+\fBx\fR and \fBy\fR
+Pixel coordinates for where to draw the symbol. If not specified, (0, 0) is
+used, which is the top-left of the screen. The screen is 320x200 pixels.
+.TP
+\fBtransform\fR
+Applies rotation or mirroring transforms to the sprite. If not specified, no
+transforms are applied. Valid values are the same as described in the
+\fBLEVEL SECTION\fR section above.
+.TP
+\fBfaction\fR
+Applies a palette swap to the colors of the sprite. If not specified, the
+normal colors are used. Valid values are the same as described in the
+\fBFACTIONS\fR section above.
+.
+.SH TITLE GROUND
+Within a \fBtitle\fR section, a \fBground\fR block draws a ground pattern of
+the kind seen in the game. The syntax is the same as described in \fBLEVEL
+SECTION\fR above. The following is an example of a title screen that shows a
+square wave pattern:
+.PP
+.EX
+  title {
+    ground {
+      _:  80 _:  80 _:  80 _:  80 _:  80 _:  80 _:  80 _:  80 _:  80
+      _:  70 _:  70 _:  70 _:  70 _:  70 _:  70 _:  70 _:  70 _:  70
+      _:  80 _:  80 _:  80 _:  80 _:  80 _:  80 _:  80 _:  80 _:  80
+      _:  70 _:  70 _:  70 _:  70 _:  70 _:  70 _:  70 _:  70 _:  70
+      _:  80 _:  80 _:  80 _:  80 _:  80 _:  80 _:  80 _:  80 _:  80
+      _:  70 _:  70 _:  70 _:  70 _:  70 _:  70 _:  70 _:  70 _:  70
+      _:  80 _:  80 _:  80 _:  80 _:  80 _:  80 _:  80 _:  80 _:  80
+      _:  70 _:  70 _:  70 _:  70 _:  70 _:  70 _:  70 _:  70 _:  70
+    }
+  }
+.EE
+.PP
+Some things to be aware of:
+.IP \(bu
+Ground sequences can be of any length, but should probably contain at least
+320 entries, which is the width of the game screen. Ideally you should include
+more, in case the game is ported to run on a device with a wider screen.
+.IP \(bu
+If the sequence length is greater than the screen width, the "middle" entries
+of the sequence are what will be drawn.
+.IP \(bu
+If the sequence length is less than the screen width, the pattern will be drawn
+in center of the screen.
+.IP \(bu
+A title screen can define multiple ground patterns, and they will be drawn
+independently. However, if the game's "solid ground" option is turned on, they
+will end up overlapping, so it's probably not a good idea.
+.
 .SH SEE ALSO
 \fBsopwith\fR(6),
 .
