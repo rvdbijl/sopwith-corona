@@ -81,17 +81,17 @@ static struct title_element default_elements[] = {
 	{TITLE_TEXT, {.text={3, 4, 12, "Distributed under the"}}},
 	{TITLE_TEXT, {.text={1, 26, 12, "GNU"}}},
 	{TITLE_TEXT, {.text={3, 30, 12, "GPL"}}},
-	{TITLE_SYMBOL, {.sym={1, 40, 180, &symbol_plane[0].sym[0]}}},
-	{TITLE_SYMBOL, {.sym={2, 130, 80, &symbol_plane[1].sym[6]}}},
-	{TITLE_SYMBOL, {.sym={2, 23, 91, &symbol_targets[3].sym[0]}}},
-	{TITLE_SYMBOL, {.sym={1, 213, 91, &symbol_ox[0].sym[0]}}},
-	{TITLE_SYMBOL, {.sym={2, 280, 165, &symbol_pixel}}},
-	{TITLE_SYMBOL, {.sym={2, 280, 170, &symbol_pixel}}},
-	{TITLE_SYMBOL, {.sym={2, 280, 175, &symbol_pixel}}},
-	{TITLE_SYMBOL, {.sym={2, 280, 180, &symbol_pixel}}},
-	{TITLE_SYMBOL, {.sym={2, 280, 185, &symbol_pixel}}},
-	{TITLE_SYMBOL, {.sym={2, 280, 190, &symbol_pixel}}},
-	{TITLE_SYMBOL, {.sym={2, 270, 160, &symbol_plane_hit[0].sym[0]}}},
+	{TITLE_SYMBOL, {.sym={1, 40, 19, &symbol_plane[0].sym[0]}}},
+	{TITLE_SYMBOL, {.sym={2, 130, 119, &symbol_plane[1].sym[6]}}},
+	{TITLE_SYMBOL, {.sym={2, 23, 108, &symbol_targets[3].sym[0]}}},
+	{TITLE_SYMBOL, {.sym={1, 212, 108, &symbol_ox[0].sym[0]}}},
+	{TITLE_SYMBOL, {.sym={2, 280, 34, &symbol_pixel}}},
+	{TITLE_SYMBOL, {.sym={2, 280, 29, &symbol_pixel}}},
+	{TITLE_SYMBOL, {.sym={2, 280, 24, &symbol_pixel}}},
+	{TITLE_SYMBOL, {.sym={2, 280, 19, &symbol_pixel}}},
+	{TITLE_SYMBOL, {.sym={2, 280, 14, &symbol_pixel}}},
+	{TITLE_SYMBOL, {.sym={2, 280, 9, &symbol_pixel}}},
+	{TITLE_SYMBOL, {.sym={2, 270, 39, &symbol_plane_hit[0].sym[0]}}},
 };
 
 static struct title_element *title_elements = default_elements;
@@ -205,7 +205,8 @@ static void DrawTitleScreenElements(void)
 		el = &title_elements[i];
 		switch (el->type) {
 		case TITLE_SYMBOL:
-			Vid_DispSymbol(el->v.sym.x + X_OFFSET, el->v.sym.y,
+			Vid_DispSymbol(el->v.sym.x + X_OFFSET,
+			               SCR_HGHT - 1 - el->v.sym.y,
 			               el->v.sym.sym, el->v.sym.faction);
 			break;
 		case TITLE_GROUND:
