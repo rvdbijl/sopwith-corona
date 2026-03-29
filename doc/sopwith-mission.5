@@ -5,7 +5,8 @@
 .
 .SH DESCRIPTION
 The Sopwith mission format allows \fBsopwith\fR(6) to load custom user-defined
-levels and other modifications to the game. The files use
+levels and other modifications to the game. The files should be UTF-8 encoded
+and use
 .UR https://github.com/fragglet/yocton
 Yocton
 .UE
@@ -426,7 +427,8 @@ prints "Hello, world!" in the middle of the screen:
 The following properties are recognized:
 .TP
 \fBtext\fR
-The text string to show.
+The text string to show. Can contain Unicode characters, but only those in code
+page 437 will be rendered.
 .TP
 \fBx\fR and \fBy\fR
 Coordinates for where to draw the text. If not specified, (0, 0) is used, which
