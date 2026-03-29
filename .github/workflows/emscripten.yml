@@ -74,7 +74,7 @@ jobs:
       with:
         folder: "pkg/emscripten/page"
         repository-name: "fragglet/sdl-sopwith-builds"
-        ssh-key: "{{ secrets.SDL_SOPWITH_BUILDS_KEY }}"
+        ssh-key: "${{ secrets.SDL_SOPWITH_BUILDS_KEY }}"
         target-folder: "${{steps.deploy_folder.outputs.DEPLOY_FOLDER}}"
         clean: true
         commit-message: "Build from fragglet/sdl-sopwith@${{github.sha}} (Version ${{steps.version.outputs.VERSION}})"
