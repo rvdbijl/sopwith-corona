@@ -12,6 +12,8 @@
 //        swmain   -      SW mainline
 //
 
+#include <string.h>
+
 #include "timer.h"
 #include "video.h"
 
@@ -237,6 +239,37 @@ restart:
 	}
 
 	return 0;
+}
+
+void *checked_realloc(void *p, size_t len)
+{
+	void *result = realloc(p, len);
+	if (result == NULL && len > 0) {
+		fprintf(stderr, "Failed allocation of %ld bytes\n",
+		        (long) len);
+		abort();
+	}
+	return result;
+}
+
+void *checked_calloc(size_t n, size_t size)
+{
+	void *result;
+	size *= n;
+	result = checked_realloc(NULL, size);
+	memset(result, 0, size);
+	return result;
+}
+
+char *checked_strdup(const char *s)
+{
+	char *result = strdup(s);
+	if (result == NULL) {
+		fprintf(stderr, "Failed strdup (%ld bytes)\n",
+		        (long) strlen(s) + 1);
+		abort();
+	}
+	return result;
 }
 
 //

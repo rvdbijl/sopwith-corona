@@ -120,8 +120,7 @@ OBJECTS *allocobj(void)
 		ob = objfree;
 		objfree = ob->ob_next;
 	} else {
-		ob = calloc(1, sizeof(OBJECTS));
-		assert(ob != NULL);
+		ob = checked_calloc(1, sizeof(OBJECTS));
 	}
 
 	ob->ob_next = NULL;

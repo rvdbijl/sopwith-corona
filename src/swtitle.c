@@ -140,12 +140,9 @@ void ClearTitleScreen(void)
 static struct title_element *AddTitleElement(void)
 {
 	++title_elements_len;
-	title_elements = realloc(
+	title_elements = checked_realloc(
 		title_elements,
 		title_elements_len * sizeof(struct title_element));
-	if (title_elements == NULL) {
-		abort();
-	}
 	return title_elements + title_elements_len - 1;
 }
 

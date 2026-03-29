@@ -193,8 +193,7 @@ static const char *HighScoreFilePath(void)
 	}
 
 	len = strlen(pref_path) + strlen(HISCORE_FILENAME) + 1;
-	hiscore_file = calloc(1, len);
-	assert(hiscore_file != NULL);
+	hiscore_file = checked_calloc(1, len);
 	snprintf(hiscore_file, len, "%s%s", pref_path, HISCORE_FILENAME);
 	return hiscore_file;
 }

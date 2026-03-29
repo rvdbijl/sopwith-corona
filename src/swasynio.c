@@ -125,7 +125,7 @@ static void Synchronize(void)
 	char *buf, *p;
 
 	// send the header ourselves first
-	buf = malloc(sizeof(PROTOHEADER_FMT) + 5);
+	buf = checked_malloc(sizeof(PROTOHEADER_FMT) + 5);
 	snprintf(buf, sizeof(PROTOHEADER_FMT) + 5, PROTOHEADER_FMT, player);
 
 	for (p = buf; *p; ++p) {

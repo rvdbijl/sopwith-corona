@@ -1135,7 +1135,7 @@ static void SopsymFromText(sopsym_t *sym, const char *text, int rotations,
 		sym->w = h;
 		sym->h = w;
 	}
-	sym->data = malloc(w * h);
+	sym->data = checked_malloc(w * h);
 
 	x = 0; y = 0;
 	for (p = text; *p != '\0'; p++) {

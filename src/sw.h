@@ -361,6 +361,12 @@ static inline int SIN(int x) {
 // Evalutes to length of static arrays.
 #define arrlen(x) (sizeof(x) / sizeof(*x))
 
+void *checked_realloc(void *p, size_t len);
+void *checked_calloc(size_t n, size_t size);
+char *checked_strdup(const char *s);
+
+#define checked_malloc(len) checked_realloc(NULL, len)
+
 #endif
 
 //

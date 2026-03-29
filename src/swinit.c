@@ -87,7 +87,7 @@ static void initobjs(void)
 void initgrnd(void)
 {
 	free(ground);
-	ground = calloc(currgame->gm_max_x, sizeof(GRNDTYPE));
+	ground = checked_calloc(currgame->gm_max_x, sizeof(GRNDTYPE));
 	memcpy(ground, currgame->gm_ground,
 	       sizeof(GRNDTYPE) * currgame->gm_max_x);
 }

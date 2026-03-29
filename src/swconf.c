@@ -50,11 +50,7 @@ static const char *GetConfigFilename(void)
 	}
 
 	buflen = strlen(pref_path) + strlen(CONFIG_FILE_NAME) + 1;
-	result = malloc(buflen);
-	if (result == NULL) {
-		return NULL;
-	}
-
+	result = checked_malloc(buflen);
 	snprintf(result, buflen, "%s%s", pref_path, CONFIG_FILE_NAME);
 	return result;
 }

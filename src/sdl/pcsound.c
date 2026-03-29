@@ -92,10 +92,8 @@ static void MakeLowPassFilter(struct filter *f, float sample_rate,
 	// Kernel length must be an odd number.
 	assert((f->kernel_len % 2) == 1);
 
-	f->kernel = calloc(f->kernel_len, sizeof(float));
-	assert(f->kernel != NULL);
-	f->samples = calloc(f->kernel_len, sizeof(float));
-	assert(f->samples != NULL);
+	f->kernel = checked_calloc(f->kernel_len, sizeof(float));
+	f->samples = checked_calloc(f->kernel_len, sizeof(float));
 	f->samples_next = 0;
 
 	// For a good intro to how this works, read "The Scientist
