@@ -22,5 +22,6 @@ extern void swposcur(int a, int b);
 extern void GetCursorPosition(int *x, int *y);
 extern int swgetc(void);
 extern void swflush(void);
+size_t UTF8_Strlen(const char *p);
 
 #endif

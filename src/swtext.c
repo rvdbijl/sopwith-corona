@@ -80,6 +80,19 @@ static bool UTF8_NextChar(const char **p)
 	return **p != '\0';
 }
 
+// Equivalent of strlen() but returns count of Unicode characters:
+size_t UTF8_Strlen(const char *p)
+{
+	size_t result = 0;
+
+	while (*p != '\0') {
+		++result;
+		UTF8_NextChar(&p);
+	}
+
+	return result;
+}
+
 // Decode the UTF-8 char at the given location; returns 0 for failure:
 static unsigned int UTF8_DecodeChar(const char *p)
 {

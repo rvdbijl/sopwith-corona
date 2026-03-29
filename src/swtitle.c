@@ -210,10 +210,10 @@ static void DrawTitleScreenText(void)
 
 		switch (el->v.text.align) {
 		case TEXT_ALIGN_CENTER:
-			x -= (strlen(text) + 1) / 2;
+			x -= (UTF8_Strlen(text) + 1) / 2;
 			break;
 		case TEXT_ALIGN_RIGHT:
-			x -= strlen(text);
+			x -= UTF8_Strlen(text);
 			break;
 		default:
 			break;
