@@ -54,6 +54,7 @@ struct title_element {
 			int color;
 			int x, y;
 			char *text;
+			enum text_align align;
 		} text;
 		struct {
 			int faction;
@@ -74,9 +75,9 @@ struct title_element {
 
 static struct title_element default_elements[] = {
 	{TITLE_GROUND, {.ground={original_ground + 367, 600}}},
-	{TITLE_TEXT, {.text={2, 18, 2, "SDL"}}},
-	{TITLE_TEXT, {.text={3, 13, 4, "S O P W I T H"}}},
-	{TITLE_TEXT, {.text={3, 20, 6, MAGIC_VERSION}}},
+	{TITLE_TEXT, {.text={2, 20, 2, "SDL", TEXT_ALIGN_CENTER}}},
+	{TITLE_TEXT, {.text={3, 20, 4, "S O P W I T H", TEXT_ALIGN_CENTER}}},
+	{TITLE_TEXT, {.text={3, 20, 6, MAGIC_VERSION, TEXT_ALIGN_CENTER}}},
 	{TITLE_TEXT, {.text={3, 0, 9, "(c) 1984, 1985, 1987"}}},
 	{TITLE_TEXT, {.text={1, 21, 9, "BMB"}}},
 	{TITLE_TEXT, {.text={3, 25, 9, "Compuscience"}}},
@@ -148,7 +149,7 @@ static struct title_element *AddTitleElement(void)
 	return title_elements + title_elements_len - 1;
 }
 
-void AddTitleText(char *text, int x, int y, int color)
+void AddTitleText(char *text, int x, int y, int color, enum text_align align)
 {
 	struct title_element *el = AddTitleElement();
 	el->type = TITLE_TEXT;
@@ -156,6 +157,7 @@ void AddTitleText(char *text, int x, int y, int color)
 	el->v.text.y = y;
 	el->v.text.color = color;
 	el->v.text.text = text;
+	el->v.text.align = align;
 }
 
 void AddTitleGround(GRNDTYPE *ground, unsigned int len)
@@ -190,6 +192,7 @@ void AddTitleLine(int x1, int y1, int x2, int y2, int color)
 static void DrawTitleScreenText(void)
 {
 	struct title_element *el;
+	const char *text;
 	int i, x;
 
 	for (i = 0; i < title_elements_len; ++i) {
@@ -200,15 +203,23 @@ static void DrawTitleScreenText(void)
 		swcolor(el->v.text.color);
 
 		x = el->v.text.x + X_OFFSET/8;
-		if (!strcmp(el->v.text.text, MAGIC_VERSION)) {
-			const char *s = "Version " PACKAGE_VERSION;
-			x -= (strlen(s) + 1) / 2;
-			swposcur(x, el->v.text.y);
-			swputs(s);
-		} else {
-			swposcur(x, el->v.text.y);
-			swputs(el->v.text.text);
+		text = el->v.text.text;
+		if (!strcmp(text, MAGIC_VERSION)) {
+			text = "Version " PACKAGE_VERSION;
 		}
+
+		switch (el->v.text.align) {
+		case TEXT_ALIGN_CENTER:
+			x -= (strlen(text) + 1) / 2;
+			break;
+		case TEXT_ALIGN_RIGHT:
+			x -= strlen(text);
+			break;
+		default:
+			break;
+		}
+		swposcur(x, el->v.text.y);
+		swputs(text);
 	}
 }
 

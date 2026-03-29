@@ -398,21 +398,27 @@ static void ProcessSymbols(struct yocton_object *obj)
 	}
 }
 
+static const char *text_align_names[] = {
+       "LEFT", "CENTER", "RIGHT", NULL,
+};
+
 static void ProcessTitleText(struct yocton_object *obj)
 {
 	struct yocton_prop *p;
 	int x = 0, y = 0, color = 3;
 	char *text = NULL;
+	enum text_align align = TEXT_ALIGN_LEFT;
 
 	while ((p = yocton_next_prop(obj)) != NULL) {
 		YOCTON_VAR_STRING(p, "text", text);
 		YOCTON_VAR_INT(p, "x", int, x);
 		YOCTON_VAR_INT(p, "y", int, y);
 		YOCTON_VAR_INT(p, "color", int, color);
+		YOCTON_VAR_ENUM(p, "align", align, text_align_names);
 	}
 
 	if (text != NULL) {
-		AddTitleText(text, x, y, color);
+		AddTitleText(text, x, y, color, align);
 	}
 }
 

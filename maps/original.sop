@@ -2224,21 +2224,24 @@ title {
 	}
 	text {
 		color: 2
-		x: 18
+		x: 20
 		y: 2
 		text: "SDL"
+		align: CENTER
 	}
 	text {
 		color: 3
-		x: 13
+		x: 20
 		y: 4
 		text: "S O P W I T H"
+		align: CENTER
 	}
 	text {
 		color: 3
 		x: 20
 		y: 6
 		text: "__VERSION__"
+		align: CENTER
 	}
 	text {
 		color: 3

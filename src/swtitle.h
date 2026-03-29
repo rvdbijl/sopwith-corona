@@ -14,6 +14,8 @@
 
 #include "sw.h"
 
+enum text_align { TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER, TEXT_ALIGN_RIGHT };
+
 extern void clrprmpt(void);
 extern bool ctlbreak(void);
 extern void getgamemode(void);
@@ -21,7 +23,7 @@ extern void swtitln(void);
 extern void swtitlf(void);
 
 void ClearTitleScreen(void);
-void AddTitleText(char *text, int x, int y, int color);
+void AddTitleText(char *text, int x, int y, int color, enum text_align align);
 void AddTitleGround(GRNDTYPE *ground, unsigned int len);
 void AddTitleSymbol(sopsym_t *sym, int x, int y, faction_t faction);
 void AddTitleLine(int x1, int y1, int x2, int y2, int color);
