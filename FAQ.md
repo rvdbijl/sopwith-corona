@@ -25,14 +25,15 @@ SDL Sopwith FAQ
 - **Q**: What platforms does it run on?
 
   **A**: I have compiled and run it successfully on Windows, Linux,
-  macOS, OpenBSD and NetBSD, for a variety of different CPU
-  architectures. Others have done ports to AmigaOS, and the Nintendo DS
-  and Wii.
+  macOS, FreeBSD, OpenBSD, NetBSD and Haiku for a variety of different
+  CPU architectures. Others have done ports to AmigaOS, and the Nintendo
+  DS and Wii. There is also an Emscripten port that allows it to be
+  played on the web.
 
   As it uses LibSDL for video and sound, it *ought to* compile "out of
   the box" on any platform supported by SDL. Other platforms supported
-  by SDL include Haiku, RISC OS, iOS and Android. If you're able to get
-  it running on new platforms, pleas let me know!
+  by SDL include RISC OS, iOS and Android. If you're able to get it
+  running on new platforms, please let me know!
 
 - **Q**: This is different to the original Sopwith!
 
@@ -68,6 +69,24 @@ SDL Sopwith FAQ
   although this did not seem to work either. I have replaced the serial
   code with code to use TCP/IP.  This means that you can play 2 player
   SDL Sopwith over a LAN with TCP/IP or even over the Internet.
+
+- **Q**: Does it have modding support?
+
+  **A**: Yes! Fans made mods of the original DOS Sopwith by editing the
+  compiled executables, but SDL Sopwith includes support for loading
+  custom ".sop" mission files using the `-m` command line parameter.
+  There is not yet a proper editor for the format, but documentation for
+  the format is included (the `sopwith-mission` manpage on Unix systems,
+  or `Mission.html` in the Windows package), and some example mod files
+  can be found in `maps/` in the source tree.
+
+- **Q**: Where can I find out more about the history of Sopwith?
+
+  **A**: The SDL Sopwith website includes a detailed history section
+  that gives a lot of information about BMB Compuscience and the
+  Imaginet networking system that Sopwith was created to promote:
+
+  <https://fragglet.github.io/sdl-sopwith/history.html>
 
 - **Q**: How do I play this through a firewall?
 
