@@ -2,15 +2,24 @@
 
 ### New features
 
-* High score table, local or online (see bug #10)
 * Save window size + location + display#
 * Demo recording and playback
 
 ### Custom levels
 
-* Add ability for users to make their own levels
 * Built-in map editor
-* New object types: artillery, flag poles, observation balloons, etc.
+* Campaigns (multi-level mods with stories)
+* New gameplay modes
+  - Sidescroller mode
+  - Bombing run
+  - Balloon busting
+  - Stop the pigeon
+* New object types:
+  - "Ace" planes
+  - Zeppelins
+  - Bridges
+  - Trains
+  - Trees
 
 ### Multiplayer
 
@@ -24,8 +33,6 @@
 ### Code cleanup
 
 * Restructure the game to be state based - eliminate use of longjmp
-* Eliminate duplication in symbols code (generate rotations+flips automatically)
 * Delete ob_xnext/ob_xprev/insertx/deletex
 * Rename functions to be more readable
 * Code reformatting w/clang-format
-
