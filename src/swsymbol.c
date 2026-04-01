@@ -650,6 +650,81 @@ static const char *swhtrsym[] = {
 	destroyed_water_tower,  // TARGET_WATER_TOWER
 };
 
+// Symbols for powerups that the player can pick up by flying into them:
+static const char *swpowerupsym[] = {
+	// POWERUP_AMMO:
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"            # # # # #           \n"
+	"          # # #   # # #         \n"
+	"          # #   #   # #         \n"
+	"          # #       # #         \n"
+	"          # #   #   # #         \n"
+	"          # #   #   # #         \n"
+	"            # # # # #           \n"
+	"            -       -           \n"
+	"        * * * * * * * * *       \n",
+
+	// POWERUP_BOMB:
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"            - - - - -           \n"
+	"          - -     - - -         \n"
+	"          - -   -   - -         \n"
+	"          - -     - - -         \n"
+	"          - -   -   - -         \n"
+	"          - -     - - -         \n"
+	"            - - - - -           \n"
+	"            #       #           \n"
+	"        * * * * * * * * *       \n",
+
+	// POWERUP_FUEL:
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"            * * * * *           \n"
+	"          * *       * *         \n"
+	"          * *   * * * *         \n"
+	"          * *     * * *         \n"
+	"          * *   * * * *         \n"
+	"          * *   * * * *         \n"
+	"            * * * * *           \n"
+	"            #       #           \n"
+	"        * * * * * * * * *       \n",
+
+	// POWERUP_COLLECTED:
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"                                \n"
+	"        * * * * * * * * *       \n",
+};
+
 static const char *swballoonsym[] = {
 	// Spherical balloon, tilt left:
 	"        # # # # # # # #         \n"
@@ -1211,6 +1286,7 @@ symset_t symbol_plane_win[4];            // swwinsym
 symset_t symbol_medal[3];                // swmedalsym
 symset_t symbol_ribbon[6];               // swribbonsym
 symset_t symbol_balloon[6];              // swballoonsym
+symset_t symbol_powerups[NUM_POWERUP_TYPES];  // swpowerupsym
 
 // special symbol for single pixel (bullets etc)
 
@@ -1250,6 +1326,7 @@ void GenerateSymbols(void)
 	SYMSETS_FROM_TEXT(swshtsym, symbol_shotwin);
 	SYMSETS_FROM_TEXT(swsplsym, symbol_birdsplat);
 	SYMSETS_FROM_TEXT(swballoonsym, symbol_balloon);
+	SYMSETS_FROM_TEXT(swpowerupsym, symbol_powerups);
 }
 
 //

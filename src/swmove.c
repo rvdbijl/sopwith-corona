@@ -943,6 +943,20 @@ bool movetarg(OBJECTS *ob)
 	return true;
 }
 
+bool movepowerup(OBJECTS *ob)
+{
+	int transform = ob->ob_original_ob->transform;
+
+	if (ob->ob_state == STANDING) {
+		ob->ob_symbol = &symbol_powerups[ob->ob_orient].sym[transform];
+	} else {
+		ob->ob_symbol =
+			&symbol_powerups[POWERUP_COLLECTED].sym[transform];
+	}
+
+	return true;
+}
+
 static void ExplosionSoundCallback(OBJECTS *ob)
 {
 	if (ob->ob_orient) {

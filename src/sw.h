@@ -43,6 +43,14 @@ typedef enum {
 	NUM_TARGET_TYPES,
 } target_type_t;
 
+typedef enum {
+	POWERUP_AMMO,
+	POWERUP_BOMB,
+	POWERUP_FUEL,
+	POWERUP_COLLECTED,
+	NUM_POWERUP_TYPES,
+} powerup_type_t;
+
 #include "swsymbol.h"
 
 // We only enable TCP/IP support if we have the appropriate socket header
@@ -171,6 +179,7 @@ typedef enum {
 	MISSILE,
 	STARBURST,
 	BALLOON,
+	POWERUP,
 	DUMMYTYPE = 99,
 } obtype_t;
 

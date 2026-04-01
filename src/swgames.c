@@ -269,7 +269,8 @@ const GAMES original_level = {
 
 static const char *obtype_names[] = {
 	"GROUND", "PLANE", "BOMB", "SHOT", "TARGET", "EXPLOSION", "SMOKE",
-	"FLOCK", "BIRD", "OX", "MISSILE", "STARBURST", "BALLOON", NULL,
+	"FLOCK", "BIRD", "OX", "MISSILE", "STARBURST", "BALLOON", "POWERUP",
+	NULL,
 };
 
 static const char *transform_names[] = {

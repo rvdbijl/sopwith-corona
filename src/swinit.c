@@ -642,34 +642,39 @@ static void AddPlayerTarget(OBJECTS *ob, const original_ob_t *orig_ob)
 	++numtarg[ob->ob_faction];
 }
 
-// building/target
-static OBJECTS *inittarget(const original_ob_t *orig_ob)
+static int Flatten(int minx, int maxx, int headroom)
 {
-	OBJECTS *ob;
-	int x;
-	int minh, maxh, aveh, minx, maxx;
+	int x, aveh;
+	int minh = 999, maxh = 0;
 
-	ob = allocobj();
-
-	// Initial symbol:
-	ob->ob_symbol = &symbol_targets[orig_ob->orient].sym[0];
-
-	minx = ob->ob_x = orig_ob->x;
-	maxx = ob->ob_x + ob->ob_symbol->w - 1;
-	minh = 999;
-	maxh = 0;
 	for (x = minx; x <= maxx; ++x) {
 		minh = imin(minh, ground[x]);
 		maxh = imax(maxh, ground[x]);
 	}
 
 	aveh = (minh + maxh) / 2;
-	aveh = clamp_max(aveh, MAX_Y - ob->ob_symbol->h - 1);
-	ob->ob_y = aveh + ob->ob_symbol->h;
+	aveh = clamp_max(aveh, MAX_Y - headroom - 1);
 
 	for (x = minx; x <= maxx; ++x) {
 		ground[x] = aveh;
 	}
+
+	return aveh;
+}
+
+// building/target
+static OBJECTS *inittarget(const original_ob_t *orig_ob)
+{
+	OBJECTS *ob;
+
+	ob = allocobj();
+
+	// Initial symbol:
+	ob->ob_symbol = &symbol_targets[orig_ob->orient].sym[0];
+
+	ob->ob_x = orig_ob->x;
+	ob->ob_y = Flatten(ob->ob_x, ob->ob_x + ob->ob_symbol->w - 1,
+	                   ob->ob_symbol->h) + ob->ob_symbol->h;
 
 	ob->ob_dx = ob->ob_dy = ob->ob_lx = ob->ob_ly = ob->ob_ldx
 	    = ob->ob_ldy = ob->ob_angle = ob->ob_hitcount = 0;
@@ -680,6 +685,32 @@ static OBJECTS *inittarget(const original_ob_t *orig_ob)
 	ob->ob_clr = ob->ob_faction;
 	ob->ob_movef = movetarg;
 	ob->ob_onmap = true;
+
+	return ob;
+}
+
+// powerup item:
+static OBJECTS *initpowerup(const original_ob_t *orig_ob)
+{
+	OBJECTS *ob;
+
+	ob = allocobj();
+
+	// Initial symbol:
+	ob->ob_symbol = &symbol_powerups[orig_ob->orient].sym[0];
+
+	ob->ob_x = orig_ob->x;
+	ob->ob_y = Flatten(ob->ob_x, ob->ob_x + ob->ob_symbol->w - 1,
+	                   ob->ob_symbol->h) + ob->ob_symbol->h;
+
+	ob->ob_dx = ob->ob_dy = ob->ob_lx = ob->ob_ly = ob->ob_ldx
+	    = ob->ob_ldy = ob->ob_angle = ob->ob_hitcount = 0;
+	ob->ob_type = POWERUP;
+	ob->ob_state = STANDING;
+	ob->ob_orient = orig_ob->orient;
+	ob->ob_clr = FACTION_PLAYER1;
+	ob->ob_movef = movepowerup;
+	ob->ob_onmap = false;
 
 	return ob;
 }
@@ -713,6 +744,22 @@ static void ApplySpriteSizeOffset(OBJECTS *ob, OBJECTS *obo, int angle)
 	ob->ob_y -= rangey;
 }
 
+// Returns true if the given object makes a big explosion (ie. fuel tanks)
+static bool IsExplosive(OBJECTS *ob)
+{
+	switch (ob->ob_type) {
+	case TARGET:
+		return ob->ob_orient == TARGET_OIL_TANK
+		    || ob->ob_orient == TARGET_TANKER_TRUCK
+		    || ob->ob_orient == TARGET_CUSTOM5
+		    || ob->ob_orient == TARGET_CUSTOM_PASSIVE5;
+	case POWERUP:
+		return ob->ob_orient == POWERUP_FUEL;
+	default:
+		return false;
+	}
+}
+
 // explosion
 void initexpl(OBJECTS *obo, int small)
 {
@@ -732,11 +779,7 @@ void initexpl(OBJECTS *obo, int small)
 
 	obotype = obo->ob_type;
 
-	if (obotype == TARGET
-	 && (obo->ob_orient == TARGET_OIL_TANK
-	  || obo->ob_orient == TARGET_TANKER_TRUCK
-	  || obo->ob_orient == TARGET_CUSTOM5
-	  || obo->ob_orient == TARGET_CUSTOM_PASSIVE5)) {
+	if (IsExplosive(obo)) {
 		ic = 1;
 		// sdh: Oil tank explosions were changed in Sopwith "Network
 		// Edition" to be much less intense; we make this change
@@ -981,6 +1024,9 @@ static void inittargets(void)
 				break;
 			case BALLOON:
 				ob = initballoon(orig_ob);
+				break;
+			case POWERUP:
+				ob = initpowerup(orig_ob);
 				break;
 			default:
 				continue;

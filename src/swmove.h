@@ -24,6 +24,7 @@ extern bool movebomb(OBJECTS *obp);
 extern bool movemiss(OBJECTS *obp);
 extern bool moveburst(OBJECTS *obp);
 extern bool movetarg(OBJECTS *obt);
+extern bool movepowerup(OBJECTS *ob);
 extern bool moveexpl(OBJECTS *obp);
 extern bool movesmok(OBJECTS *obp);
 extern bool moveflck(OBJECTS *obp);

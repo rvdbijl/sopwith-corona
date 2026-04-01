@@ -321,6 +321,7 @@ static void swkill(OBJECTS * ob1, OBJECTS * ob2)
 		TargetDestroyed(ob, ttype);
 		return;
 
+	case POWERUP:
 	case TARGET:
 		if (ob->ob_state != STANDING) {
 			return;
@@ -340,7 +341,9 @@ static void swkill(OBJECTS * ob1, OBJECTS * ob2)
 		ob->ob_onmap = false;
 		initexpl(ob, 0);
 
-		TargetDestroyed(ob, ttype);
+		if (ob->ob_type == TARGET) {
+			TargetDestroyed(ob, ttype);
+		}
 		return;
 
 	case PLANE:
