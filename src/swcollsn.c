@@ -267,13 +267,22 @@ static void PowerupCollected(OBJECTS *powerup, OBJECTS *plane)
 		plane->ob_rounds = clamp_max(plane->ob_rounds + (MAXROUNDS / 2),
 		                             MAXROUNDS);
 		break;
+	case POWERUP_AMMO_BIG:
+		plane->ob_rounds = MAXROUNDS;
+		break;
 	case POWERUP_FUEL:
 		plane->ob_life = clamp_max(plane->ob_life + (MAXFUEL / 2),
 		                           MAXFUEL);
 		break;
+	case POWERUP_FUEL_BIG:
+		plane->ob_life = MAXFUEL;
+		break;
 	case POWERUP_BOMB:
 		plane->ob_bombs = clamp_max(plane->ob_bombs + (MAXBOMBS / 2),
 		                            MAXBOMBS);
+		break;
+	case POWERUP_BOMB_BIG:
+		plane->ob_bombs = MAXBOMBS;
 		break;
 	default:
 		break;

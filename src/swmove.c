@@ -946,12 +946,25 @@ bool movetarg(OBJECTS *ob)
 bool movepowerup(OBJECTS *ob)
 {
 	int transform = ob->ob_original_ob->transform;
+	int collected_frame;
+
+	switch (ob->ob_orient) {
+		case POWERUP_AMMO_BIG:
+		case POWERUP_BOMB_BIG:
+		case POWERUP_FUEL_BIG:
+		case POWERUP_COLLECTED_BIG:
+			collected_frame = POWERUP_COLLECTED_BIG;
+			break;
+		default:
+			collected_frame = POWERUP_COLLECTED;
+			break;
+	}
 
 	if (ob->ob_state == STANDING) {
 		ob->ob_symbol = &symbol_powerups[ob->ob_orient].sym[transform];
 	} else {
 		ob->ob_symbol =
-			&symbol_powerups[POWERUP_COLLECTED].sym[transform];
+			&symbol_powerups[collected_frame].sym[transform];
 	}
 
 	return true;

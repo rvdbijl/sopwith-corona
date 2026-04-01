@@ -161,6 +161,21 @@ level {
 		x: 1068
 		orient: 2
 	}
+	object {
+		type: POWERUP
+		x: 1088
+		orient: 3
+	}
+	object {
+		type: POWERUP
+		x: 1108
+		orient: 4
+	}
+	object {
+		type: POWERUP
+		x: 1128
+		orient: 5
+	}
 
 	// Player 2 base:
 	object {

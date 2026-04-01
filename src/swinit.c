@@ -754,7 +754,8 @@ static bool IsExplosive(OBJECTS *ob)
 		    || ob->ob_orient == TARGET_CUSTOM5
 		    || ob->ob_orient == TARGET_CUSTOM_PASSIVE5;
 	case POWERUP:
-		return ob->ob_orient == POWERUP_FUEL;
+		return ob->ob_orient == POWERUP_FUEL
+		    || ob->ob_orient == POWERUP_FUEL_BIG;
 	default:
 		return false;
 	}
