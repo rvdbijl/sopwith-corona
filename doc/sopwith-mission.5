@@ -168,6 +168,10 @@ Observation balloon. The value of the \fBorient\fR property defines the type
 of balloon; 0 = spherical balloon, 1 = Caquot-style. The value of the
 \fBfaction\fR property specifies the faction to which the balloon belongs.
 .TP
+\fBPOWERUP\fR
+A collectible power-up item. The value of the \fBorient\fR property defines the
+type of power-up, see \fBPOWER-UP TYPES\fR below.
+.TP
 \fBOX\fR
 An Ox (type of cattle). The Ox does nothing except act as an obstacle, and does
 not need to be killed to advance to the next level. Does not appear in novice
@@ -296,6 +300,10 @@ counterclockwise (1), 45 degrees (2) and 67.5 degrees (3).
 \fBswbstsym\fR (8x8)
 Starburst (flare). There are two frames of animation.
 .TP
+\fBswpowerupsym\fR (16x16)
+Power-up items. There is one frame for each type of power-up. See \fBPOWER-UP
+TYPES\fR below.
+.TP
 \fBswexpsym\fR (8x8)
 Debris after an explosion. There are eight frames for different types of
 debris.
@@ -351,6 +359,31 @@ Radio tower
 .TP
 19
 Water tower
+.SH POWER-UP TYPES
+.TP
+0
+Ammo (bullets), small
+.TP
+1
+Bombs, small
+.TP
+2
+Fuel tank, small
+.TP
+3
+Ammo (bullets), large (full restock)
+.TP
+4
+Bombs, large (full restock)
+.TP
+5
+Fuel tank, large (full refuel)
+.TP
+6
+Empty platform after power-up is collected (small)
+.TP
+7
+Empty platform after power-up is collected (large)
 .SH SOUNDS SECTION
 The \fBsounds\fR section allows the in-game music to be replaced. There is
 only one property at present, named \fBtitle_tune\fR; its value is a string
