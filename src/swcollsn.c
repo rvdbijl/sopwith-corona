@@ -258,6 +258,28 @@ static bool IsYoungShot(OBJECTS *ob)
 	return ob && ob->ob_type == SHOT && ob->ob_life >= BULLIFE - 1;
 }
 
+static void PowerupCollected(OBJECTS *powerup, OBJECTS *plane)
+{
+	powerup->ob_state = FINISHED;
+
+	switch (powerup->ob_orient) {
+	case POWERUP_AMMO:
+		plane->ob_rounds = clamp_max(plane->ob_rounds + (MAXROUNDS / 2),
+		                             MAXROUNDS);
+		break;
+	case POWERUP_FUEL:
+		plane->ob_life = clamp_max(plane->ob_life + (MAXFUEL / 2),
+		                           MAXFUEL);
+		break;
+	case POWERUP_BOMB:
+		plane->ob_bombs = clamp_max(plane->ob_bombs + (MAXBOMBS / 2),
+		                            MAXBOMBS);
+		break;
+	default:
+		break;
+	}
+}
+
 static void swkill(OBJECTS * ob1, OBJECTS * ob2)
 {
 	OBJECTS *ob, *obt;
@@ -339,10 +361,14 @@ static void swkill(OBJECTS * ob1, OBJECTS * ob2)
 
 		ob->ob_state = FINISHED;
 		ob->ob_onmap = false;
-		initexpl(ob, 0);
 
-		if (ob->ob_type == TARGET) {
-			TargetDestroyed(ob, ttype);
+		if (ob->ob_type == POWERUP && obt->ob_movef == moveplyr) {
+			PowerupCollected(ob, obt);
+		} else {
+			initexpl(ob, 0);
+			if (ob->ob_type == TARGET) {
+				TargetDestroyed(ob, ttype);
+			}
 		}
 		return;
 
@@ -359,6 +385,11 @@ static void swkill(OBJECTS * ob1, OBJECTS * ob2)
 		}
 
 		if (ob->ob_endsts == WINNER) {
+			return;
+		}
+
+		// Plane flying into powerup does not cause a crash:
+		if (ttype == POWERUP) {
 			return;
 		}
 
