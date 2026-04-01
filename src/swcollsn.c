@@ -371,7 +371,8 @@ static void swkill(OBJECTS * ob1, OBJECTS * ob2)
 		ob->ob_state = FINISHED;
 		ob->ob_onmap = false;
 
-		if (ob->ob_type == POWERUP && obt->ob_movef == moveplyr) {
+		if (ob->ob_type == POWERUP && obt->ob_movef == moveplyr
+		 && obt->ob_type == PLANE && PlaneIsFlying(obt->ob_state)) {
 			PowerupCollected(ob, obt);
 		} else {
 			initexpl(ob, 0);
