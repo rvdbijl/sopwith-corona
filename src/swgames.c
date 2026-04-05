@@ -326,8 +326,9 @@ static void SetGround(struct yocton_object *yo, GRNDTYPE **ground,
 	struct yocton_prop *p;
 
 	while ((p = yocton_next_prop(yo)) != NULL) {
-		yocton_check(yo, "expected prop name '_'",
-		             !strcmp(yocton_prop_name(p), "_"));
+		const char *name = yocton_prop_name(p);
+		yocton_check(yo, !strcmp(name, "_"),
+		             "expected prop name '_', got '%s'", name);
 		YOCTON_VAR_INT_ARRAY(p, "_", GRNDTYPE, *ground,
 		                     *ground_len);
 	}
@@ -359,15 +360,17 @@ static void ProcessSymbol(const char *name, struct yocton_object *obj)
 	unsigned long l;
 
 	while ((p = yocton_next_prop(obj)) != NULL) {
-
+		const char *pn = yocton_prop_name(p);
 		errno = 0;
-		l = strtoul(yocton_prop_name(p), &ptr, 10);
-		yocton_check(obj, "expecting frame number as property name",
-		             *ptr == '\0' && errno != ERANGE && l < 256);
+		l = strtoul(pn, &ptr, 10);
+		yocton_check(obj, *ptr == '\0' && errno != ERANGE && l < 256,
+		             "expecting frame number as property, got '%s'",
+		              pn);
 
 		s = LookupSymset(name, l);
-		yocton_check(obj, "expecting valid symbol name and "
-		             "frame number", s != NULL);
+		yocton_check(obj, s != NULL,
+		             "failed to look up symbol '%s' frame %d",
+		             name, (int) l);
 		value = yocton_prop_value(p);
 		if (s != NULL && value != NULL) {
 			SymsetFromText(s, value);
@@ -441,10 +444,10 @@ static void ProcessTitleSymbol(struct yocton_object *obj)
 		YOCTON_VAR_ENUM(p, "faction", faction, faction_names);
 	}
 
-	yocton_check(obj, "symbol block must specify name property",
-	             symname != NULL);
-	yocton_check(obj, "transform must be in range 0-7",
-	             transform >= 0 && transform < 8);
+	yocton_check(obj, symname != NULL,
+	             "symbol block must specify name property");
+	yocton_check(obj, transform >= 0 && transform < 8,
+	             "transform must be in range 0-7, got %d", transform);
 
 	if (yocton_have_error(obj, NULL, NULL)) {
 		return;
@@ -452,10 +455,8 @@ static void ProcessTitleSymbol(struct yocton_object *obj)
 
 	symset = LookupSymset(symname, frame);
 	if (symset == NULL) {
-		char buf[64];
-		snprintf(buf, sizeof(buf), "failed to lookup symbol %s frame %d",
-		         symname, frame);
-		yocton_check(obj, buf, 0);
+		yocton_check(obj, 0, "failed to look up symbol '%s' frame %d",
+		             symname, frame);
 		return;
 	}
 
@@ -485,8 +486,8 @@ static void ProcessTitleLine(struct yocton_object *obj)
 		YOCTON_VAR_INT(p, "color", int, color);
 	}
 
-	yocton_check(obj, "must specify x1, y1, x2 and y2 properties",
-	             x1 != -1 && x2 != -1 && y1 != -1 && y2 != -1);
+	yocton_check(obj, x1 != -1 && x2 != -1 && y1 != -1 && y2 != -1,
+	             "must specify x1, y1, x2 and y2 properties");
 
 	if (!yocton_have_error(obj, NULL, NULL)) {
 		AddTitleLine(x1, y1, x2, y2, color);
@@ -542,8 +543,8 @@ void LoadCustomLevel(const char *filename)
 		// the expectation that files will be able to contain multiple
 		// levels in the future.
 		if (!strcmp(name, "level")) {
-			yocton_check(obj, "only one level per file supported",
-			             !processed_level);
+			yocton_check(obj, !processed_level,
+			             "only one level per file supported");
 			ProcessLevel(yocton_prop_inner(p));
 			processed_level = true;
 		}
