@@ -18,13 +18,13 @@
 
 #include "yocton.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
 #include <ctype.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <limits.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #ifdef ALLOC_TESTING
@@ -36,8 +36,10 @@
 #define ERROR_ALLOC "memory allocation failure"
 #define ERROR_EOF   "unexpected EOF"
 
-#define CHECK_OR_RETURN(condition, value) \
-	if (!(condition)) { return value; }
+#define CHECK_OR_RETURN(condition, value)                                      \
+	if (!(condition)) {                                                    \
+		return value;                                                  \
+	}
 
 struct yocton_buffer {
 	uint8_t *data;
@@ -73,11 +75,18 @@ struct yocton_instream {
 	struct yocton_object *root;
 };
 
-static const uint8_t utf8_bom[] = { 0xef, 0xbb, 0xbf };
+static const uint8_t utf8_bom[] = {0xef, 0xbb, 0xbf};
 
 const char yocton_enum_allow_integers = 0;
 
-static void input_error(struct yocton_instream *s, char *fmt, ...)
+static void input_error_append(struct yocton_instream *s, const char *fmt,
+                                va_list args)
+{
+	size_t len = strlen(s->error_buf);
+	vsnprintf(s->error_buf + len, ERROR_BUF_SIZE - len, fmt, args);
+}
+
+static void input_error(struct yocton_instream *s, const char *fmt, ...)
 {
 	va_list args;
 
@@ -86,7 +95,8 @@ static void input_error(struct yocton_instream *s, char *fmt, ...)
 		return;
 	}
 	va_start(args, fmt);
-	vsnprintf(s->error_buf, ERROR_BUF_SIZE, fmt, args);
+	input_error_append(s, fmt, args);
+	va_end(args);
 }
 
 // Assign the result of an allocation, storing an error if result == NULL.
@@ -96,15 +106,14 @@ static int assign_alloc(void *ptr, struct yocton_instream *s, void *result)
 		input_error(s, ERROR_ALLOC);
 		return 0;
 	}
-	* ((void **) ptr) = result;
+	*((void **) ptr) = result;
 	return 1;
 }
 
 static int buffer_dup(struct yocton_instream *s, struct yocton_buffer *to,
                       const struct yocton_buffer *from)
 {
-	CHECK_OR_RETURN(
-	    assign_alloc(&to->data, s, malloc(from->len + 1)), 0);
+	CHECK_OR_RETURN(assign_alloc(&to->data, s, malloc(from->len + 1)), 0);
 	memcpy(to->data, from->data, from->len);
 	to->data[from->len] = '\0';
 	to->len = from->len;
@@ -114,8 +123,8 @@ static int buffer_dup(struct yocton_instream *s, struct yocton_buffer *to,
 static int peek_next_byte(struct yocton_instream *s, uint8_t *c)
 {
 	if (s->buf_offset >= s->buf_len) {
-		s->buf_len = s->callback(s->buf, s->buf_size,
-		                         s->callback_handle);
+		s->buf_len =
+		    s->callback(s->buf, s->buf_size, s->callback_handle);
 		if (s->buf_len == 0) {
 			return 0;
 		}
@@ -150,7 +159,8 @@ static int append_string_byte(struct yocton_instream *s, uint8_t c)
 		s->string_size = s->string_size == 0 ? 64 : s->string_size * 2;
 		CHECK_OR_RETURN(
 		    assign_alloc(&s->string.data, s,
-		        realloc(s->string.data, s->string_size)), 0);
+		                 realloc(s->string.data, s->string_size)),
+		    0);
 	}
 	s->string.data[s->string.len] = c;
 	++s->string.len;
@@ -162,34 +172,42 @@ static int read_escape_sequence(struct yocton_instream *s, uint8_t *c)
 	uint8_t xcs[3];
 	CHECK_OR_RETURN(read_next_byte(s, c), 0);
 	switch (*c) {
-		case 'n':  *c = '\n'; return 1;
-		case 't':  *c = '\t'; return 1;
-		case '\\': *c = '\\'; return 1;
-		case '"':  *c = '\"'; return 1;
-		case 'x':
-			if (!read_next_byte(s, &xcs[0]) || !isxdigit(xcs[0])
-			 || !read_next_byte(s, &xcs[1]) || !isxdigit(xcs[1])) {
-				input_error(s, "\\x sequence must be followed "
-				            "by two hexadecimal characters");
-				return 0;
-			}
-			xcs[2] = '\0';
-			*c = (uint8_t) strtoul((const char *) xcs, NULL, 16);
-			if (*c == 0) {
-				input_error(s, "NUL byte not allowed in "
-				            "\\x escape sequence.");
-				return 0;
-			}
-			if (*c >= 0x20) {
-				input_error(s, "\\x escape sequence can only "
-				            "be used for control characters "
-				            "(ASCII 0x01-0x1f range)");
-				return 0;
-			}
-			return 1;
-		default:
-			input_error(s, "unknown string escape: \\%c", *c);
+	case 'n':
+		*c = '\n';
+		return 1;
+	case 't':
+		*c = '\t';
+		return 1;
+	case '\\':
+		*c = '\\';
+		return 1;
+	case '"':
+		*c = '\"';
+		return 1;
+	case 'x':
+		if (!read_next_byte(s, &xcs[0]) || !isxdigit(xcs[0]) ||
+		    !read_next_byte(s, &xcs[1]) || !isxdigit(xcs[1])) {
+			input_error(s, "\\x sequence must be followed by two "
+			               "hexadecimal characters");
 			return 0;
+		}
+		xcs[2] = '\0';
+		*c = (uint8_t) strtoul((const char *) xcs, NULL, 16);
+		if (*c == 0) {
+			input_error(s, "NUL byte not allowed in \\x escape "
+			               "sequence.");
+			return 0;
+		}
+		if (*c >= 0x20) {
+			input_error(s, "\\x escape sequence can only be used "
+			               "for control characters (ASCII "
+			               "0x01-0x1f range)");
+			return 0;
+		}
+		return 1;
+	default:
+		input_error(s, "unknown string escape: \\%c", *c);
+		return 0;
 	}
 }
 
@@ -204,19 +222,18 @@ static enum token_type skip_past_spaces(struct yocton_instream *s, uint8_t *c)
 	while (peek_next_byte(s, c)) {
 		if (*c == '/') {
 			// Skip past comment.
-			CHECK_OR_RETURN(
-			    read_next_byte(s, c) && *c == '/'
-			 && read_next_byte(s, &c2) && c2 == '/',
-			    TOKEN_ERROR);
+			CHECK_OR_RETURN(read_next_byte(s, c) && *c == '/' &&
+			                    read_next_byte(s, &c2) && c2 == '/',
+			                TOKEN_ERROR);
 			while (peek_next_byte(s, c) && *c != '\n') {
 				CHECK_OR_RETURN(read_next_byte(s, c),
 				                TOKEN_ERROR);
 			}
 		} else if (*c == utf8_bom[0]) {
 			CHECK_OR_RETURN(
-			    read_next_byte(s, c) && *c == utf8_bom[0]
-			 && read_next_byte(s, &c2) && c2 == utf8_bom[1]
-			 && read_next_byte(s, &c3) && c3 == utf8_bom[2],
+			    read_next_byte(s, c) && *c == utf8_bom[0] &&
+			        read_next_byte(s, &c2) && c2 == utf8_bom[1] &&
+			        read_next_byte(s, &c3) && c3 == utf8_bom[2],
 			    TOKEN_ERROR);
 		} else if (isspace(*c)) {
 			CHECK_OR_RETURN(read_next_byte(s, c), TOKEN_ERROR);
@@ -276,8 +293,10 @@ static enum token_type read_string(struct yocton_instream *s)
 				return TOKEN_ERROR;
 			}
 		} else if (c < 0x20) {
-			input_error(s, "control character not allowed inside "
-			            "string (ASCII char 0x%02x)", c);
+			input_error(s,
+			            "control character not allowed inside "
+			            "string (ASCII char 0x%02x)",
+			            c);
 			return TOKEN_ERROR;
 		}
 		CHECK_OR_RETURN(append_string_byte(s, c), TOKEN_ERROR);
@@ -319,15 +338,20 @@ static enum token_type read_next_token(struct yocton_instream *s)
 
 	s->token_lineno = s->lineno;
 	switch (c) {
-		case ':':  return TOKEN_COLON;
-		case '{':  return TOKEN_OPEN_BRACE;
-		case '}':  return TOKEN_CLOSE_BRACE;
-		case '\"': return read_string(s);
-		case '&':
-			input_error(s, "'&' operator can only be used to "
-			            "join quoted strings");
-			return TOKEN_ERROR;
-		default:   return read_symbol(s, c);
+	case ':':
+		return TOKEN_COLON;
+	case '{':
+		return TOKEN_OPEN_BRACE;
+	case '}':
+		return TOKEN_CLOSE_BRACE;
+	case '\"':
+		return read_string(s);
+	case '&':
+		input_error(s, "'&' operator can only be used to join quoted "
+		               "strings");
+		return TOKEN_ERROR;
+	default:
+		return read_symbol(s, c);
 	}
 }
 
@@ -387,8 +411,7 @@ static int init_instream(struct yocton_instream *instream)
 	instream->buf_size = 256;
 	instream->error_buf = (char *) calloc(ERROR_BUF_SIZE, 1);
 	CHECK_OR_RETURN(instream->error_buf != NULL, 0);
-	instream->buf =
-	    (uint8_t *) calloc(instream->buf_size, sizeof(uint8_t));
+	instream->buf = (uint8_t *) calloc(instream->buf_size, sizeof(uint8_t));
 	CHECK_OR_RETURN(instream->buf != NULL, 0);
 	instream->string_size = 0;
 	instream->string.data = NULL;
@@ -400,8 +423,8 @@ static struct yocton_instream *new_instream(yocton_read callback, void *handle)
 {
 	struct yocton_instream *instream = NULL;
 
-	instream = (struct yocton_instream *)
-	    calloc(1, sizeof(struct yocton_instream));
+	instream = (struct yocton_instream *) calloc(
+	    1, sizeof(struct yocton_instream));
 	CHECK_OR_RETURN(instream != NULL, NULL);
 
 	if (!init_instream(instream)) {
@@ -464,17 +487,24 @@ int __yocton_prop_have_error(struct yocton_prop *p)
 	return yocton_have_error(p->parent, NULL, NULL);
 }
 
-void yocton_check(struct yocton_object *obj, const char *error_msg,
-                  int normally_true)
+void yocton_check(struct yocton_object *obj, int normally_true,
+                  const char *error_fmt, ...)
 {
-	if (!normally_true) {
-		if (obj->property != NULL) {
-			input_error(obj->instream, "property '%s': %s",
-			            obj->property->name.data, error_msg);
-		} else {
-			input_error(obj->instream, "%s", error_msg);
-		}
+	va_list args;
+
+	if (normally_true || yocton_have_error(obj, NULL, NULL)) {
+		return;
 	}
+
+	// We include the property name in the error message, if we have one:
+	if (obj->property != NULL) {
+		input_error(obj->instream, "property '%s': ",
+		            obj->property->name.data);
+	}
+
+	va_start(args, error_fmt);
+	input_error_append(obj->instream, error_fmt, args);
+	va_end(args);
 }
 
 void yocton_free(struct yocton_object *obj)
@@ -498,7 +528,8 @@ static void skip_forward(struct yocton_object *obj)
 	child = obj->property->child;
 	// Read out all subproperties until we get a NULL response and have
 	// finished skipping over them.
-	while (yocton_next_prop(child) != NULL);
+	while (yocton_next_prop(child) != NULL)
+		;
 	free_obj(child);
 	obj->property->child = NULL;
 }
@@ -506,30 +537,31 @@ static void skip_forward(struct yocton_object *obj)
 static int parse_next_prop(struct yocton_object *obj, struct yocton_prop *p)
 {
 	switch (read_next_token(obj->instream)) {
-		case TOKEN_COLON:
-			// This is the string:string case.
-			p->type = YOCTON_PROP_STRING;
-			if (read_next_token(obj->instream) != TOKEN_STRING) {
-				input_error(obj->instream, "string expected "
-				            "to follow ':'");
-				return 0;
-			}
-			CHECK_OR_RETURN(
-			    buffer_dup(obj->instream, &p->value,
-			               &obj->instream->string), 0);
-			return 1;
-		case TOKEN_OPEN_BRACE:
-			p->type = YOCTON_PROP_OBJECT;
-			CHECK_OR_RETURN(
-			    assign_alloc(&p->child, obj->instream,
-			        calloc(1, sizeof(struct yocton_object))), 0);
-			p->child->instream = obj->instream;
-			p->child->done = 0;
-			return 1;
-		default:
-			input_error(obj->instream, "':' or '{' expected to "
-			            "follow property name");
+	case TOKEN_COLON:
+		// This is the string:string case.
+		p->type = YOCTON_PROP_STRING;
+		if (read_next_token(obj->instream) != TOKEN_STRING) {
+			input_error(obj->instream,
+			            "string expected to follow ':'");
 			return 0;
+		}
+		CHECK_OR_RETURN(buffer_dup(obj->instream, &p->value,
+		                           &obj->instream->string),
+		                0);
+		return 1;
+	case TOKEN_OPEN_BRACE:
+		p->type = YOCTON_PROP_OBJECT;
+		CHECK_OR_RETURN(
+		    assign_alloc(&p->child, obj->instream,
+		                 calloc(1, sizeof(struct yocton_object))),
+		    0);
+		p->child->instream = obj->instream;
+		p->child->done = 0;
+		return 1;
+	default:
+		input_error(obj->instream,
+		            "':' or '{' expected to follow property name");
+		return 0;
 	}
 }
 
@@ -537,14 +569,14 @@ static struct yocton_prop *next_prop(struct yocton_object *obj)
 {
 	struct yocton_prop *p = NULL;
 
-	CHECK_OR_RETURN(
-	    assign_alloc(&p, obj->instream,
-	        calloc(1, sizeof(struct yocton_prop))), NULL);
+	CHECK_OR_RETURN(assign_alloc(&p, obj->instream,
+	                             calloc(1, sizeof(struct yocton_prop))),
+	                NULL);
 	obj->property = p;
 	p->parent = obj;
 
-	if (!buffer_dup(obj->instream, &p->name, &obj->instream->string)
-	 || !parse_next_prop(obj, p)) {
+	if (!buffer_dup(obj->instream, &p->name, &obj->instream->string) ||
+	    !parse_next_prop(obj, p)) {
 		free_property(p);
 		obj->property = NULL;
 		return NULL;
@@ -564,28 +596,28 @@ struct yocton_prop *yocton_next_prop(struct yocton_object *obj)
 	obj->property = NULL;
 
 	switch (read_next_token(obj->instream)) {
-		case TOKEN_STRING:
-			return next_prop(obj);
-		case TOKEN_CLOSE_BRACE:
-			if (obj == obj->instream->root) {
-				input_error(obj->instream, "closing brace "
-				            "'}' not expected at top level");
-				return NULL;
-			}
-			obj->done = 1;
+	case TOKEN_STRING:
+		return next_prop(obj);
+	case TOKEN_CLOSE_BRACE:
+		if (obj == obj->instream->root) {
+			input_error(
+			    obj->instream,
+			    "closing brace '}' not expected at top level");
 			return NULL;
-		case TOKEN_EOF:
-			// EOF is only valid at the top level.
-			if (obj != obj->instream->root) {
-				input_error(obj->instream, ERROR_EOF);
-				return NULL;
-			}
-			obj->done = 1;
+		}
+		obj->done = 1;
+		return NULL;
+	case TOKEN_EOF:
+		// EOF is only valid at the top level.
+		if (obj != obj->instream->root) {
+			input_error(obj->instream, ERROR_EOF);
 			return NULL;
-		default:
-			input_error(obj->instream, "expected start of "
-			            "next property");
-			return NULL;
+		}
+		obj->done = 1;
+		return NULL;
+	default:
+		input_error(obj->instream, "expected start of next property");
+		return NULL;
 	}
 }
 
@@ -602,8 +634,9 @@ const char *yocton_prop_name(struct yocton_prop *p)
 const char *yocton_prop_value(struct yocton_prop *p)
 {
 	if (p->type != YOCTON_PROP_STRING) {
-		input_error(p->parent->instream, "property '%s' has object, "
-		            "not string type", p->name.data);
+		input_error(p->parent->instream,
+		            "property '%s' has object, not string type",
+		            p->name.data);
 		return "";
 	}
 	return (const char *) p->value.data;
@@ -617,15 +650,16 @@ char *yocton_prop_value_dup(struct yocton_prop *p)
 		return NULL;
 	}
 	result = strdup(value);
-	yocton_check(p->parent, ERROR_ALLOC, result != NULL);
+	yocton_check(p->parent, result != NULL, ERROR_ALLOC);
 	return result;
 }
 
 struct yocton_object *yocton_prop_inner(struct yocton_prop *p)
 {
 	if (p->type != YOCTON_PROP_OBJECT) {
-		input_error(p->parent->instream, "property '%s' has string, "
-		            "not object type", p->name.data);
+		input_error(p->parent->instream,
+		            "property '%s' has string, not object type",
+		            p->name.data);
 		return NULL;
 	}
 	return p->child;
@@ -638,8 +672,8 @@ signed long long yocton_prop_int(struct yocton_prop *p, size_t n)
 	char *endptr;
 
 	if (n == 0 || n > sizeof(long long)) {
-		input_error(p->parent->instream, "unsupported "
-		            "integer size: %d-bit", n * 8);
+		input_error(p->parent->instream,
+		            "unsupported integer size: %d-bit", n * 8);
 		return 0;
 	} else if (n == sizeof(long long)) {
 		min = LLONG_MIN;
@@ -654,15 +688,16 @@ signed long long yocton_prop_int(struct yocton_prop *p, size_t n)
 	result = strtoll(value, &endptr, 10);
 	// Must be entire string, not empty, nothing leading or trailing:
 	if (*value == '\0' || isspace(*value) || *endptr != '\0') {
-		input_error(p->parent->instream, "not a valid integer "
-		            "value: '%s'", value);
+		input_error(p->parent->instream,
+		            "not a valid integer value: '%s'", value);
 		return 0;
 	}
 
-	if (((result == LLONG_MIN || result == LLONG_MAX) && errno == ERANGE)
-	 || result < min || result > max) {
-		input_error(p->parent->instream, "value not in range of a "
-		            "%d-bit signed integer: %s", n * 8, value);
+	if (((result == LLONG_MIN || result == LLONG_MAX) && errno == ERANGE) ||
+	    result < min || result > max) {
+		input_error(p->parent->instream,
+		            "value not in range of a %d-bit signed integer: %s",
+		            n * 8, value);
 		return 0;
 	}
 	return result;
@@ -675,8 +710,8 @@ unsigned long long yocton_prop_uint(struct yocton_prop *p, size_t n)
 	char *endptr;
 
 	if (n == 0 || n > sizeof(unsigned long long)) {
-		input_error(p->parent->instream, "unsupported "
-		            "integer size: %d-bit", n * 8);
+		input_error(p->parent->instream,
+		            "unsupported integer size: %d-bit", n * 8);
 		return 0;
 	} else if (n == sizeof(unsigned long long)) {
 		max = ULLONG_MAX;
@@ -688,14 +723,16 @@ unsigned long long yocton_prop_uint(struct yocton_prop *p, size_t n)
 	errno = 0;
 	result = strtoull(value, &endptr, 10);
 	if (*value == '\0' || isspace(*value) || *endptr != '\0') {
-		input_error(p->parent->instream, "not a valid integer "
-		            "value: '%s'", value);
+		input_error(p->parent->instream,
+		            "not a valid integer value: '%s'", value);
 		return 0;
 	}
 
 	if ((result == ULLONG_MAX && errno == ERANGE) || result > max) {
-		input_error(p->parent->instream, "value not in range of a "
-		            "%d-bit unsigned integer: %s", n * 8, value);
+		input_error(
+		    p->parent->instream,
+		    "value not in range of a %d-bit unsigned integer: %s",
+		    n * 8, value);
 		return 0;
 	}
 	return result;
@@ -711,14 +748,16 @@ static unsigned int yocton_enum_try_index(struct yocton_prop *p,
 	errno = 0;
 	parsed = strtoul(value, &endptr, 10);
 	if (*value == '\0' || isspace(*value) || *endptr != '\0') {
-		input_error(p->parent->instream, "not a valid enum "
-		            "value (or integer index): '%s'", value);
+		input_error(p->parent->instream,
+		            "not a valid enum value (or integer index): '%s'",
+		            value);
 		return 0;
 	}
 	if (parsed >= num_values) {
-		input_error(p->parent->instream, "index out of range for "
-		            "enum: %s > %d (maximum value)", value,
-		            num_values - 1);
+		input_error(
+		    p->parent->instream,
+		    "index out of range for enum: %s > %d (maximum value)",
+		    value, num_values - 1);
 		return 0;
 	}
 
@@ -740,8 +779,7 @@ unsigned int yocton_prop_enum(struct yocton_prop *p, const char **values)
 	}
 
 	// Unknown value.
-	input_error(p->parent->instream, "unknown enum value: '%s'",
-	            value);
+	input_error(p->parent->instream, "unknown enum value: '%s'", value);
 	return 0;
 }
 
@@ -768,8 +806,9 @@ int __yocton_reserve_array(struct yocton_prop *p, void **array, size_t nmemb,
 int __yocton_prop_alloc(struct yocton_prop *p, void **ptr, size_t size)
 {
 	if (*ptr != NULL) {
-		input_error(p->parent->instream, "pointer is non-NULL; "
-		            "property may be duplicated unexpectedly");
+		input_error(p->parent->instream,
+		            "pointer is non-NULL; property may be duplicated "
+		            "unexpectedly");
 		return 0;
 	}
 
