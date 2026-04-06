@@ -1,3 +1,24 @@
+# v2.10.0 (????-??-??)
+
+ * A bug was fixed where the high scores file was not being closed after the
+   file was written. This fixes high scores on Emscripten.
+ * The Emscripten port can now load mission files from URLs by appending
+   `?file=https://...` to the page's address.
+ * There is a new example file named `sopwith1.sop` which reproduces the
+   original "Sopwith 1" title screen and music.
+ * Memory allocation failures are now correctly handled.
+ * The FAQ was updated to include answers to a couple more questions.
+ * The MacOS port has been discontinued because of Apple's requirement that
+   app developers must pay for the privilege. Apple users are directed to use
+   the Emscripten version instead.
+
+Custom mission files:
+ * Mission files can now replace the title screen. The newly-included example
+   file `title.sop` demonstrates how this feature can be used.
+ * Mission files can now include "power-up" objects. These are collectible
+   items that the player can use to restock their plane's ammo, bombs or fuel
+   without needing to return to base.
+
 # v2.9.0 (2025-12-06)
 
  * A crash was fixed when any object was destroyed in multiplayer (thanks to
