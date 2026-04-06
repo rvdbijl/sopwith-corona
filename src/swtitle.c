@@ -257,7 +257,8 @@ static void DrawTitleScreenElements(void)
 			xoff = (SCR_WDTH - (int) el->v.ground.ground_len) / 2;
 			swground(el->v.ground.ground - imin(xoff, 0),
 			         imax(xoff, 0),
-			         imin(el->v.ground.ground_len, SCR_WDTH));
+			         imin(el->v.ground.ground_len, SCR_WDTH),
+			         GROUND_RENDER_PREF);
 			break;
 		default:
 			break;

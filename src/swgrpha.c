@@ -42,9 +42,13 @@ void Notification(const char *s, ...)
 	notification_time = Timer_GetMS();
 }
 
-void swground(GRNDTYPE *gptr, int xstart, int w)
+void swground(GRNDTYPE *gptr, int xstart, int w, ground_render_t render)
 {
-	if (conf_solidground) {
+	if (render == GROUND_RENDER_PREF) {
+		render = conf_solidground ? GROUND_RENDER_SOLID
+		                          : GROUND_RENDER_LINE;
+	}
+	if (render == GROUND_RENDER_SOLID) {
 		Vid_DispGround_Solid(gptr, xstart, w);
 	} else {
 		Vid_DispGround(gptr, xstart, w);
@@ -181,7 +185,7 @@ void swdisp(void)
 		}
 	}
 
-	swground(ground + displx, 0, SCR_WDTH);
+	swground(ground + displx, 0, SCR_WDTH, GROUND_RENDER_PREF);
 
 	if (Timer_GetMS() - notification_time < NOTIFICATION_TIME_MS) {
 		swposcur(0, 0);

@@ -55,6 +55,12 @@ typedef enum {
 	NUM_POWERUP_TYPES,
 } powerup_type_t;
 
+typedef enum {
+	GROUND_RENDER_PREF,
+	GROUND_RENDER_LINE,
+	GROUND_RENDER_SOLID,
+} ground_render_t;
+
 #include "swsymbol.h"
 
 // We only enable TCP/IP support if we have the appropriate socket header
