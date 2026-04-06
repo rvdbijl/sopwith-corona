@@ -463,13 +463,14 @@ static void ProcessTitleSymbol(struct yocton_object *obj)
 	AddTitleSymbol(&symset->sym[transform], x, y, faction);
 }
 
-static void ProcessTitleGround(struct yocton_object *obj)
+static void ProcessTitleGround(struct yocton_object *obj,
+                               ground_render_t render)
 {
 	GRNDTYPE *ground = NULL;
 	unsigned int ground_len = 0;
 
 	SetGround(obj, &ground, &ground_len);
-	AddTitleGround(ground, ground_len);
+	AddTitleGround(ground, ground_len, render);
 }
 
 static void ProcessTitleLine(struct yocton_object *obj)
@@ -507,7 +508,16 @@ static void ProcessTitle(struct yocton_object *obj)
 			ProcessTitleText(yocton_prop_inner(p));
 		}
 		if (!strcmp(name, "ground")) {
-			ProcessTitleGround(yocton_prop_inner(p));
+			ProcessTitleGround(yocton_prop_inner(p),
+			                   GROUND_RENDER_PREF);
+		}
+		if (!strcmp(name, "ground_line")) {
+			ProcessTitleGround(yocton_prop_inner(p),
+			                   GROUND_RENDER_LINE);
+		}
+		if (!strcmp(name, "ground_solid")) {
+			ProcessTitleGround(yocton_prop_inner(p),
+			                   GROUND_RENDER_SOLID);
 		}
 		if (!strcmp(name, "symbol")) {
 			ProcessTitleSymbol(yocton_prop_inner(p));

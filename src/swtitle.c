@@ -64,6 +64,7 @@ struct title_element {
 		struct {
 			GRNDTYPE *ground;
 			unsigned int ground_len;
+			ground_render_t render;
 		} ground;
 		struct {
 			int color;
@@ -157,12 +158,13 @@ void AddTitleText(char *text, int x, int y, int color, enum text_align align)
 	el->v.text.align = align;
 }
 
-void AddTitleGround(GRNDTYPE *ground, unsigned int len)
+void AddTitleGround(GRNDTYPE *ground, unsigned int len, ground_render_t render)
 {
 	struct title_element *el = AddTitleElement();
 	el->type = TITLE_GROUND;
 	el->v.ground.ground = ground;
 	el->v.ground.ground_len = len;
+	el->v.ground.render = render;
 }
 
 void AddTitleSymbol(sopsym_t *sym, int x, int y, faction_t faction)
@@ -258,7 +260,7 @@ static void DrawTitleScreenElements(void)
 			swground(el->v.ground.ground - imin(xoff, 0),
 			         imax(xoff, 0),
 			         imin(el->v.ground.ground_len, SCR_WDTH),
-			         GROUND_RENDER_PREF);
+			         el->v.ground.render);
 			break;
 		default:
 			break;

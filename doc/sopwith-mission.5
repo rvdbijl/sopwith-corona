@@ -554,9 +554,14 @@ of the sequence are what will be drawn.
 If the sequence length is less than the screen width, the pattern will be drawn
 in center of the screen.
 .IP \(bu
+The ground will be drawn differently depending on whether the game's "solid
+ground" option is turned on or not. To ignore the user's preference and force a
+particular drawing mode, use \fBground_solid\fR or \fBground_line\fR instead of
+\fBground\fR.
+.IP \(bu
 A title screen can define multiple ground patterns, and they will be drawn
-independently. However, if the game's "solid ground" option is turned on, they
-will end up overlapping, so it's probably not a good idea.
+independently. However, it's probably best to use \fBground_line\fR to ensure
+the lines don't overlap when the "solid ground" option is turned on.
 .
 .SH TITLE LINE
 Within a \fBtitle\fR section, a \fBline\fR block draws a line between two
