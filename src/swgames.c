@@ -502,29 +502,27 @@ static void ProcessTitle(struct yocton_object *obj)
 	ClearTitleScreen();
 
 	while ((p = yocton_next_prop(obj)) != NULL) {
-		const char *name = yocton_prop_name(p);
-
-		if (!strcmp(name, "text")) {
+		YOCTON_IF_PROP(p, "text", {
 			ProcessTitleText(yocton_prop_inner(p));
-		}
-		if (!strcmp(name, "ground")) {
+		});
+		YOCTON_IF_PROP(p, "ground", {
 			ProcessTitleGround(yocton_prop_inner(p),
 			                   GROUND_RENDER_PREF);
-		}
-		if (!strcmp(name, "ground_line")) {
+		});
+		YOCTON_IF_PROP(p, "ground_line", {
 			ProcessTitleGround(yocton_prop_inner(p),
 			                   GROUND_RENDER_LINE);
-		}
-		if (!strcmp(name, "ground_solid")) {
+		});
+		YOCTON_IF_PROP(p, "ground_solid", {
 			ProcessTitleGround(yocton_prop_inner(p),
 			                   GROUND_RENDER_SOLID);
-		}
-		if (!strcmp(name, "symbol")) {
+		});
+		YOCTON_IF_PROP(p, "symbol", {
 			ProcessTitleSymbol(yocton_prop_inner(p));
-		}
-		if (!strcmp(name, "line")) {
+		});
+		YOCTON_IF_PROP(p, "line", {
 			ProcessTitleLine(yocton_prop_inner(p));
-		}
+		});
 	}
 }
 
@@ -547,26 +545,25 @@ void LoadCustomLevel(const char *filename)
 	assert(obj != NULL);
 
 	while ((p = yocton_next_prop(obj)) != NULL) {
-		const char *name = yocton_prop_name(p);
 		// TODO: Add support for multiple levels within a mission file.
 		// The level data gets embedded within a level {} object with
 		// the expectation that files will be able to contain multiple
 		// levels in the future.
-		if (!strcmp(name, "level")) {
+		YOCTON_IF_PROP(p, "level", {
 			yocton_check(obj, !processed_level,
 			             "only one level per file supported");
 			ProcessLevel(yocton_prop_inner(p));
 			processed_level = true;
-		}
-		if (!strcmp(name, "symbols")) {
+		});
+		YOCTON_IF_PROP(p, "symbols", {
 			ProcessSymbols(yocton_prop_inner(p));
-		}
-		if (!strcmp(name, "sounds")) {
+		});
+		YOCTON_IF_PROP(p, "sounds", {
 			ProcessSounds(yocton_prop_inner(p));
-		}
-		if (!strcmp(name, "title")) {
+		});
+		YOCTON_IF_PROP(p, "title", {
 			ProcessTitle(yocton_prop_inner(p));
-		}
+		});
 	}
 
 	if (yocton_have_error(obj, &lineno, &error_msg)) {
