@@ -275,24 +275,6 @@ void GetCursorPosition(int *x, int *y)
 	}
 }
 
-int swgetc(void)
-{
-	int i;
-
-	while(!(i = Vid_GetChar())) {
-
-		// sdh 15/11/2001: dont thrash the processor while
-		// waiting for a key press
-		Timer_Sleep(50);
-
-		swsndupdate();
-		if (ctlbreak())
-			break;
-	}
-
-	return i;
-}
-
 //
 // 2003-02-14: Code was checked into version control; no further entries
 // will be added to this log.
