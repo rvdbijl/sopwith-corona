@@ -42,7 +42,7 @@ static int num_orig_planes;
 GRNDTYPE *ground;
 
 static bool have_savescore = false;
-static score_t savescore;		/* save players score on restart  */
+static score_t savescore;		/* save players score on restart */
 int starting_level = 0;
 
 static const char *helptxt =

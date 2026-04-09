@@ -163,7 +163,7 @@ static const char *swhitsym[] = {
 	"              * * *             \n",
 };
 
-static const char *swwinsym[] = {  /*  Win plane pixel array  */
+static const char *swwinsym[] = {  /* Win plane pixel array */
 	"                                \n"
 	"                                \n"
 	"                                \n"

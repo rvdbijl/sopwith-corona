@@ -88,33 +88,33 @@ typedef enum {
 #define strncasecmp strnicmp
 #endif
 
-/*  Constants  */
+/* Constants */
 
 #define FPS             10              /* How fast the game runs */
 
 #define DEFAULT_PORT    3847            /* Default TCP port for multiplayer */
 
-#define MAX_Y           200             /*  Maximum Y coordinate            */
-#define MIN_SPEED       4               /*  Minimum plane speed             */
-#define MAX_SPEED       8               /*  Maximum plane speed             */
-#define MAX_THROTTLE    4               /*  Maximum acceleration            */
+#define MAX_Y           200             /* Maximum Y coordinate */
+#define MIN_SPEED       4               /* Minimum plane speed */
+#define MAX_SPEED       8               /* Maximum plane speed */
+#define MAX_THROTTLE    4               /* Maximum acceleration */
 
-#define MAXCRCOUNT      10              /*  Number of turns as crashed      */
-#define FALLCOUNT       10              /*  Moves between falling plane adj */
-#define STALLCOUNT      6               /*  Moves between stalling plane adj*/
-#define TARGHITCOUNT    10              /*  Target hit count before explod'n*/
+#define MAXCRCOUNT      10              /* Number of turns as crashed */
+#define FALLCOUNT       10              /* Moves between falling plane adj */
+#define STALLCOUNT      6               /* Moves between stalling plane adj*/
+#define TARGHITCOUNT    10              /* Target hit count before explod'n*/
 
-#define SCR_WDTH        320             /*  Screen Width                    */
-#define SCR_HGHT        200             /*  Screen Height                   */
+#define SCR_WDTH        320             /* Screen Width */
+#define SCR_HGHT        200             /* Screen Height */
 
-#define SCR_CENTR       ((SCR_WDTH / 2) - 8) /*  Centre column of screen */
-#define SCR_MNSH        16              /*  Minumum line number to shift    */
-#define SCR_MXSH        75              /*  Maximum line number to shift    */
+#define SCR_CENTR       ((SCR_WDTH / 2) - 8) /* Centre column of screen */
+#define SCR_MNSH        16              /* Minumum line number to shift */
+#define SCR_MXSH        75              /* Maximum line number to shift */
 
 // sdh 27/7/2002: make these independent of the screen width
 
-#define WRLD_RSX        (currgame->gm_max_x / 320 * 2 + 1) /*  World display X and  */
-#define WRLD_RSY        (MAX_Y / SCR_MNSH + 1)     /*  Y divisors           */
+#define WRLD_RSX        (currgame->gm_max_x / 320 * 2 + 1) /* World display X and */
+#define WRLD_RSY        (MAX_Y / SCR_MNSH + 1)     /* Y divisors */
 
 #define GAUGEX          (SCR_CENTR - 25)  /* X co-ordinate of first gauge */
 
@@ -128,33 +128,32 @@ typedef enum {
 
 #define MAXROUNDS       200             /* Maximum number of rounds of shot */
 #define MAXBOMBS        5               /* Maximum number of bombs available*/
-#define MAXMISSILES     5               /* Maximum number of missiles       */
-#define MAXBURSTS       5               /* Maximum nuber of starbursts      */
-#define MAXFUEL         9000            /* Maximum number of turns between  */
-                                        /*  refuellings                     */
+#define MAXMISSILES     5               /* Maximum number of missiles */
+#define MAXBURSTS       5               /* Maximum nuber of starbursts */
+#define MAXFUEL         9000            /* Maximum turns between refuellings */
 #define MAXCRASH        5               /* Mximum number of crashes allowed */
 
 #define MAX_PLANES      16              /* Maximum planes per level */
-#define MAX_PLYR        4               /* Maximum number of players        */
-#define MAX_OBJS        100             /* Maximum number of objects        */
-#define NUM_STRAY_BIRDS 1               /* Number of stray birds per flock  */
+#define MAX_PLYR        4               /* Maximum number of players */
+#define MAX_OBJS        100             /* Maximum number of objects */
+#define NUM_STRAY_BIRDS 1               /* Number of stray birds per flock */
 
-#define ANGLES          16              /*  Number of angle increments      */
-#define ORIENTS         2               /*  Number of plane orientations    */
-#define SYM_WDTH        16              /*  Symbol width in pixels          */
-#define SYM_HGHT        16              /*  Symbol height in pixels         */
+#define ANGLES          16              /* Number of angle increments */
+#define ORIENTS         2               /* Number of plane orientations */
+#define SYM_WDTH        16              /* Symbol width in pixels */
+#define SYM_HGHT        16              /* Symbol height in pixels */
 
-#define BULSPEED        10              /* Bullet speed    */
-#define BULLIFE         10              /* Bullet life     */
-#define BOMBLIFE        5               /* Moves between bomb course adj   */
-#define MISSLIFE        50              /* Missile life                    */
-#define BURSTLIFE       20              /* Starburst life                  */
-#define EXPLLIFE        3               /* Moves between explosion "  "    */
-#define SMOKELIFE       10              /* Smoke life                      */
-#define BIRDLIFE        4               /* Moves between bird flaps        */
-#define FLOCKLIFE       5               /* Moves between flop flaps        */
+#define BULSPEED        10              /* Bullet speed */
+#define BULLIFE         10              /* Bullet life */
+#define BOMBLIFE        5               /* Moves between bomb course adj */
+#define MISSLIFE        50              /* Missile life */
+#define BURSTLIFE       20              /* Starburst life */
+#define EXPLLIFE        3               /* Moves between explosion "  " */
+#define SMOKELIFE       10              /* Smoke life */
+#define BIRDLIFE        4               /* Moves between bird flaps */
+#define FLOCKLIFE       5               /* Moves between flop flaps */
 
-typedef enum {               /*  Player states  */
+typedef enum {               /* Player states */
 	WAITING = 0,
 	FLYING ,
 	HIT,
@@ -193,14 +192,14 @@ typedef enum {
 	DUMMYTYPE = 99,
 } obtype_t;
 
-#define NEAR            ( 150 * 150 )   /* Computer control distances        */
+#define NEAR            ( 150 * 150 )   /* Computer control distances */
 #define CLOSE           32
 #define HOME            16
 #define SAFERESET       32
 
-#define QUIT            -5000           /* Plane life value when quitting    */
+#define QUIT            -5000           /* Plane life value when quitting */
 
-#define K_ACCEL         0x0001          /* Keyboard word masks               */
+#define K_ACCEL         0x0001          /* Keyboard word masks */
 #define K_DEACC         0x0002
 #define K_FLAPU         0x0004
 #define K_FLAPD         0x0008
@@ -216,7 +215,7 @@ typedef enum {
 
 typedef  unsigned int GRNDTYPE;
 
-struct tt {                     /*  Continuous tone table entry    */
+struct tt {                     /* Continuous tone table entry */
 	unsigned int tt_tone;
 	unsigned int tt_chng;
 	struct tt *tt_next;
@@ -300,7 +299,7 @@ typedef struct {
 	transform_t transform;           /* Rotation/mirroring */
 } original_ob_t;
 
-typedef struct obj {                            /*  Object list             */
+typedef struct obj {                            /* Object list */
 	obstate_t      ob_state;
 	int            ob_x, ob_y;
 	int            ob_dx, ob_dy;
@@ -359,7 +358,7 @@ typedef struct obj {                            /*  Object list             */
 	bool           ob_goingsun;
 } OBJECTS;
 
-typedef struct {                                /*  Game structure          */
+typedef struct {                                /* Game structure */
 	unsigned int gm_rseed;
 	original_ob_t *gm_objects;
 	unsigned int gm_num_objects;

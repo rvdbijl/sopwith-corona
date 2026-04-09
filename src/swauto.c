@@ -20,7 +20,7 @@
 #include "swmain.h"
 #include "swobject.h"
 
-static int courseadj;		/*  Course adjustment             */
+static int courseadj;		/* Course adjustment */
 
 static int shoot(OBJECTS *obt, OBJECTS *obs)
 {

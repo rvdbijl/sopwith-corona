@@ -40,43 +40,44 @@ bool conf_big_explosions = 1;       // big oil tank explosions
 
 int conf_video_palette = 0;			// Video palette selection (0 is the default CGA color scheme)
 
-playmode_t playmode;		/* Mode of play                     */
+playmode_t playmode;		/* Mode of play */
 const GAMES *currgame;		/* Game parameters and current game */
 OBJECTS *consoleplayer;
 int numtarg[NUM_FACTIONS];	/* Number of active targets by faction */
-int countmove;			/* Performance counters             */
+int countmove;			/* Performance counters */
 
-int gamenum = 0;		/* Current game number              */
+int gamenum = 0;		/* Current game number */
 int gmaxspeed, gminspeed;	/* Speed range based on game number */
 int targrnge;			/* Target range based on game number */
 
-bool titleflg;			/* Title flag                       */
-bool soundflg = 0;		/* Sound flag                       */
+bool titleflg;			/* Title flag */
+bool soundflg = 0;		/* Sound flag */
 
-int displx;			/* Display left and right           */
+int displx;			/* Display left and right */
 
-OBJECTS *planes[MAX_PLANES];    /* Plane objects                    */
+OBJECTS *planes[MAX_PLANES];    /* Plane objects */
 int num_planes;
 
-OBJECTS *objbot, *objtop,	/* Top and bottom of object list    */
-*objfree,			/* Free list                        */
-*deltop, *delbot;		/* Newly deallocated objects        */
-OBJECTS topobj, botobj;		/* Top and Bottom of obj. x list    */
+OBJECTS *objbot, *objtop,	/* Top and bottom of object list */
+*objfree,			/* Free list */
+*deltop, *delbot;		/* Newly deallocated objects */
+OBJECTS topobj, botobj;		/* Top and Bottom of obj. x list */
 
 int endcount;
-int player;			/* Pointer to player's object       */
-bool plyrplane;			/* Current object is player flag    */
-bool compplane;			/* Current object is a comp plane   */
-unsigned int explseed;		/* random seed for explosion        */
+int player;			/* Pointer to player's object */
+bool plyrplane;			/* Current object is player flag */
+bool compplane;			/* Current object is a comp plane */
+unsigned int explseed;		/* random seed for explosion */
 
 int keydelay = -1;		/* Number of displays per keystroke */
-int dispcnt;			/* Displays to delay keyboard       */
+int dispcnt;			/* Displays to delay keyboard */
 int endstat;			/* End of game status for curr. move */
-int maxcrash;			/* Maximum number of crashes        */
-bool restart_flag;              /* Return to main menu              */
+int maxcrash;			/* Maximum number of crashes */
+bool restart_flag;              /* Return to main menu */
 
-const int sintab[ANGLES] = {	/* sine table of pi/8 increments    */
-	0, 98, 181, 237,	/*   multiplied by 256              */
+/* Sine table of pi/8 increments, multiplied by 256 */
+const int sintab[ANGLES] = {
+	0, 98, 181, 237,
 	256, 237, 181, 98,
 	0, -98, -181, -237,
 	-256, -237, -181, -98
@@ -84,7 +85,7 @@ const int sintab[ANGLES] = {	/* sine table of pi/8 increments    */
 
 /* buffer of player commands, loops round.
  * latest_player_commands[plr][latest_player_time[plr] % MAX_NET_LAG] is the
- * very latest command for plr.  */
+ * very latest command for plr. */
 int latest_player_commands[MAX_PLYR][MAX_NET_LAG];
 int latest_player_time[MAX_PLYR];
 int num_players;
@@ -99,7 +100,7 @@ static int player_command_time[MAX_NET_LAG];
  * (ie. in a single player game): the amount equal to skip_time here.
  * skip_time is generated from the lag players experience.
  * This means that lagged players wait a bit to "catch up" with the
- * others, keeping the game in sync.  */
+ * others, keeping the game in sync. */
 static int skip_time;
 
 static bool CanMove(void)
