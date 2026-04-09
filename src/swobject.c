@@ -194,7 +194,7 @@ void movexy(OBJECTS *ob, int *x, int *y)
 	updateobjpos(ob);
 }
 
-void setdxdy(OBJECTS * obj, int dx, int dy)
+void setdxdy(OBJECTS *obj, int dx, int dy)
 {
 	obj->ob_dx = (dx >> 8);
 	obj->ob_ldx = (dx << 8) & 0xffff;

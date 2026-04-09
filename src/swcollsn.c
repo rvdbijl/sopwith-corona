@@ -212,7 +212,7 @@ static void TargetDestroyed(OBJECTS *ob, obtype_t type)
 	}
 }
 
-static bool scorepenalty(obtype_t ttype, OBJECTS * ob, int score)
+static bool scorepenalty(obtype_t ttype, OBJECTS *ob, int score)
 {
 	OBJECTS *obt;
 
@@ -232,7 +232,7 @@ static bool scorepenalty(obtype_t ttype, OBJECTS * ob, int score)
 
 static const int crtdepth[8] = { 1, 2, 2, 3, 3, 2, 2, 1 };
 
-static void crater(OBJECTS * ob)
+static void crater(OBJECTS *ob)
 {
 	int i, x, y, ymin, ymax;
 	int xmin, xmax;
@@ -289,7 +289,7 @@ static void PowerupCollected(OBJECTS *powerup, OBJECTS *plane)
 	}
 }
 
-static void swkill(OBJECTS * ob1, OBJECTS * ob2)
+static void swkill(OBJECTS *ob1, OBJECTS *ob2)
 {
 	OBJECTS *ob, *obt;
 	int i;
@@ -649,7 +649,7 @@ static int ComputeValour(OBJECTS *ob)
 	return valour;
 }
 
-void scorepln(OBJECTS * ob, obtype_t type)
+void scorepln(OBJECTS *ob, obtype_t type)
 {
 	int had_taken_off = ob->ob_life < (MAXFUEL - (MAXFUEL / 100));
 

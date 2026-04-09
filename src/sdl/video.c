@@ -568,7 +568,7 @@ void Vid_SetVideoPalette(int palette)
 	Vid_Update();
 }
 
-const char* Vid_GetVideoPaletteName(int palette)
+const char *Vid_GetVideoPaletteName(int palette)
 {
 	return video_palettes[palette].name;
 }

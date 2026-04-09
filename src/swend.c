@@ -82,7 +82,7 @@ void winner(OBJECTS *ob)
 	}
 }
 
-void loser(OBJECTS * ob)
+void loser(OBJECTS *ob)
 {
 	ob->ob_endsts = LOSER;
 

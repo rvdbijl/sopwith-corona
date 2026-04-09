@@ -124,7 +124,7 @@ static void refuel(OBJECTS *ob)
 	topup(&ob->ob_bursts, MAXBURSTS);
 }
 
-static int symangle(OBJECTS * ob)
+static int symangle(OBJECTS *ob)
 {
 	int dx, dy;
 
@@ -837,7 +837,7 @@ bool moveburst(OBJECTS *ob)
 	return y < MAX_Y;
 }
 
-static void TargetSoundCallback(OBJECTS * ob)
+static void TargetSoundCallback(OBJECTS *ob)
 {
 	if (ob->ob_firing) {
 		sound(S_SHOT, 0, ob);
@@ -977,7 +977,7 @@ static void ExplosionSoundCallback(OBJECTS *ob)
 	}
 }
 
-bool moveexpl(OBJECTS * obp)
+bool moveexpl(OBJECTS *obp)
 {
 	OBJECTS *ob;
 	int x, y;
@@ -1028,7 +1028,7 @@ bool moveexpl(OBJECTS * obp)
 	return y < MAX_Y;
 }
 
-bool movesmok(OBJECTS * obp)
+bool movesmok(OBJECTS *obp)
 {
 	OBJECTS *ob;
 	obstate_t planestate;
@@ -1050,7 +1050,7 @@ bool movesmok(OBJECTS * obp)
 	return true;
 }
 
-bool moveflck(OBJECTS * obp)
+bool moveflck(OBJECTS *obp)
 {
 	OBJECTS *ob;
 	int x, y;
@@ -1150,7 +1150,7 @@ static bool checkwall(OBJECTS *obp, int direction)
 	return false;
 }
 
-bool movebird(OBJECTS * obp)
+bool movebird(OBJECTS *obp)
 {
 	OBJECTS *ob;
 	int x, y;
@@ -1190,7 +1190,7 @@ bool movebird(OBJECTS * obp)
 	return true;
 }
 
-bool moveox(OBJECTS * ob)
+bool moveox(OBJECTS *ob)
 {
 	int transform = ob->ob_original_ob->transform;
 	ob->ob_symbol = &symbol_ox[ob->ob_state != STANDING].sym[transform];
@@ -1218,7 +1218,7 @@ bool crashpln(OBJECTS *ob)
 	return true;
 }
 
-bool hitpln(OBJECTS * obp)
+bool hitpln(OBJECTS *obp)
 {
 	OBJECTS *ob;
 

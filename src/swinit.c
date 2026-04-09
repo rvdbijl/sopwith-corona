@@ -403,7 +403,7 @@ static void AdjustBullet(OBJECTS *bullet, OBJECTS *src)
 }
 
 // bullet
-void initshot(OBJECTS *obo, OBJECTS * targ)
+void initshot(OBJECTS *obo, OBJECTS *targ)
 {
 	OBJECTS *ob;
 	int nangle, nspeed, dx, dy, r, bspeed, x, y;

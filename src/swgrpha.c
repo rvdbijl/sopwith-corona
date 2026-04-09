@@ -66,7 +66,7 @@ static inline int ob_color(OBJECTS *ob)
 	}
 }
 
-void swputsym(int x, int y, OBJECTS * ob)
+void swputsym(int x, int y, OBJECTS *ob)
 {
 	Vid_DispSymbol(x, y, ob->ob_symbol, ob_color(ob));
 }

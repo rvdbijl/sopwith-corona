@@ -58,7 +58,7 @@ static void dispmedals(OBJECTS *ob)
 	}
 }
 
-static void dispscore(OBJECTS * ob)
+static void dispscore(OBJECTS *ob)
 {
 	char buf[10];
 	int x;

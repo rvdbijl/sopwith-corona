@@ -161,7 +161,7 @@ static TONETAB *allocton(void)
 	return frsttone;
 }
 
-static void deallton(TONETAB * ttp)
+static void deallton(TONETAB *ttp)
 {
 	TONETAB *tt = ttp;
 	TONETAB *ttb = tt->tt_prev;
@@ -195,7 +195,7 @@ void initsndt(void)
 	freetone = tonetab;
 }
 
-void stopsound(OBJECTS * ob)
+void stopsound(OBJECTS *ob)
 {
 	TONETAB *tt = ob->ob_sound;
 
@@ -512,7 +512,7 @@ void swsound(void)
 	soundtype = soundparm = 32767;
 }
 
-void sound(int type, int parm, OBJECTS * ob)
+void sound(int type, int parm, OBJECTS *ob)
 {
 	// if we are already playing the title music, ignore
 	if (type == S_TITLE) {
