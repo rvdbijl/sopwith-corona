@@ -85,8 +85,8 @@ void swsplatbird(void)
 	
 	randsd();
 
-	splat.x = (unsigned) (seed % (SCR_WDTH - 32));
-	splat.y = (unsigned) (seed % (SCR_HGHT - 60)) + 60;
+	splat.x = (unsigned int) (seed % (SCR_WDTH - 32));
+	splat.y = (unsigned int) (seed % (SCR_HGHT - 60)) + 60;
 	splat.sym = &symbol_birdsplat[0].sym[0];
 	splat.clr = FACTION_PLAYER2;
 
@@ -99,8 +99,8 @@ void swwindshot(void)
 
 	randsd();
 
-	splat.x = (unsigned) (seed % (SCR_WDTH - 16));
-	splat.y = (unsigned) (seed % (SCR_HGHT - 50)) + 50;
+	splat.x = (unsigned int) (seed % (SCR_WDTH - 16));
+	splat.y = (unsigned int) (seed % (SCR_HGHT - 50)) + 50;
 	splat.sym = &symbol_shotwin[0].sym[0];
 	splat.clr = FACTION_PLAYER1;
 

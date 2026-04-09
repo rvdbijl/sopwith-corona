@@ -67,7 +67,7 @@ int endcount;
 int player;			/* Pointer to player's object       */
 bool plyrplane;			/* Current object is player flag    */
 bool compplane;			/* Current object is a comp plane   */
-unsigned explseed;		/* random seed for explosion        */
+unsigned int explseed;		/* random seed for explosion        */
 
 int keydelay = -1;		/* Number of displays per keystroke */
 int dispcnt;			/* Displays to delay keyboard       */

@@ -54,7 +54,7 @@ extern bool    plyrplane;
 extern bool    compplane;
 extern bool    forcdisp;
 extern char    *histin, *histout;
-extern unsigned explseed;
+extern unsigned int explseed;
 extern int     keydelay;
 extern int     dispcnt;
 extern int     endstat;

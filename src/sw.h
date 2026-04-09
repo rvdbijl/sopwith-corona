@@ -217,8 +217,8 @@ typedef enum {
 typedef  unsigned int GRNDTYPE;
 
 struct tt {                     /*  Continuous tone table entry    */
-	unsigned  tt_tone;
-	unsigned  tt_chng;
+	unsigned int tt_tone;
+	unsigned int tt_chng;
 	struct tt *tt_next;
 	struct tt *tt_prev;
 };

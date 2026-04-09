@@ -31,8 +31,8 @@ extern void soundoff(void);
 extern void swsndupdate(void);
 
 extern OBJECTS *ob;
-extern unsigned freq;
-extern unsigned  modulo;
+extern unsigned int freq;
+extern unsigned int modulo;
 extern char *expltune;
 
 #endif

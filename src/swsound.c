@@ -62,18 +62,18 @@ static const int noteindex[] = {
 static int soundtype = 32767;		/*  Current sound type and          */
 static int soundparm = 32767;		/*     and priority parameter       */
 static OBJECTS *soundobj = NULL;	/*  Object making sound             */
-static unsigned lastfreq = 0;		/*  Last frequency used             */
+static unsigned int lastfreq = 0;	/*  Last frequency used             */
 static OBJECTS *lastobj = NULL;		/*  Previous object making sound    */
 static void (*toneadj) () = NULL;	/*  Tone adjustment on clock tick   */
 
 static TONETAB tonetab[SNDSIZE];	/*  Continuous tone table           */
 static TONETAB *frsttone, *freetone;	/*  Tone list and free list         */
-static unsigned soundticks;		/*  Ticks since last sound selection */
+static unsigned int soundticks;		/*  Ticks since last sound selection */
 
 static int numexpls;			/*  Number of explosions currently  */
 					/*  active                          */
 static int explplace;			/*  Place in explosion tune;        */
-static unsigned expltone;		/*  Current explosion tone          */
+static unsigned int expltone;		/*  Current explosion tone          */
 static int explticks;			/*  Ticks until note change         */
 static int exploctv;			/*  Octave                          */
 
@@ -102,13 +102,13 @@ char *expltune =
 #endif
 
 static int titlplace;		/*  Place in title tune;            */
-static unsigned titltone;	/*  Current title tone              */
+static unsigned int titltone;	/*  Current title tone              */
 static int titlticks;		/*  Ticks until note change         */
 static int titloctv;		/*  Octave                          */
 
 static char *tune;		/* Tune player statics              */
 static int place;
-static unsigned tunefreq;
+static unsigned int tunefreq;
 static int tunedura;
 static int octavefactor;
 
@@ -363,7 +363,7 @@ static void adjcont(void)
 
 static void adjshot(void)
 {
-	static unsigned savefreq;
+	static unsigned int savefreq;
 
 	if (lastfreq == 0xF000) {
 		tone(savefreq);
