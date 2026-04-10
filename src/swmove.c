@@ -56,7 +56,7 @@ void swmove(void)
 	ob = objtop;
 	while (ob) {
 		obn = ob->ob_next;
-		ob->ob_drwflg = (*ob->ob_movef) (ob);
+		ob->ob_drwflg = (*ob->ob_movef)(ob);
 		ob = obn;
 	}
 
@@ -79,18 +79,18 @@ static void nearpln(OBJECTS *ob)
 		// TODO: Planes currently target any plane of a different
 		// faction. In the future it would be nice to support
 		// alliances between factions.
-		if (obt->ob_type != PLANE
-		 || obt->ob_faction == ob->ob_faction) {
+		if (obt->ob_type != PLANE ||
+		    obt->ob_faction == ob->ob_faction) {
 			continue;
 		}
 
 		if (obt->ob_movef == movecomp) {
-			if (playmode != PLAYMODE_COMPUTER
-			 || in_range(obt->ob_original_ob->territory_l, obx,
+			if (playmode != PLAYMODE_COMPUTER ||
+			    in_range(obt->ob_original_ob->territory_l, obx,
 			             obt->ob_original_ob->territory_r)) {
 				obc = obt->ob_target;
-				if (!obc || abs(obx - obt->ob_x)
-				          < abs(obc->ob_x - obt->ob_x)) {
+				if (!obc || abs(obx - obt->ob_x) <
+				                abs(obc->ob_x - obt->ob_x)) {
 					obt->ob_target = ob;
 				}
 			}
@@ -205,9 +205,10 @@ bool moveplyr(OBJECTS *ob)
 			swend(NULL, true);
 		}
 	}
-	
+
 	// get move command for this tic
-	multkey = latest_player_commands[ob->ob_plrnum][countmove % MAX_NET_LAG];
+	multkey =
+	    latest_player_commands[ob->ob_plrnum][countmove % MAX_NET_LAG];
 
 	// Thanks to Kodath duMatri for fixing this :)
 	if ((multkey & K_HARRYKEYS) != 0 && ob->ob_orient) {
@@ -225,10 +226,9 @@ bool moveplyr(OBJECTS *ob)
 			++ob->ob_crashcnt;
 		}
 
-		if (endstat != WINNER
-		 && (ob->ob_life <= QUIT
-		  || (playmode != PLAYMODE_ASYNCH
-		   && ob->ob_crashcnt >= MAXCRASH))) {
+		if (endstat != WINNER &&
+		    (ob->ob_life <= QUIT || (playmode != PLAYMODE_ASYNCH &&
+		                             ob->ob_crashcnt >= MAXCRASH))) {
 			if (!endstat) {
 				loser(ob);
 			}
@@ -413,8 +413,7 @@ static bool stallpln(OBJECTS *ob)
 	ob->ob_speed = 0;
 	ob->ob_dy = 0;
 	ob->ob_hitcount = STALLCOUNT;
-	ob->ob_state =
-		ob->ob_state == WOUNDED ? WOUNDSTALL : STALLED;
+	ob->ob_state = ob->ob_state == WOUNDED ? WOUNDSTALL : STALLED;
 	ob->ob_athome = false;
 
 	return true;
@@ -480,9 +479,9 @@ static bool movepln(OBJECTS *ob)
 	case WOUNDSTALL:
 		newstate = WOUNDED;
 
-	      commonstall:
-		stalled = ob->ob_angle != (3 * ANGLES / 4)
-			|| ob->ob_speed < gminspeed;
+	commonstall:
+		stalled = ob->ob_angle != (3 * ANGLES / 4) ||
+		          ob->ob_speed < gminspeed;
 		if (!stalled) {
 			ob->ob_state = state = newstate;
 		}
@@ -501,13 +500,13 @@ static bool movepln(OBJECTS *ob)
 			}
 		}
 
-	     controlled:
+	controlled:
 		if (ob->ob_goingsun) {
 			break;
 		}
 
-		if (ob->ob_life <= 0 && !ob->ob_athome
-		 && !PlaneIsKilled(state)) {
+		if (ob->ob_life <= 0 && !ob->ob_athome &&
+		    !PlaneIsKilled(state)) {
 			hitpln(ob);
 			scorepln(ob, GROUND);
 			return movepln(ob);
@@ -543,13 +542,13 @@ static bool movepln(OBJECTS *ob)
 		}
 
 		if (!(countmove & 0x0003)) {
-			if (!stalled && nspeed < gminspeed
-			 && playmode != PLAYMODE_NOVICE) {
+			if (!stalled && nspeed < gminspeed &&
+			    playmode != PLAYMODE_NOVICE) {
 				--nspeed;
 				update = true;
 			} else {
-				limit = gminspeed
-				      + ob->ob_accel + gravity[nangle];
+				limit =
+				    gminspeed + ob->ob_accel + gravity[nangle];
 				if (nspeed < limit) {
 					++nspeed;
 					update = true;
@@ -584,8 +583,7 @@ static bool movepln(OBJECTS *ob)
 				ob->ob_dx = ob->ob_ldx = ob->ob_ldy = 0;
 				ob->ob_dy = -nspeed;
 			} else {
-				setdxdy(ob,
-				        nspeed * COS(nangle),
+				setdxdy(ob, nspeed * COS(nangle),
 				        nspeed * SIN(nangle));
 			}
 		}
@@ -595,8 +593,7 @@ static bool movepln(OBJECTS *ob)
 			if (ob->ob_hitcount <= 0) {
 				ob->ob_orient = !ob->ob_orient;
 				ob->ob_angle =
-				    ((3 * ANGLES / 2) - ob->ob_angle)
-				    % ANGLES;
+				    ((3 * ANGLES / 2) - ob->ob_angle) % ANGLES;
 				ob->ob_hitcount = STALLCOUNT;
 			}
 		}
@@ -626,8 +623,8 @@ static bool movepln(OBJECTS *ob)
 		int a = (16 - ob->ob_angle) % 16;
 		ob->ob_symbol = &symbol_plane[a % 4].sym[4 + a / 4];
 	} else {
-		ob->ob_symbol = &symbol_plane[ob->ob_angle % 4]
-			.sym[ob->ob_angle / 4];
+		ob->ob_symbol =
+		    &symbol_plane[ob->ob_angle % 4].sym[ob->ob_angle / 4];
 	}
 
 	movexy(ob, &x, &y);
@@ -637,9 +634,8 @@ static bool movepln(OBJECTS *ob)
 		updateobjpos(ob);
 	}
 
-	if (!compplane
-	 && consoleplayer->ob_endsts == PLAYING
-	 && !PlaneIsKilled(ob->ob_state)) {
+	if (!compplane && consoleplayer->ob_endsts == PLAYING &&
+	    !PlaneIsKilled(ob->ob_state)) {
 		nearpln(ob);
 	}
 
@@ -698,8 +694,8 @@ bool moveshot(OBJECTS *ob)
 
 	movexy(ob, &x, &y);
 
-	if (!in_range(0, x, currgame->gm_max_x - 1)
-	 || !in_range((int) ground[x] + 1, y, MAX_Y - 1)) {
+	if (!in_range(0, x, currgame->gm_max_x - 1) ||
+	    !in_range((int) ground[x] + 1, y, MAX_Y - 1)) {
 		deallobj(ob);
 		return false;
 	}
@@ -772,13 +768,10 @@ bool movemiss(OBJECTS *ob)
 				obt = obt->ob_missiletarget;
 			}
 			aim(ob, obt->ob_x, obt->ob_y, NULL, false);
-			angle = ob->ob_angle
-			    =
-			    (ob->ob_angle + ob->ob_flaps +
-			     ANGLES) % ANGLES;
-			setdxdy(ob,
-				ob->ob_speed * COS(angle),
-				ob->ob_speed * SIN(angle));
+			angle = ob->ob_angle =
+			    (ob->ob_angle + ob->ob_flaps + ANGLES) % ANGLES;
+			setdxdy(ob, ob->ob_speed * COS(angle),
+			        ob->ob_speed * SIN(angle));
 		}
 		movexy(ob, &x, &y);
 
@@ -800,8 +793,7 @@ bool movemiss(OBJECTS *ob)
 		return false;
 	}
 
-	ob->ob_symbol =
-		&symbol_missile[ob->ob_angle % 4].sym[ob->ob_angle / 4];
+	ob->ob_symbol = &symbol_missile[ob->ob_angle % 4].sym[ob->ob_angle / 4];
 
 	if (y >= MAX_Y) {
 		return false;
@@ -852,13 +844,13 @@ static OBJECTS *FindEnemyPlane(OBJECTS *ob)
 		// TODO: Targets consider any plane of a different faction
 		// to be an enemy. In the future we may want to support
 		// alliances between factions.
-		if (obp->ob_type != PLANE
-		 || obp->ob_faction == ob->ob_faction) {
+		if (obp->ob_type != PLANE ||
+		    obp->ob_faction == ob->ob_faction) {
 			continue;
 		}
 		// In single player mode, computer planes do not get targeted.
-		if (playmode != PLAYMODE_ASYNCH
-		 && obp->ob_faction != FACTION_PLAYER1) {
+		if (playmode != PLAYMODE_ASYNCH &&
+		    obp->ob_faction != FACTION_PLAYER1) {
 			continue;
 		}
 		if (PlaneIsKilled(obp->ob_state)) {
@@ -911,10 +903,8 @@ bool movetarg(OBJECTS *ob)
 	assert(ob->ob_orient < arrlen(target_aggression));
 	aggression = target_aggression[ob->ob_orient];
 
-	if (ob->ob_state == STANDING
-	 && gamenum > 0
-	 && aggression > 0
-	 && (gamenum > 1 || (countmove % aggression) == (aggression - 1))) {
+	if (ob->ob_state == STANDING && gamenum > 0 && aggression > 0 &&
+	    (gamenum > 1 || (countmove % aggression) == (aggression - 1))) {
 		OBJECTS *plane = FindEnemyPlane(ob);
 		if (plane) {
 			initshot(ob, plane);
@@ -925,11 +915,10 @@ bool movetarg(OBJECTS *ob)
 	ob->ob_hitcount = clamp_min(ob->ob_hitcount - 1, 0);
 
 	if (ob->ob_state == STANDING) {
-		ob->ob_symbol =
-			&symbol_targets[ob->ob_orient].sym[transform];
+		ob->ob_symbol = &symbol_targets[ob->ob_orient].sym[transform];
 	} else {
 		ob->ob_symbol =
-			&symbol_target_hit[ob->ob_orient].sym[transform];
+		    &symbol_target_hit[ob->ob_orient].sym[transform];
 	}
 
 	// Symbol changes on explosion, and the new sprite might be a
@@ -947,22 +936,22 @@ bool movepowerup(OBJECTS *ob)
 	int collected_frame;
 
 	switch (ob->ob_orient) {
-		case POWERUP_AMMO_BIG:
-		case POWERUP_BOMB_BIG:
-		case POWERUP_FUEL_BIG:
-		case POWERUP_COLLECTED_BIG:
-			collected_frame = POWERUP_COLLECTED_BIG;
-			break;
-		default:
-			collected_frame = POWERUP_COLLECTED;
-			break;
+	case POWERUP_AMMO_BIG:
+	case POWERUP_BOMB_BIG:
+	case POWERUP_FUEL_BIG:
+	case POWERUP_COLLECTED_BIG:
+		collected_frame = POWERUP_COLLECTED_BIG;
+		break;
+	default:
+		collected_frame = POWERUP_COLLECTED;
+		break;
 	}
 
 	if (ob->ob_state == STANDING) {
 		ob->ob_symbol = &symbol_powerups[ob->ob_orient].sym[transform];
 	} else {
 		ob->ob_symbol =
-			&symbol_powerups[collected_frame].sym[transform];
+		    &symbol_powerups[collected_frame].sym[transform];
 	}
 
 	return true;
@@ -1003,8 +992,8 @@ bool moveexpl(OBJECTS *obp)
 				--ob->ob_dx;
 			}
 		}
-		if ((ob->ob_orient && ob->ob_dy > -10)
-		 || (!ob->ob_orient && ob->ob_dy > -gminspeed)) {
+		if ((ob->ob_orient && ob->ob_dy > -10) ||
+		    (!ob->ob_orient && ob->ob_dy > -gminspeed)) {
 			--ob->ob_dy;
 		}
 		ob->ob_life = EXPLLIFE;
@@ -1017,7 +1006,7 @@ bool moveexpl(OBJECTS *obp)
 			stopsound(ob);
 		}
 		deallobj(ob);
-		return (false);
+		return false;
 	}
 	++ob->ob_hitcount;
 
@@ -1037,9 +1026,9 @@ bool movesmok(OBJECTS *obp)
 
 	--ob->ob_life;
 
-	if (ob->ob_life <= 0
-	 || (planestate != FALLING && planestate != CRASHED
-	  && !PlaneIsWounded(planestate))) {
+	if (ob->ob_life <= 0 ||
+	    (planestate != FALLING && planestate != CRASHED &&
+	     !PlaneIsWounded(planestate))) {
 		deallobj(ob);
 		return false;
 	}
@@ -1112,16 +1101,14 @@ bool moveballoon(OBJECTS *ob)
 	// cancel out and we never drift out of the same area of the map.
 	dx = SIN(step / 7) * 128;
 	dy = SIN(step / 3) * 128;
-	ob->ob_dx =  dx >> 16;
+	ob->ob_dx = dx >> 16;
 	ob->ob_ldx = dx & 0xffff;
 	ob->ob_dy = dy >> 16;
 	ob->ob_ldy = dy & 0xffff;
 	movexy(ob, &x, &y);
 
 	// Which way are we drifting?
-	f = orig->orient * 3
-	  + (dx >= 20000 ? 2 :
-	     dx <= -20000 ? 0 : 1);
+	f = orig->orient * 3 + (dx >= 20000 ? 2 : dx <= -20000 ? 0 : 1);
 
 	ob->ob_symbol = &symbol_balloon[f].sym[orig->transform];
 	return true;
@@ -1169,7 +1156,7 @@ bool movebird(OBJECTS *obp)
 		ob->ob_life = BIRDLIFE;
 	} else {
 		--ob->ob_life;
-		
+
 		if (ob->ob_life <= 0) {
 			ob->ob_orient = !ob->ob_orient;
 			ob->ob_life = BIRDLIFE;
@@ -1179,8 +1166,8 @@ bool movebird(OBJECTS *obp)
 	movexy(ob, &x, &y);
 
 	ob->ob_symbol = &symbol_bird[ob->ob_orient].sym[0];
-	if (!in_range(0, x, currgame->gm_max_x - 1)
-	 || !in_range((int) ground[x] + 1, y, MAX_Y - 1)) {
+	if (!in_range(0, x, currgame->gm_max_x - 1) ||
+	    !in_range((int) ground[x] + 1, y, MAX_Y - 1)) {
 		ob->ob_y -= ob->ob_dy;
 		ob->ob_life = -2;
 		return false;
@@ -1209,9 +1196,10 @@ bool crashpln(OBJECTS *ob)
 	ob->ob_athome = false;
 	ob->ob_dx = ob->ob_dy = ob->ob_ldx = ob->ob_ldy = ob->ob_speed = 0;
 
-	ob->ob_hitcount = ((abs(orig_ob->x - ob->ob_x) < SAFERESET)
-	                && (abs(ob->ob_orig_y - ob->ob_y) < SAFERESET))
-	    ? (MAXCRCOUNT << 1) : MAXCRCOUNT;
+	ob->ob_hitcount = ((abs(orig_ob->x - ob->ob_x) < SAFERESET) &&
+	                   (abs(ob->ob_orig_y - ob->ob_y) < SAFERESET))
+	                    ? (MAXCRCOUNT << 1)
+	                    : MAXCRCOUNT;
 
 	return true;
 }

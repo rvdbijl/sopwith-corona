@@ -18,7 +18,7 @@
 #include "swmain.h"
 #include "swtext.h"
 
-static void dispribbonrow (int *ribbonid, int ribbons_nr, int y)
+static void dispribbonrow(int *ribbonid, int ribbons_nr, int y)
 {
 	int i;
 	int offset = 50 + ((3 - ribbons_nr) * 4);
@@ -42,15 +42,14 @@ static void dispmedals(OBJECTS *ob)
 	for (i = 0; i < ob->ob_score.medals_nr; i++) {
 		int medal_id = ob->ob_score.medals[i];
 
-		Vid_DispSymbol(medal_offset + medal_offsets[medal_id],
-		               11, &symbol_medal[medal_id].sym[0],
-		               FACTION_PLAYER1);
+		Vid_DispSymbol(medal_offset + medal_offsets[medal_id], 11,
+		               &symbol_medal[medal_id].sym[0], FACTION_PLAYER1);
 		medal_offset += medal_widths[medal_id];
 	}
 
 	if (ob->ob_score.ribbons_nr <= 3) {
-		dispribbonrow(ob->ob_score.ribbons,
-		              ob->ob_score.ribbons_nr, 15);
+		dispribbonrow(ob->ob_score.ribbons, ob->ob_score.ribbons_nr,
+		              15);
 	} else {
 		dispribbonrow(ob->ob_score.ribbons, 3, 16);
 		dispribbonrow(ob->ob_score.ribbons + 3,
@@ -125,9 +124,9 @@ static void dispmapobjects(void)
 	int mapx, mapy, x, y, groundy;
 	OBJECTS *ob;
 
-	for (ob=objtop; ob; ob=ob->ob_next) {
-		if (!ob->ob_onmap
-		 || ob->ob_x < 0 || ob->ob_x >= currgame->gm_max_x) {
+	for (ob = objtop; ob; ob = ob->ob_next) {
+		if (!ob->ob_onmap || ob->ob_x < 0 ||
+		    ob->ob_x >= currgame->gm_max_x) {
 			continue;
 		}
 
@@ -147,9 +146,8 @@ static void dispmapobjects(void)
 		x = SCR_CENTR + mapx / WRLD_RSX;
 		y = mapy / WRLD_RSY;
 
-		if (y < SCR_MNSH-1) {
-			Vid_PlotPixel(x, y,
-				      Vid_FuselageColor(ob->ob_clr));
+		if (y < SCR_MNSH - 1) {
+			Vid_PlotPixel(x, y, Vid_FuselageColor(ob->ob_clr));
 		}
 	}
 }
@@ -201,7 +199,7 @@ static void dispmap(void)
 
 	// border of status bar
 	for (x = 0; x < SCR_WDTH; ++x) {
-		Vid_PlotPixel(x, (SCR_MNSH + 2), 7);
+		Vid_PlotPixel(x, SCR_MNSH + 2, 7);
 	}
 }
 

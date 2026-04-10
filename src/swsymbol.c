@@ -1252,8 +1252,12 @@ static void Rotate(int *x, int *y, int w, int h, int rotations, bool mirror)
 	int i, tmp;
 
 	for (i = 0; i < rotations; i++) {
-		tmp = *x; *x = *y; *y = w - 1 - tmp;
-		tmp = w; w = h; h = tmp;
+		tmp = *x;
+		*x = *y;
+		*y = w - 1 - tmp;
+		tmp = w;
+		w = h;
+		h = tmp;
 	}
 
 	if (mirror) {
@@ -1300,7 +1304,8 @@ static void SopsymFromText(sopsym_t *sym, const char *text, int rotations,
 	}
 	sym->data = checked_malloc(w * h);
 
-	x = 0; y = 0;
+	x = 0;
+	y = 0;
 	for (p = text; *p != '\0'; p++) {
 		if (*p == '\n') {
 			x = 0;
@@ -1314,7 +1319,8 @@ static void SopsymFromText(sopsym_t *sym, const char *text, int rotations,
 			}
 
 			if (x < w * 2 && y < h && (x % 2) == 0) {
-				dx = x / 2; dy = y;
+				dx = x / 2;
+				dy = y;
 				Rotate(&dx, &dy, w, h, rotations, mirror);
 				sym->data[dy * sym->w + dx] = c;
 			}
@@ -1327,8 +1333,7 @@ void SymsetFromText(symset_t *s, const char *text)
 {
 	int r;
 
-	for (r = 0; r < 4; r++)
-	{
+	for (r = 0; r < 4; r++) {
 		SopsymFromText(&s->sym[r], text, r, false);
 		SopsymFromText(&s->sym[r + 4], text, r, true);
 	}
@@ -1357,23 +1362,23 @@ static void InitSymset(symset_t *s, const char *name, int frame)
 
 // converted symbols:
 
-symset_t symbol_bomb[2];                 // swbmbsym
+symset_t symbol_bomb[2];                      // swbmbsym
 symset_t symbol_targets[NUM_TARGET_TYPES];    // swtrgsym
 symset_t symbol_target_hit[NUM_TARGET_TYPES]; // swhtrsym
-symset_t symbol_debris[8];               // swexpsym
-symset_t symbol_flock[2];                // swflksym
-symset_t symbol_bird[2];                 // swbrdsym
-symset_t symbol_ox[2];                   // swoxsym
-symset_t symbol_shotwin[1];              // swshtsym
-symset_t symbol_birdsplat[1];            // swsplsym
-symset_t symbol_missile[4];              // swmscsym
-symset_t symbol_burst[2];                // swbstsym
-symset_t symbol_plane[4];                // swplnsym
-symset_t symbol_plane_hit[4];            // swhitsym
-symset_t symbol_plane_win[4];            // swwinsym
-symset_t symbol_medal[3];                // swmedalsym
-symset_t symbol_ribbon[6];               // swribbonsym
-symset_t symbol_balloon[6];              // swballoonsym
+symset_t symbol_debris[8];                    // swexpsym
+symset_t symbol_flock[2];                     // swflksym
+symset_t symbol_bird[2];                      // swbrdsym
+symset_t symbol_ox[2];                        // swoxsym
+symset_t symbol_shotwin[1];                   // swshtsym
+symset_t symbol_birdsplat[1];                 // swsplsym
+symset_t symbol_missile[4];                   // swmscsym
+symset_t symbol_burst[2];                     // swbstsym
+symset_t symbol_plane[4];                     // swplnsym
+symset_t symbol_plane_hit[4];                 // swhitsym
+symset_t symbol_plane_win[4];                 // swwinsym
+symset_t symbol_medal[3];                     // swmedalsym
+symset_t symbol_ribbon[6];                    // swribbonsym
+symset_t symbol_balloon[6];                   // swballoonsym
 symset_t symbol_powerups[NUM_POWERUP_TYPES];  // swpowerupsym
 
 // special symbol for single pixel (bullets etc)
@@ -1383,13 +1388,14 @@ static uint8_t pixel_data[] = {3};
 sopsym_t symbol_pixel = {pixel_data, 1, 1};
 
 // generate array of symset_t structs from array of strings:
-#define SYMSETS_FROM_TEXT(text, out)                    \
-        { int _i;                                       \
-          for (_i = 0; _i < arrlen(out); ++_i) {        \
-             InitSymset(&(out)[_i], #text, _i);         \
-             SymsetFromText(&(out)[_i], (text)[_i]);    \
-          }                                             \
-        }
+#define SYMSETS_FROM_TEXT(text, out)                                           \
+	{                                                                      \
+		int _i;                                                        \
+		for (_i = 0; _i < arrlen(out); ++_i) {                         \
+			InitSymset(&(out)[_i], #text, _i);                     \
+			SymsetFromText(&(out)[_i], (text)[_i]);                \
+		}                                                              \
+	}
 
 void GenerateSymbols(void)
 {

@@ -19,16 +19,16 @@
 #include "timer.h"
 #include "video.h"
 
-#include "swtext.h"
 #include "swsound.h"
+#include "swtext.h"
 #include "swtitle.h"
 
-#define BLINK_PERIOD  400 /* ms */
+#define BLINK_PERIOD 400 /* ms */
 
 // sdh: emulate text display
 
-static int cur_x = 0, cur_y = 0;	// place we are writing text
-static int cur_color;		// text color
+static int cur_x = 0, cur_y = 0; // place we are writing text
+static int cur_color;            // text color
 
 // Unicode code points for the characters in font_data[]:
 // https://en.wikipedia.org/wiki/Code_page_437
@@ -168,9 +168,8 @@ static inline void drawchar(int x, int y, int c)
 
 		for (x2 = 0; x2 < 8; ++x2) {
 			if (p[y2] & m) {
-				Vid_PlotPixel(
-					x + x2, SCR_HGHT - 1 - (y + y2),
-					cur_color);
+				Vid_PlotPixel(x + x2, SCR_HGHT - 1 - (y + y2),
+				              cur_color);
 			}
 
 			m >>= 1;
@@ -210,8 +209,8 @@ void swgets(char *s, int max)
 		unsigned char c;
 
 		// erase background from previous write
-		Vid_Box(or_x * 8, SCR_HGHT - (or_y) * 8 - 1,
-		        erase_len * 8, 8, 0);
+		Vid_Box(or_x * 8, SCR_HGHT - (or_y) * 8 - 1, erase_len * 8, 8,
+		        0);
 
 		cur_x = or_x;
 		cur_y = or_y;

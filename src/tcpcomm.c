@@ -12,9 +12,9 @@
 // TCP/IP Communications
 //
 
+#include "tcpcomm.h"
 #include "swasynio.h"
 #include "swtitle.h"
-#include "tcpcomm.h"
 #include "timer.h"
 #include "video.h"
 
@@ -24,9 +24,9 @@
 #define TCPIP
 #endif
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <string.h>
 
 #ifdef HAVE_NETINET_IN_H
@@ -75,7 +75,7 @@ static void comminit(void)
 static int PollSocket(int s)
 {
 	fd_set in_fds, except_fds;
-	struct timeval timeout = { 0, 1 };  // 1us = ~immediate
+	struct timeval timeout = {0, 1}; // 1us = ~immediate
 
 	FD_ZERO(&in_fds);
 	FD_SET(s, &in_fds);
@@ -104,10 +104,10 @@ void commconnect(char *host)
 	{
 		char *p = strchr(host, ':');
 		if (p) {
-			realhost = checked_malloc(p-host + 2);
-			strncpy(realhost, host, p-host);
-			realhost[p-host] = '\0';
-			port = atoi(p+1);
+			realhost = checked_malloc(p - host + 2);
+			strncpy(realhost, host, p - host);
+			realhost[p - host] = '\0';
+			port = atoi(p + 1);
 		} else {
 			realhost = host;
 		}
@@ -140,11 +140,11 @@ void commconnect(char *host)
 	in.sin_port = htons(port);
 
 	if (connect(tcp_sock, (struct sockaddr *) &in, sizeof(in)) < 0) {
-		ErrorExit("commconnect: cant connect to '%s': %s",
-		          host, strerror(errno));
+		ErrorExit("commconnect: cant connect to '%s': %s", host,
+		          strerror(errno));
 	}
 	fprintf(stderr, "commconnect: connected to '%s'!\n", host);
-#endif    /* #ifdef TCPIP */
+#endif /* #ifdef TCPIP */
 }
 
 // open a socket and listen until a connection is established
@@ -171,20 +171,20 @@ void commlisten(void)
 	in.sin_port = htons(asynport);
 
 	if (bind(server_sock, (struct sockaddr *) &in, sizeof(in)) < 0) {
-		ErrorExit("commlisten: cant bind to port %d: %s",
-		          asynport, strerror(errno));
+		ErrorExit("commlisten: cant bind to port %d: %s", asynport,
+		          strerror(errno));
 	}
 
 	atexit(commterm);
 
 	// listen for connections
 	if (listen(server_sock, 1)) {
-		ErrorExit("commlisten: cant listen on port %i: %s",
-		          asynport, strerror(errno));
+		ErrorExit("commlisten: cant listen on port %i: %s", asynport,
+		          strerror(errno));
 	}
 
-	fprintf(stderr,
-		"commlisten: listening for connection on port %i\n", asynport);
+	fprintf(stderr, "commlisten: listening for connection on port %i\n",
+	        asynport);
 
 	// listen for connection
 	for (;;) {
@@ -198,7 +198,8 @@ void commlisten(void)
 		}
 
 		in_size = sizeof(in);
-		tcp_sock = accept(server_sock, (struct sockaddr *) &in, &in_size);
+		tcp_sock =
+		    accept(server_sock, (struct sockaddr *) &in, &in_size);
 
 		if (tcp_sock >= 0) {
 			break;
@@ -210,7 +211,7 @@ void commlisten(void)
 
 	fprintf(stderr, "commlisten: accepted connection from %s\n",
 	        inet_ntoa(in.sin_addr));
-#endif   /* #ifdef TCPIP */
+#endif /* #ifdef TCPIP */
 }
 
 // read a byte from socket
@@ -240,7 +241,7 @@ int commin(void)
 	return c;
 #else
 	return 0;
-#endif   /* #ifdef TCPIP */
+#endif /* #ifdef TCPIP */
 }
 
 // send a byte
@@ -254,7 +255,7 @@ void commout(unsigned char i)
 	if (!send(tcp_sock, (char *) &i, 1, 0)) {
 		ErrorExit("commout: %s writing to socket", strerror(errno));
 	}
-#endif   /* #ifdef TCPIP */
+#endif /* #ifdef TCPIP */
 }
 
 // disconnect
@@ -270,7 +271,7 @@ void commterm(void)
 		closesocket(server_sock);
 		server_sock = -1;
 	}
-#endif      /* #ifdef TCPIP */
+#endif /* #ifdef TCPIP */
 }
 
 bool isNetworkGame(void)
@@ -279,7 +280,7 @@ bool isNetworkGame(void)
 	if (tcp_sock > 0) {
 		return true;
 	}
-#endif   /* #ifdef TCPIP */
+#endif /* #ifdef TCPIP */
 
 	return false;
 }

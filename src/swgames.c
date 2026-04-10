@@ -13,8 +13,8 @@
 //
 
 #include <assert.h>
-#include <string.h>
 #include <errno.h>
+#include <string.h>
 
 #include "sw.h"
 #include "swgames.h"
@@ -349,8 +349,7 @@ static void SetGround(struct yocton_object *yo, GRNDTYPE **ground,
 		const char *name = yocton_prop_name(p);
 		yocton_check(yo, !strcmp(name, "_"),
 		             "expected prop name '_', got '%s'", name);
-		YOCTON_VAR_INT_ARRAY(p, "_", GRNDTYPE, *ground,
-		                     *ground_len);
+		YOCTON_VAR_INT_ARRAY(p, "_", GRNDTYPE, *ground, *ground_len);
 	}
 }
 
@@ -359,11 +358,12 @@ static void ProcessLevel(struct yocton_object *obj)
 	struct yocton_prop *p;
 
 	while ((p = yocton_next_prop(obj)) != NULL) {
-		YOCTON_VAR_ARRAY(p, "object", cl.gm_objects, cl.gm_num_objects, {
-			AddObject(&cl.gm_objects[cl.gm_num_objects],
-			          yocton_prop_inner(p));
-			++cl.gm_num_objects;
-		});
+		YOCTON_VAR_ARRAY(
+		    p, "object", cl.gm_objects, cl.gm_num_objects, {
+			    AddObject(&cl.gm_objects[cl.gm_num_objects],
+			              yocton_prop_inner(p));
+			    ++cl.gm_num_objects;
+		    });
 		YOCTON_IF_PROP(p, "ground", {
 			SetGround(yocton_prop_inner(p), &cl.gm_ground,
 			          &cl.gm_max_x);
@@ -385,12 +385,12 @@ static void ProcessSymbol(const char *name, struct yocton_object *obj)
 		l = strtoul(pn, &ptr, 10);
 		yocton_check(obj, *ptr == '\0' && errno != ERANGE && l < 256,
 		             "expecting frame number as property, got '%s'",
-		              pn);
+		             pn);
 
 		s = LookupSymset(name, l);
 		yocton_check(obj, s != NULL,
-		             "failed to look up symbol '%s' frame %d",
-		             name, (int) l);
+		             "failed to look up symbol '%s' frame %d", name,
+		             (int) l);
 		value = yocton_prop_value(p);
 		if (s != NULL && value != NULL) {
 			SymsetFromText(s, value);
@@ -417,8 +417,7 @@ static void ProcessSymbols(struct yocton_object *obj)
 	struct yocton_prop *p;
 
 	while ((p = yocton_next_prop(obj)) != NULL) {
-		ProcessSymbol(yocton_prop_name(p),
-		              yocton_prop_inner(p));
+		ProcessSymbol(yocton_prop_name(p), yocton_prop_inner(p));
 	}
 }
 
@@ -525,9 +524,8 @@ static void ProcessTitle(struct yocton_object *obj)
 	ClearTitleScreen();
 
 	while ((p = yocton_next_prop(obj)) != NULL) {
-		YOCTON_IF_PROP(p, "text", {
-			ProcessTitleText(yocton_prop_inner(p));
-		});
+		YOCTON_IF_PROP(p, "text",
+		               { ProcessTitleText(yocton_prop_inner(p)); });
 		YOCTON_IF_PROP(p, "ground", {
 			ProcessTitleGround(yocton_prop_inner(p),
 			                   GROUND_RENDER_PREF);
@@ -540,12 +538,10 @@ static void ProcessTitle(struct yocton_object *obj)
 			ProcessTitleGround(yocton_prop_inner(p),
 			                   GROUND_RENDER_SOLID);
 		});
-		YOCTON_IF_PROP(p, "symbol", {
-			ProcessTitleSymbol(yocton_prop_inner(p));
-		});
-		YOCTON_IF_PROP(p, "line", {
-			ProcessTitleLine(yocton_prop_inner(p));
-		});
+		YOCTON_IF_PROP(p, "symbol",
+		               { ProcessTitleSymbol(yocton_prop_inner(p)); });
+		YOCTON_IF_PROP(p, "line",
+		               { ProcessTitleLine(yocton_prop_inner(p)); });
 	}
 }
 
@@ -578,15 +574,12 @@ void LoadCustomLevel(const char *filename)
 			ProcessLevel(yocton_prop_inner(p));
 			processed_level = true;
 		});
-		YOCTON_IF_PROP(p, "symbols", {
-			ProcessSymbols(yocton_prop_inner(p));
-		});
-		YOCTON_IF_PROP(p, "sounds", {
-			ProcessSounds(yocton_prop_inner(p));
-		});
-		YOCTON_IF_PROP(p, "title", {
-			ProcessTitle(yocton_prop_inner(p));
-		});
+		YOCTON_IF_PROP(p, "symbols",
+		               { ProcessSymbols(yocton_prop_inner(p)); });
+		YOCTON_IF_PROP(p, "sounds",
+		               { ProcessSounds(yocton_prop_inner(p)); });
+		YOCTON_IF_PROP(p, "title",
+		               { ProcessTitle(yocton_prop_inner(p)); });
 	}
 
 	if (yocton_have_error(obj, &lineno, &error_msg)) {

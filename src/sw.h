@@ -65,8 +65,8 @@ typedef enum {
 
 // We only enable TCP/IP support if we have the appropriate socket header
 // files. Emscripten doesn't get TCP/IP.
-#if !defined(__EMSCRIPTEN__) && ( \
-    defined(HAVE_NETINET_IN_H) || defined(HAVE_WINSOCK_H))
+#if !defined(__EMSCRIPTEN__) &&                                                \
+    (defined(HAVE_NETINET_IN_H) || defined(HAVE_WINSOCK_H))
 #define TCPIP
 #endif
 
@@ -83,40 +83,40 @@ typedef enum {
 #endif
 
 #ifdef _MSC_VER
-#define inline __inline
-#define strcasecmp stricmp
+#define inline      __inline
+#define strcasecmp  stricmp
 #define strncasecmp strnicmp
 #endif
 
 /* Constants */
 
-#define FPS             10              /* How fast the game runs */
+#define FPS 10 /* How fast the game runs */
 
-#define DEFAULT_PORT    3847            /* Default TCP port for multiplayer */
+#define DEFAULT_PORT 3847 /* Default TCP port for multiplayer */
 
-#define MAX_Y           200             /* Maximum Y coordinate */
-#define MIN_SPEED       4               /* Minimum plane speed */
-#define MAX_SPEED       8               /* Maximum plane speed */
-#define MAX_THROTTLE    4               /* Maximum acceleration */
+#define MAX_Y        200 /* Maximum Y coordinate */
+#define MIN_SPEED    4   /* Minimum plane speed */
+#define MAX_SPEED    8   /* Maximum plane speed */
+#define MAX_THROTTLE 4   /* Maximum acceleration */
 
-#define MAXCRCOUNT      10              /* Number of turns as crashed */
-#define FALLCOUNT       10              /* Moves between falling plane adj */
-#define STALLCOUNT      6               /* Moves between stalling plane adj*/
-#define TARGHITCOUNT    10              /* Target hit count before explod'n*/
+#define MAXCRCOUNT   10 /* Number of turns as crashed */
+#define FALLCOUNT    10 /* Moves between falling plane adj */
+#define STALLCOUNT   6  /* Moves between stalling plane adj*/
+#define TARGHITCOUNT 10 /* Target hit count before explod'n*/
 
-#define SCR_WDTH        320             /* Screen Width */
-#define SCR_HGHT        200             /* Screen Height */
+#define SCR_WDTH 320 /* Screen Width */
+#define SCR_HGHT 200 /* Screen Height */
 
-#define SCR_CENTR       ((SCR_WDTH / 2) - 8) /* Centre column of screen */
-#define SCR_MNSH        16              /* Minumum line number to shift */
-#define SCR_MXSH        75              /* Maximum line number to shift */
+#define SCR_CENTR ((SCR_WDTH / 2) - 8) /* Centre column of screen */
+#define SCR_MNSH  16                   /* Minumum line number to shift */
+#define SCR_MXSH  75                   /* Maximum line number to shift */
 
 // sdh 27/7/2002: make these independent of the screen width
 
-#define WRLD_RSX        (currgame->gm_max_x / 320 * 2 + 1) /* World display X and */
-#define WRLD_RSY        (MAX_Y / SCR_MNSH + 1)     /* Y divisors */
+#define WRLD_RSX (currgame->gm_max_x / 320 * 2 + 1) /* World display X and */
+#define WRLD_RSY (MAX_Y / SCR_MNSH + 1)             /* Y divisors */
 
-#define GAUGEX          (SCR_CENTR - 25)  /* X co-ordinate of first gauge */
+#define GAUGEX (SCR_CENTR - 25) /* X co-ordinate of first gauge */
 
 typedef enum {
 	PLAYMODE_UNSET = 0,
@@ -126,36 +126,36 @@ typedef enum {
 	PLAYMODE_NOVICE
 } playmode_t;
 
-#define MAXROUNDS       200             /* Maximum number of rounds of shot */
-#define MAXBOMBS        5               /* Maximum number of bombs available*/
-#define MAXMISSILES     5               /* Maximum number of missiles */
-#define MAXBURSTS       5               /* Maximum nuber of starbursts */
-#define MAXFUEL         9000            /* Maximum turns between refuellings */
-#define MAXCRASH        5               /* Mximum number of crashes allowed */
+#define MAXROUNDS   200  /* Maximum number of rounds of shot */
+#define MAXBOMBS    5    /* Maximum number of bombs available*/
+#define MAXMISSILES 5    /* Maximum number of missiles */
+#define MAXBURSTS   5    /* Maximum nuber of starbursts */
+#define MAXFUEL     9000 /* Maximum turns between refuellings */
+#define MAXCRASH    5    /* Mximum number of crashes allowed */
 
-#define MAX_PLANES      16              /* Maximum planes per level */
-#define MAX_PLYR        4               /* Maximum number of players */
-#define MAX_OBJS        100             /* Maximum number of objects */
-#define NUM_STRAY_BIRDS 1               /* Number of stray birds per flock */
+#define MAX_PLANES      16  /* Maximum planes per level */
+#define MAX_PLYR        4   /* Maximum number of players */
+#define MAX_OBJS        100 /* Maximum number of objects */
+#define NUM_STRAY_BIRDS 1   /* Number of stray birds per flock */
 
-#define ANGLES          16              /* Number of angle increments */
-#define ORIENTS         2               /* Number of plane orientations */
-#define SYM_WDTH        16              /* Symbol width in pixels */
-#define SYM_HGHT        16              /* Symbol height in pixels */
+#define ANGLES   16 /* Number of angle increments */
+#define ORIENTS  2  /* Number of plane orientations */
+#define SYM_WDTH 16 /* Symbol width in pixels */
+#define SYM_HGHT 16 /* Symbol height in pixels */
 
-#define BULSPEED        10              /* Bullet speed */
-#define BULLIFE         10              /* Bullet life */
-#define BOMBLIFE        5               /* Moves between bomb course adj */
-#define MISSLIFE        50              /* Missile life */
-#define BURSTLIFE       20              /* Starburst life */
-#define EXPLLIFE        3               /* Moves between explosion "  " */
-#define SMOKELIFE       10              /* Smoke life */
-#define BIRDLIFE        4               /* Moves between bird flaps */
-#define FLOCKLIFE       5               /* Moves between flop flaps */
+#define BULSPEED  10 /* Bullet speed */
+#define BULLIFE   10 /* Bullet life */
+#define BOMBLIFE  5  /* Moves between bomb course adj */
+#define MISSLIFE  50 /* Missile life */
+#define BURSTLIFE 20 /* Starburst life */
+#define EXPLLIFE  3  /* Moves between explosion "  " */
+#define SMOKELIFE 10 /* Smoke life */
+#define BIRDLIFE  4  /* Moves between bird flaps */
+#define FLOCKLIFE 5  /* Moves between flop flaps */
 
-typedef enum {               /* Player states */
+typedef enum { /* Player states */
 	WAITING = 0,
-	FLYING ,
+	FLYING,
 	HIT,
 	CRASHED,
 	FALLING,
@@ -192,30 +192,30 @@ typedef enum {
 	DUMMYTYPE = 99,
 } obtype_t;
 
-#define NEAR            ( 150 * 150 )   /* Computer control distances */
-#define CLOSE           32
-#define HOME            16
-#define SAFERESET       32
+#define NEAR      (150 * 150) /* Computer control distances */
+#define CLOSE     32
+#define HOME      16
+#define SAFERESET 32
 
-#define QUIT            -5000           /* Plane life value when quitting */
+#define QUIT -5000 /* Plane life value when quitting */
 
-#define K_ACCEL         0x0001          /* Keyboard word masks */
-#define K_DEACC         0x0002
-#define K_FLAPU         0x0004
-#define K_FLAPD         0x0008
-#define K_FLIP          0x0010
-#define K_SHOT          0x0020
-#define K_HARRYKEYS     0x0040          /* reverse flapu/d when flipped */
-#define K_BOMB          0x0100
-#define K_HOME          0x0200
-#define K_SOUND         0x0400
-#define K_BREAK         0x0800
-#define K_MISSILE       0x1000
-#define K_STARBURST     0x2000
+#define K_ACCEL     0x0001 /* Keyboard word masks */
+#define K_DEACC     0x0002
+#define K_FLAPU     0x0004
+#define K_FLAPD     0x0008
+#define K_FLIP      0x0010
+#define K_SHOT      0x0020
+#define K_HARRYKEYS 0x0040 /* reverse flapu/d when flipped */
+#define K_BOMB      0x0100
+#define K_HOME      0x0200
+#define K_SOUND     0x0400
+#define K_BREAK     0x0800
+#define K_MISSILE   0x1000
+#define K_STARBURST 0x2000
 
-typedef  unsigned int GRNDTYPE;
+typedef unsigned int GRNDTYPE;
 
-struct tt {                     /* Continuous tone table entry */
+struct tt { /* Continuous tone table entry */
 	unsigned int tt_tone;
 	unsigned int tt_chng;
 	struct tt *tt_next;
@@ -224,17 +224,18 @@ struct tt {                     /* Continuous tone table entry */
 
 typedef struct tt TONETAB;
 
-#define MEDAL_PURPLEHEART   0 /* Returned when damaged */
-#define MEDAL_COMPETENCE    1 /* Dealt nontrivial amount of damage */
-#define MEDAL_VALOUR        2 /* The Iron Cross / Victoria Cross for
-                                 getting enough valour points */
+#define MEDAL_PURPLEHEART 0 /* Returned when damaged */
+#define MEDAL_COMPETENCE  1 /* Dealt nontrivial amount of damage */
+#define MEDAL_VALOUR                                                           \
+	2 /* The Iron Cross / Victoria Cross for                               \
+	     getting enough valour points */
 
-#define RIBBON_ACE          0 /* Five plane kills, returned to base */
-#define RIBBON_TOPACE       1 /* 25 plane kills, returned to base */
-#define RIBBON_PERFECT      2 /* Finished one stage with full planes */
-#define RIBBON_SERVICE      3 /* Returned 3x after doing some damage */
-#define RIBBON_COMPETENCE2  4 /* 2nd Competence medal (ribbon) */
-#define RIBBON_PREVALOUR    5 /* About half-way towards MEDAL_VALOUR */
+#define RIBBON_ACE         0 /* Five plane kills, returned to base */
+#define RIBBON_TOPACE      1 /* 25 plane kills, returned to base */
+#define RIBBON_PERFECT     2 /* Finished one stage with full planes */
+#define RIBBON_SERVICE     3 /* Returned 3x after doing some damage */
+#define RIBBON_COMPETENCE2 4 /* 2nd Competence medal (ribbon) */
+#define RIBBON_PREVALOUR   5 /* About half-way towards MEDAL_VALOUR */
 
 // Score for the current flight. This gets reset to zero after each crash,
 // landing or new level.
@@ -249,13 +250,13 @@ typedef struct {
 // only gets updated when the plane is landed or the level is finished.
 typedef struct {
 	int score;
-	int planekills;  /* Total planes shot down (+return to base) */
-	int valour;      /* Total points for valourous conduct */
-	int landings;    /* Landings with nontrivial competence */
-	int medals_nr;   /* Awarded # of medals */
-	int medals[3];   /* Medal display order */
-	int ribbons_nr;  /* Awarded # of ribbons */
-	int ribbons[6];  /* Ribbon display order */
+	int planekills; /* Total planes shot down (+return to base) */
+	int valour;     /* Total points for valourous conduct */
+	int landings;   /* Landings with nontrivial competence */
+	int medals_nr;  /* Awarded # of medals */
+	int medals[3];  /* Medal display order */
+	int ribbons_nr; /* Awarded # of ribbons */
+	int ribbons[6]; /* Ribbon display order */
 } score_t;
 
 // Objects in levels are assigned a faction. This is mainly used to control
@@ -294,51 +295,51 @@ typedef struct {
 	obtype_t type;
 	int x;
 	int orient;
-	int territory_l, territory_r;    /* Computer plane territory */
+	int territory_l, territory_r; /* Computer plane territory */
 	faction_t faction;
-	transform_t transform;           /* Rotation/mirroring */
+	transform_t transform; /* Rotation/mirroring */
 } original_ob_t;
 
-typedef struct obj {                            /* Object list */
-	obstate_t      ob_state;
-	int            ob_x, ob_y;
-	int            ob_dx, ob_dy;
-	int            ob_angle;
-	int            ob_orient;
-	int            ob_speed;
-	int            ob_accel;
-	int            ob_flaps;
-	struct obj    *ob_firing;
-	int            ob_rounds;
-	int            ob_hitcount;
-	int            ob_life;
-	struct obj    *ob_owner;
-	faction_t      ob_faction;
-	struct obj    *ob_target;
-	int            ob_bombs;
-	int            ob_clr;
-	int            ob_lx, ob_ly;
-	int            ob_ldx, ob_ldy;
-	struct obj    *ob_next;
-	struct obj    *ob_prev;
-	void        ( *ob_soundf ) (struct obj *);
-	bool        ( *ob_movef ) (struct obj *);
-	struct obj    *ob_xnext;
-	struct obj    *ob_xprev;
-	int            ob_crashcnt;
-	sopsym_t      *ob_symbol;
-	int            ob_bdelay;
-	obtype_t       ob_type;
-	struct tt     *ob_sound;
-	int            ob_missiles;
-	struct obj    *ob_mfiring;
-	int            ob_mdelay;
-	struct obj    *ob_missiletarget;
-	int            ob_bursts;
-	int            ob_bsdelay;
-	int            ob_plrnum;
-	obendstatus_t  ob_endsts;
-	score_t	       ob_score;
+typedef struct obj { /* Object list */
+	obstate_t ob_state;
+	int ob_x, ob_y;
+	int ob_dx, ob_dy;
+	int ob_angle;
+	int ob_orient;
+	int ob_speed;
+	int ob_accel;
+	int ob_flaps;
+	struct obj *ob_firing;
+	int ob_rounds;
+	int ob_hitcount;
+	int ob_life;
+	struct obj *ob_owner;
+	faction_t ob_faction;
+	struct obj *ob_target;
+	int ob_bombs;
+	int ob_clr;
+	int ob_lx, ob_ly;
+	int ob_ldx, ob_ldy;
+	struct obj *ob_next;
+	struct obj *ob_prev;
+	void (*ob_soundf)(struct obj *);
+	bool (*ob_movef)(struct obj *);
+	struct obj *ob_xnext;
+	struct obj *ob_xprev;
+	int ob_crashcnt;
+	sopsym_t *ob_symbol;
+	int ob_bdelay;
+	obtype_t ob_type;
+	struct tt *ob_sound;
+	int ob_missiles;
+	struct obj *ob_mfiring;
+	int ob_mdelay;
+	struct obj *ob_missiletarget;
+	int ob_bursts;
+	int ob_bsdelay;
+	int ob_plrnum;
+	obendstatus_t ob_endsts;
+	score_t ob_score;
 	flight_score_t ob_flightscore;
 	const original_ob_t *ob_original_ob;
 	// There is a non-orthogonality here. The original X position is
@@ -347,32 +348,34 @@ typedef struct obj {                            /* Object list */
 	// generated automatically when the object first gets instantiated.
 	// That generated values is saved here as ob_orig_y, and we must
 	// look in two different locations to get the two coordinates.
-	int            ob_orig_y;
+	int ob_orig_y;
 
-	bool           ob_bombing;
-	bool           ob_drwflg;
-	bool           ob_onmap;
-	bool           ob_home;
-	bool           ob_athome;
-	bool           ob_bfiring;
-	bool           ob_goingsun;
+	bool ob_bombing;
+	bool ob_drwflg;
+	bool ob_onmap;
+	bool ob_home;
+	bool ob_athome;
+	bool ob_bfiring;
+	bool ob_goingsun;
 } OBJECTS;
 
-typedef struct {                                /* Game structure */
+typedef struct { /* Game structure */
 	unsigned int gm_rseed;
 	original_ob_t *gm_objects;
 	unsigned int gm_num_objects;
 	GRNDTYPE *gm_ground;
-	unsigned int gm_max_x;  // Defines length of gm_ground[] array.
+	unsigned int gm_max_x; // Defines length of gm_ground[] array.
 } GAMES;
 
 extern const int sintab[ANGLES];
 
-static inline int COS(int x) {
-	return sintab[(x+(ANGLES/4)) % ANGLES];
+static inline int COS(int x)
+{
+	return sintab[(x + (ANGLES / 4)) % ANGLES];
 }
 
-static inline int SIN(int x) {
+static inline int SIN(int x)
+{
 	return sintab[x % ANGLES];
 }
 

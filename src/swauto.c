@@ -20,7 +20,7 @@
 #include "swmain.h"
 #include "swobject.h"
 
-static int courseadj;		/* Course adjustment */
+static int courseadj; /* Course adjustment */
 
 static int shoot(OBJECTS *obt, OBJECTS *obs)
 {
@@ -33,9 +33,8 @@ static int shoot(OBJECTS *obt, OBJECTS *obs)
 	copyobj(&obsp, obs);
 	copyobj(&obtsp, obt);
 	nspeed = obsp.ob_speed + BULSPEED;
-	setdxdy(&obsp,
-		nspeed * COS(obsp.ob_angle),
-		nspeed * SIN(obsp.ob_angle));
+	setdxdy(&obsp, nspeed * COS(obsp.ob_angle),
+	        nspeed * SIN(obsp.ob_angle));
 	obsp.ob_x += SYM_WDTH / 2;
 	obsp.ob_y -= SYM_HGHT / 2;
 
@@ -56,9 +55,8 @@ static int shoot(OBJECTS *obt, OBJECTS *obs)
 					nangle += r;
 				}
 				nangle = (nangle + ANGLES) % ANGLES;
-				setdxdy(&obtsp,
-					nspeed * COS(nangle),
-					nspeed * SIN(nangle));
+				setdxdy(&obtsp, nspeed * COS(nangle),
+				        nspeed * SIN(nangle));
 			}
 		}
 
@@ -67,11 +65,10 @@ static int shoot(OBJECTS *obt, OBJECTS *obs)
 		if (!in_range(0, r, rprev)) {
 			return 0;
 		}
-		if (in_range(obtx, obx, obtx + SYM_WDTH - 1)
-		 && in_range(obty - SYM_HGHT + 1, oby, obty)) {
+		if (in_range(obtx, obx, obtx + SYM_WDTH - 1) &&
+		    in_range(obty - SYM_HGHT + 1, oby, obty)) {
 			return 1 + (i > (BULLIFE / 3));
 		}
-
 	}
 
 	return 0;
@@ -81,8 +78,7 @@ static bool WithinHomeRange(OBJECTS *ob, int x, int y)
 {
 	const original_ob_t *orig_ob = ob->ob_original_ob;
 
-	return abs(x - orig_ob->x) < HOME
-	    && abs(y - ob->ob_orig_y) < HOME;
+	return abs(x - orig_ob->x) < HOME && abs(y - ob->ob_orig_y) < HOME;
 }
 
 static bool IsTarget(OBJECTS *ob)
@@ -150,15 +146,15 @@ static bool tstcrash2(OBJECTS *ob, int x, int y, int alt, int dy)
 // Planes are "wingmen" if they defend the same territory.
 static bool IsWingman(OBJECTS *plane, OBJECTS *plane2)
 {
-	int midpoint = (plane2->ob_original_ob->territory_l
-	              + plane2->ob_original_ob->territory_r) / 2;
-	return plane != plane2
-	    && plane->ob_faction == plane2->ob_faction
-	    && in_range(plane->ob_original_ob->territory_l, midpoint,
+	int midpoint = (plane2->ob_original_ob->territory_l +
+	                plane2->ob_original_ob->territory_r) /
+	               2;
+	return plane != plane2 && plane->ob_faction == plane2->ob_faction &&
+	       in_range(plane->ob_original_ob->territory_l, midpoint,
 	                plane->ob_original_ob->territory_r);
 }
 
-#define IS_AHEAD_OF(other, plane) \
+#define IS_AHEAD_OF(other, plane)                                              \
 	(((other)->ob_x * direction) >= ((plane)->ob_x * direction))
 
 static void FindWingmen(OBJECTS *plane, OBJECTS **behind, OBJECTS **ahead)
@@ -174,16 +170,16 @@ static void FindWingmen(OBJECTS *plane, OBJECTS **behind, OBJECTS **ahead)
 
 	for (i = 0; i < num_planes; i++) {
 		OBJECTS *wingman = planes[i];
-		if (!IsWingman(plane, wingman)
-		 || !PlaneIsFlying(wingman->ob_state)) {
+		if (!IsWingman(plane, wingman) ||
+		    !PlaneIsFlying(wingman->ob_state)) {
 			continue;
 		}
-		if (IS_AHEAD_OF(wingman, plane)
-		 && (*ahead == NULL || IS_AHEAD_OF(*ahead, wingman))) {
+		if (IS_AHEAD_OF(wingman, plane) &&
+		    (*ahead == NULL || IS_AHEAD_OF(*ahead, wingman))) {
 			*ahead = wingman;
 		}
-		if (!IS_AHEAD_OF(wingman, plane)
-		 && (*behind == NULL || IS_AHEAD_OF(wingman, *behind))) {
+		if (!IS_AHEAD_OF(wingman, plane) &&
+		    (*behind == NULL || IS_AHEAD_OF(wingman, *behind))) {
 			*behind = wingman;
 		}
 	}
@@ -192,15 +188,14 @@ static void FindWingmen(OBJECTS *plane, OBJECTS **behind, OBJECTS **ahead)
 int aim(OBJECTS *ob, int ax, int ay, OBJECTS *obt, bool longway)
 {
 	OBJECTS *behind = NULL, *ahead = NULL;
-	int r, rmin, i, n=0;
+	int r, rmin, i, n = 0;
 	int x, y, dx, dy, nx, ny;
 	int nangle, nspeed;
 	OBJECTS obs;
-	static const int cflaps[3] = { 0, -1, 1 };
+	static const int cflaps[3] = {0, -1, 1};
 	static int crange[3], ccrash[3], calt[3];
 
-	if (PlaneIsStalled(ob->ob_state)
-	 && ob->ob_angle != (3 * ANGLES / 4)) {
+	if (PlaneIsStalled(ob->ob_state) && ob->ob_angle != (3 * ANGLES / 4)) {
 		ob->ob_flaps = -1;
 		ob->ob_accel = MAX_THROTTLE;
 		return 0;
@@ -215,8 +210,8 @@ int aim(OBJECTS *ob, int ax, int ay, OBJECTS *obt, bool longway)
 
 	// If there is another plane ahead of us in the formation, wait until
 	// it takes off first so that we don't all crash into each other.
-	if (ob->ob_athome && ahead != NULL
-	 && abs(ob->ob_x - ahead->ob_x) < 64) {
+	if (ob->ob_athome && ahead != NULL &&
+	    abs(ob->ob_x - ahead->ob_x) < 64) {
 		return 0;
 	}
 
@@ -227,8 +222,7 @@ int aim(OBJECTS *ob, int ax, int ay, OBJECTS *obt, bool longway)
 	} else if (ahead != NULL && abs(ob->ob_x - ahead->ob_x) < 80) {
 		// Form up behind and below the plane in front of us
 		// (echelon formation)
-		return aim(ob, ahead->ob_x + 20, ahead->ob_y - 20,
-		           NULL, false);
+		return aim(ob, ahead->ob_x + 20, ahead->ob_y - 20, NULL, false);
 	} else {
 		int height;
 
@@ -236,8 +230,9 @@ int aim(OBJECTS *ob, int ax, int ay, OBJECTS *obt, bool longway)
 			if (!ob->ob_hitcount) {
 				ob->ob_hitcount = (y > (MAX_Y - 50)) ? 2 : 1;
 			}
-			return (aim(ob, x, ob->ob_hitcount == 1
-				    ? (y + 25) : (y - 25), NULL, true));
+			return aim(ob, x,
+			           ob->ob_hitcount == 1 ? (y + 25) : (y - 25),
+			           NULL, true);
 		}
 		ob->ob_hitcount = 0;
 		height = clamp_max(y + 100, MAX_Y - 50 - courseadj);
@@ -246,8 +241,7 @@ int aim(OBJECTS *ob, int ax, int ay, OBJECTS *obt, bool longway)
 			// to fly a bit higher to give the others space.
 			height = clamp_max(height + 32, MAX_Y - 32);
 		}
-		return (aim(ob, x + (dx < 0 ? 150 : -150), height,
-		            NULL, true));
+		return aim(ob, x + (dx < 0 ? 150 : -150), height, NULL, true);
 	}
 
 	if (ob->ob_speed) {
@@ -283,14 +277,15 @@ int aim(OBJECTS *ob, int ax, int ay, OBJECTS *obt, bool longway)
 	}
 
 	for (i = 0; i < 3; ++i) {
-		nangle = (obs.ob_angle
-			  + (obs.ob_orient ? -cflaps[i] : cflaps[i])
-			  + ANGLES) % ANGLES;
+		nangle = (obs.ob_angle +
+		          (obs.ob_orient ? -cflaps[i] : cflaps[i]) + ANGLES) %
+		         ANGLES;
 		setdxdy(&obs, nspeed * COS(nangle), nspeed * SIN(nangle));
 		movexy(&obs, &nx, &ny);
 		crange[i] = range(nx, ny, ax, ay);
 		calt[i] = ny - currgame->gm_ground[nx + 8];
-		ccrash[i] = tstcrash2(ob, nx, ny, calt[i], nspeed * SIN(nangle));
+		ccrash[i] =
+		    tstcrash2(ob, nx, ny, calt[i], nspeed * SIN(nangle));
 
 		copyobj(&obs, ob);
 	}
@@ -357,11 +352,9 @@ int aim(OBJECTS *ob, int ax, int ay, OBJECTS *obt, bool longway)
 
 	if (ahead != NULL && abs(ahead->ob_x - ob->ob_x) < 24) {
 		// We're getting too close to the plane in front, slow down.
-		ob->ob_accel =
-			clamp_min(1, ahead->ob_accel - 2);
-	}
-	else if (behind != NULL && abs(behind->ob_x - ob->ob_x) > 32
-	 && ob->ob_dy == 0) {
+		ob->ob_accel = clamp_min(1, ahead->ob_accel - 2);
+	} else if (behind != NULL && abs(behind->ob_x - ob->ob_x) > 32 &&
+	           ob->ob_dy == 0) {
 		// The closest wingman is a long way behind us, so slow
 		// down and let it catch up.
 		ob->ob_accel = clamp_min(1, behind->ob_accel - 2);
@@ -399,8 +392,8 @@ int gohome(OBJECTS *ob)
 	if (ob->ob_state == WOUNDED && (countmove & 1)) {
 		return 0;
 	} else {
-		return aim(ob, ob->ob_original_ob->x, ob->ob_orig_y,
-		           NULL, false);
+		return aim(ob, ob->ob_original_ob->x, ob->ob_orig_y, NULL,
+		           false);
 	}
 }
 
@@ -420,8 +413,7 @@ static void attack(OBJECTS *obp, OBJECTS *ob)
 {
 	courseadj = ((countmove & 0x001F) < 16) << 4;
 	if (ob->ob_speed) {
-		aim(obp,
-		    ob->ob_x - ((CLOSE * COS(ob->ob_angle)) >> 8),
+		aim(obp, ob->ob_x - ((CLOSE * COS(ob->ob_angle)) >> 8),
 		    ob->ob_y - ((CLOSE * SIN(ob->ob_angle)) >> 8), ob, false);
 	} else {
 		aim(obp, ob->ob_x, ob->ob_y + 4, ob, false);

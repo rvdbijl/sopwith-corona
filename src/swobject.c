@@ -20,8 +20,8 @@
 
 bool PlaneIsKilled(obstate_t state)
 {
-	return state != FLYING && state != STALLED
-	    && state != WOUNDED && state != WOUNDSTALL;
+	return state != FLYING && state != STALLED && state != WOUNDED &&
+	       state != WOUNDSTALL;
 }
 
 bool PlaneIsStalled(obstate_t state)

@@ -48,10 +48,10 @@ enum menukey {
 // Which keys are currently down or have been pressed since the last call
 // to Vid_GetGameKeys:
 
-#define KEYDOWN_KEYBOARD     (1 << 0)
-#define KEYDOWN_WAS_PRESSED  (1 << 1)
-#define KEYDOWN_TOUCH        (1 << 2)
-#define KEYDOWN_GAMEPAD      (1 << 3)
+#define KEYDOWN_KEYBOARD    (1 << 0)
+#define KEYDOWN_WAS_PRESSED (1 << 1)
+#define KEYDOWN_TOUCH       (1 << 2)
+#define KEYDOWN_GAMEPAD     (1 << 3)
 
 extern int keysdown[NUM_KEYS];
 extern int keybindings[NUM_KEYS];
@@ -107,8 +107,7 @@ extern void Vid_XorPixel(int x, int y, int clr);
 
 // draw a symbol
 
-extern void Vid_DispSymbol(int x, int y, sopsym_t *symbol,
-                           faction_t f);
+extern void Vid_DispSymbol(int x, int y, sopsym_t *symbol, faction_t f);
 extern int Vid_FuselageColor(faction_t f);
 
 // clear screen

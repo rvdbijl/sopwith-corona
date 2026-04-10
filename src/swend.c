@@ -12,12 +12,12 @@
 //        swend    -      SW end of game
 //
 
-#include "sw.h"
 #include "swend.h"
+#include "sw.h"
 #include "swmain.h"
-#include "swtext.h"
-#include "swsound.h"
 #include "swobject.h"
+#include "swsound.h"
+#include "swtext.h"
 
 void swend(char *msg, bool update)
 {
@@ -55,10 +55,10 @@ void endgame(faction_t winning_faction)
 	ob = objtop;
 	while (ob->ob_type == PLANE) {
 		if (ob->ob_endsts == PLAYING) {
-			if (ob->ob_faction == winning_faction
-			 && (ob->ob_crashcnt < (MAXCRASH - 1)
-			  || (ob->ob_crashcnt < MAXCRASH
-			   && !PlaneIsKilled(ob->ob_state)))) {
+			if (ob->ob_faction == winning_faction &&
+			    (ob->ob_crashcnt < (MAXCRASH - 1) ||
+			     (ob->ob_crashcnt < MAXCRASH &&
+			      !PlaneIsKilled(ob->ob_state)))) {
 				winner(ob);
 			} else {
 				loser(ob);
@@ -95,7 +95,7 @@ void dispendmessage(void)
 {
 	if (consoleplayer->ob_endsts != PLAYING) {
 		swcolor(0x82);
-		swposcur((SCR_WDTH/16) - 4, 12);
+		swposcur((SCR_WDTH / 16) - 4, 12);
 		swputs("THE END");
 	}
 }

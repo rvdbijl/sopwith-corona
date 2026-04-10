@@ -59,22 +59,22 @@ static const int noteindex[] = {
     7   // g
 };
 
-static int soundtype = 32767;		/* Current sound type */
-static int soundparm = 32767;		/* Current sound priority */
-static OBJECTS *soundobj = NULL;	/* Object making sound */
-static unsigned int lastfreq = 0;	/* Last frequency used */
-static OBJECTS *lastobj = NULL;		/* Previous object making sound */
-static void (*toneadj) () = NULL;	/* Tone adjustment on clock tick */
+static int soundtype = 32767;     /* Current sound type */
+static int soundparm = 32767;     /* Current sound priority */
+static OBJECTS *soundobj = NULL;  /* Object making sound */
+static unsigned int lastfreq = 0; /* Last frequency used */
+static OBJECTS *lastobj = NULL;   /* Previous object making sound */
+static void (*toneadj)() = NULL;  /* Tone adjustment on clock tick */
 
-static TONETAB tonetab[SNDSIZE];	/* Continuous tone table */
-static TONETAB *frsttone, *freetone;	/* Tone list and free list */
-static unsigned int soundticks;		/* Ticks since last sound selection */
+static TONETAB tonetab[SNDSIZE];     /* Continuous tone table */
+static TONETAB *frsttone, *freetone; /* Tone list and free list */
+static unsigned int soundticks;      /* Ticks since last sound selection */
 
-static int numexpls;			/* Number of explosions active */
-static int explplace;			/* Place in explosion tune; */
-static unsigned int expltone;		/* Current explosion tone */
-static int explticks;			/* Ticks until note change */
-static int exploctv;			/* Octave */
+static int numexpls;          /* Number of explosions active */
+static int explplace;         /* Place in explosion tune; */
+static unsigned int expltone; /* Current explosion tone */
+static int explticks;         /* Ticks until note change */
+static int exploctv;          /* Octave */
 
 char *expltune =
     // "Wild Blue Yonder", the anthem of the US Air Force (earlier versions of
@@ -88,12 +88,12 @@ char *expltune =
     "d8/g2/r16/g8/g+2/r16/g+8/a2/r16/a8/>c2/<r16/"
     "b8/a8/g8/b4/g8/b4/g8/a4./g1/";
 
-static int titlplace;		/* Place in title tune; */
-static unsigned int titltone;	/* Current title tone */
-static int titlticks;		/* Ticks until note change */
-static int titloctv;		/* Octave */
+static int titlplace;         /* Place in title tune; */
+static unsigned int titltone; /* Current title tone */
+static int titlticks;         /* Ticks until note change */
+static int titloctv;          /* Octave */
 
-static char *tune;		/* Tune player statics */
+static char *tune; /* Tune player statics */
 static int place;
 static unsigned int tunefreq;
 static int tunedura;
@@ -223,13 +223,13 @@ static void tone(unsigned int freq)
 
 // music note generation
 
-#define NOTEEND     '/'
-#define UPOCTAVE    '>'
-#define DOWNOCTAVE  '<'
-#define SHARP       '+'
-#define FLAT        '-'
-#define DOT         '.'
-#define REST        'R'
+#define NOTEEND    '/'
+#define UPOCTAVE   '>'
+#define DOWNOCTAVE '<'
+#define SHARP      '+'
+#define FLAT       '-'
+#define DOT        '.'
+#define REST       'R'
 
 static void playnote(void)
 {
@@ -411,7 +411,7 @@ static void soundadj(void)
 	++soundticks;
 
 	if (lastfreq && toneadj) {
-		(*toneadj) ();
+		(*toneadj)();
 	}
 
 	if (numexpls) {
@@ -491,7 +491,6 @@ void swsound(void)
 		toneadj = adjshot;
 		lastobj = NULL;
 		break;
-
 	}
 
 	soundtype = soundparm = 32767;

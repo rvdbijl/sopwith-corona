@@ -22,11 +22,15 @@
 #ifdef HAVE_STDBOOL_H
 #include <stdbool.h>
 #else
-typedef enum { false, true } bool;
+typedef enum {
+	false,
+	true
+} bool;
 #endif
 
 // Integer equivalents of fmin()/fmax():
-static inline int imin(int x, int y) {
+static inline int imin(int x, int y)
+{
 	if (x < y) {
 		return x;
 	} else {
@@ -34,7 +38,8 @@ static inline int imin(int x, int y) {
 	}
 }
 
-static inline int imax(int x, int y) {
+static inline int imax(int x, int y)
+{
 	if (x > y) {
 		return x;
 	} else {
@@ -44,15 +49,15 @@ static inline int imax(int x, int y) {
 
 // These often read a lot clearer when imin/imax are being used to restrict
 // a value to a particular range:
-#define clamp_min imax
-#define clamp_max imin
+#define clamp_min                    imax
+#define clamp_max                    imin
 #define clamp_range(min, value, max) clamp_min(min, clamp_max(value, max))
 
-static inline bool in_range(int min, int value, int max) {
+static inline bool in_range(int min, int value, int max)
+{
 	// Note: This should probably be 'value < max' but '<=' is used here
 	// to be consistent with clamp_range() above.
 	return value >= min && value <= max;
 }
 
 #endif
-

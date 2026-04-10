@@ -31,9 +31,9 @@
 #include "swinit.h"
 #include "swmain.h"
 #include "swmenu.h"
-#include "swtext.h"
 #include "swsound.h"
 #include "swsymbol.h"
+#include "swtext.h"
 #include "swtitle.h"
 #include "timer.h"
 
@@ -41,14 +41,19 @@
 // score table gets shown?
 #define HIGH_SCORE_PERIOD 10000
 
-#define X_OFFSET ((SCR_WDTH/2)-160)
+#define X_OFFSET ((SCR_WDTH / 2) - 160)
 
 // If a text element has this magic string value, it is (1) drawn centered and
 // (2) replaced by a string that shows the program version.
-#define MAGIC_VERSION  "__VERSION__"
+#define MAGIC_VERSION "__VERSION__"
 
 struct title_element {
-	enum { TITLE_GROUND, TITLE_TEXT, TITLE_SYMBOL, TITLE_LINE } type;
+	enum {
+		TITLE_GROUND,
+		TITLE_TEXT,
+		TITLE_SYMBOL,
+		TITLE_LINE
+	} type;
 	union {
 		struct {
 			int color;
@@ -142,8 +147,7 @@ static struct title_element *AddTitleElement(void)
 {
 	++title_elements_len;
 	title_elements = checked_realloc(
-		title_elements,
-		title_elements_len * sizeof(struct title_element));
+	    title_elements, title_elements_len * sizeof(struct title_element));
 	return title_elements + title_elements_len - 1;
 }
 
@@ -201,7 +205,7 @@ static void DrawTitleScreenText(void)
 		}
 		swcolor(el->v.text.color);
 
-		x = el->v.text.x + X_OFFSET/8;
+		x = el->v.text.x + X_OFFSET / 8;
 		text = el->v.text.text;
 		if (!strcmp(text, MAGIC_VERSION)) {
 			text = "Version " PACKAGE_VERSION;

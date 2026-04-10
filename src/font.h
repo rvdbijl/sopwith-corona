@@ -22,7 +22,7 @@
 
 /* ---- 8x8 font definition ---- */
 
-#define GFX_FONTDATAMAX (8*256)
+#define GFX_FONTDATAMAX (8 * 256)
 
 static uint8_t font_data[GFX_FONTDATAMAX] = {
 
@@ -2589,4 +2589,3 @@ static uint8_t font_data[GFX_FONTDATAMAX] = {
 };
 
 #endif /* __FONT_H__ */
-

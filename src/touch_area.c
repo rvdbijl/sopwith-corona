@@ -12,21 +12,21 @@
 // playing on a touch screen.
 //
 
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
-#include "video.h"
 #include "sw.h"
 #include "swinit.h"
 #include "swmain.h"
 #include "swtext.h"
+#include "video.h"
 
-#define MARGIN 4
-#define BUTTON_WIDTH  87
-#define BUTTON_HEIGHT 36
-#define SMALL_BUTTON_WIDTH  39  /* single character button */
+#define MARGIN              4
+#define BUTTON_WIDTH        87
+#define BUTTON_HEIGHT       36
+#define SMALL_BUTTON_WIDTH  39 /* single character button */
 #define SMALL_BUTTON_HEIGHT 30
 
 static bool button_pressed[16];
@@ -55,8 +55,8 @@ static const struct touch_button game_buttons[] = {
 
 static const struct touch_button *curr_buttons = game_buttons;
 
-static void GetButtonPos(const struct touch_button *b, int *x, int *y,
-                         int *w, int *h)
+static void GetButtonPos(const struct touch_button *b, int *x, int *y, int *w,
+                         int *h)
 {
 	if (strlen(b->label) == 1) {
 		*x = b->x * 8 - 15;
@@ -75,8 +75,8 @@ static void DrawTouchArea(const struct touch_button *buttons)
 {
 	int i, cx;
 
-	Vid_Box(0, SCR_HGHT - 3 - MARGIN,
-	        SCR_WDTH, TOUCH_AREA_HEIGHT - MARGIN - 3, 0);
+	Vid_Box(0, SCR_HGHT - 3 - MARGIN, SCR_WDTH,
+	        TOUCH_AREA_HEIGHT - MARGIN - 3, 0);
 
 	for (i = 0; buttons[i].type != TOUCH_BUTTON_END; i++) {
 		const struct touch_button *b = &buttons[i];
@@ -87,8 +87,8 @@ static void DrawTouchArea(const struct touch_button *buttons)
 			swcolor(3);
 		} else {
 			int x, y, w, h;
-			bool pressed = i < arrlen(button_pressed)
-			            && button_pressed[i];
+			bool pressed =
+			    i < arrlen(button_pressed) && button_pressed[i];
 			GetButtonPos(b, &x, &y, &w, &h);
 			Vid_Box(x, SCR_HGHT - y, w, h, 3);
 			Vid_Box(x + 1, SCR_HGHT - y - 1, w - 2, h - 2,
@@ -109,9 +109,8 @@ const struct touch_button *Vid_GetTouchButton(int x, int y)
 		const struct touch_button *b = &curr_buttons[i];
 		GetButtonPos(b, &bx, &by, &bw, &bh);
 
-		if (b->type != TOUCH_BUTTON_LABEL
-		 && x >= bx && y >= by
-		 && x < bx + bw && y < by + bh) {
+		if (b->type != TOUCH_BUTTON_LABEL && x >= bx && y >= by &&
+		    x < bx + bw && y < by + bh) {
 			return b;
 		}
 	}
@@ -175,8 +174,7 @@ void Vid_ShowTouchKeys(const char *keys)
 			y += 4;
 		}
 
-		snprintf(button_labels[i], sizeof(button_labels[i]),
-		         "%c", key);
+		snprintf(button_labels[i], sizeof(button_labels[i]), "%c", key);
 	}
 
 	buttons[i + 2].type = TOUCH_BUTTON_END;

@@ -17,20 +17,20 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "timer.h"
 #include "pcsound.h"
+#include "timer.h"
 #include "video.h"
 
 #include "sw.h"
 #include "swconf.h"
 #include "swend.h"
+#include "swmain.h"
 #include "swmenu.h"
 #include "swsound.h"
 #include "swtext.h"
 #include "swtitle.h"
-#include "swmain.h"
 
-#define CONFIG_SETTING_COLUMN  28
+#define CONFIG_SETTING_COLUMN 28
 
 static const char menukeys[] = "1234567890ABCDEFGHIJKL";
 
@@ -91,8 +91,9 @@ enum menu_action ToggleConfigOption(const struct menuitem *item)
 		break;
 	case CONF_INT:
 		// TODO: This should not be a special case.
-		if(!strcasecmp(opt->name, "conf_video_palette")) {
-			*opt->value.i = (*opt->value.i + 1) % Vid_GetNumVideoPalettes();
+		if (!strcasecmp(opt->name, "conf_video_palette")) {
+			*opt->value.i =
+			    (*opt->value.i + 1) % Vid_GetNumVideoPalettes();
 			Vid_SetVideoPalette(*opt->value.i);
 		}
 		break;
@@ -121,8 +122,8 @@ void FullscreenBackground(void *_title)
 	// Planes on the menus look decorative but serve a real
 	// purpose: they give you an impression of what the game will
 	// look like under the different palettes.
-	Vid_DispSymbol(x * 8 - 32, SCR_HGHT - 10,
-	               &symbol_plane[0].sym[0], FACTION_PLAYER1);
+	Vid_DispSymbol(x * 8 - 32, SCR_HGHT - 10, &symbol_plane[0].sym[0],
+	               FACTION_PLAYER1);
 	Vid_DispSymbol((x + title_len) * 8 + 16, SCR_HGHT - 10,
 	               &symbol_plane[0].sym[6], FACTION_PLAYER2);
 
@@ -158,7 +159,7 @@ static void DrawConfigOption(const struct menuitem *item)
 		swputs(*opt->value.b ? "on" : "off");
 		break;
 	case CONF_INT:
-		if(!strcasecmp(opt->name, "conf_video_palette")) {
+		if (!strcasecmp(opt->name, "conf_video_palette")) {
 			swputs(Vid_GetVideoPaletteName(*opt->value.i));
 		}
 		break;
@@ -186,7 +187,7 @@ static void DrawMenu(const struct menu *menu, int selected)
 
 	swcolor(3);
 
-	for (i=0, keynum=0; items[i].label != NULL; ++i) {
+	for (i = 0, keynum = 0; items[i].label != NULL; ++i) {
 		char *prefix, *suffix;
 		char buf[40];
 		int key;
@@ -215,8 +216,8 @@ static void DrawMenu(const struct menu *menu, int selected)
 		} else {
 			swcolor(3);
 		}
-		snprintf(buf, sizeof(buf), "%-5s%c - %s%s",
-		         prefix, key, items[i].label, suffix);
+		snprintf(buf, sizeof(buf), "%-5s%c - %s%s", prefix, key,
+		         items[i].label, suffix);
 
 		GetCursorPosition(NULL, &y);
 		swposcur(0, y);
@@ -241,8 +242,7 @@ static void DrawMenu(const struct menu *menu, int selected)
 	Vid_Update();
 }
 
-static const struct menuitem *MenuItemForKey(const struct menu *menu,
-                                             int key)
+static const struct menuitem *MenuItemForKey(const struct menu *menu, int key)
 {
 	const struct menuitem *items = menu->items;
 	int i, keynum;
@@ -251,7 +251,7 @@ static const struct menuitem *MenuItemForKey(const struct menu *menu,
 		return NULL;
 	}
 
-	for (i=0, keynum=0; items[i].label != NULL; ++i) {
+	for (i = 0, keynum = 0; items[i].label != NULL; ++i) {
 		int itemkey;
 		if (items[i].key == 0) {
 			continue;
@@ -304,8 +304,7 @@ static bool MenuKeypress(const struct menu *menu, enum menu_action *result)
 	return true;
 }
 
-static int MoveCursor(const struct menu *menu, int orig_selected,
-                      int direction)
+static int MoveCursor(const struct menu *menu, int orig_selected, int direction)
 {
 	const struct menuitem *items = menu->items;
 	int selected = orig_selected;
@@ -375,8 +374,8 @@ enum menu_action RunMenu(const struct menu *menu)
 			swend(NULL, false);
 		}
 
-		if (!MenuKeypress(menu, &result)
-		 || !ControllerPress(menu, &result, &selected)) {
+		if (!MenuKeypress(menu, &result) ||
+		    !ControllerPress(menu, &result, &selected)) {
 			return result;
 		}
 

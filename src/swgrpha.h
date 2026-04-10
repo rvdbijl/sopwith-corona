@@ -17,10 +17,9 @@
 extern char *vidram;
 
 extern void swdisp(void);
-extern void swground(GRNDTYPE *gptr, int xstart, int w,
-                     ground_render_t render);
+extern void swground(GRNDTYPE *gptr, int xstart, int w, ground_render_t render);
 extern void swputsym(int x, int y, OBJECTS *ob);
-//extern char    fill[];
+// extern char    fill[];
 
 extern void swinitgrph(void);
 

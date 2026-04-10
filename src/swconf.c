@@ -19,18 +19,18 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "timer.h"
 #include "pcsound.h"
+#include "timer.h"
 #include "video.h"
 
 #include "sw.h"
 #include "swconf.h"
 #include "swend.h"
+#include "swmain.h"
 #include "swmenu.h"
 #include "swsound.h"
 #include "swtext.h"
 #include "swtitle.h"
-#include "swmain.h"
 
 #define CONFIG_FILE_NAME "sopwith.cfg"
 
@@ -92,7 +92,7 @@ static const struct conf_option confoptions[] = {
 static void Chomp(char *s)
 {
 	char *p;
-	for (p=s+strlen(s)-1; isspace(*p) && p > s; --p) {
+	for (p = s + strlen(s) - 1; isspace(*p) && p > s; --p) {
 		*p = '\0';
 	}
 }
@@ -131,7 +131,8 @@ static void ParseConfigLine(const char *config_file, int lineno, char *line)
 	}
 
 	name = p;
-	for (; *p != '\0' && !isspace(*p); ++p);
+	for (; *p != '\0' && !isspace(*p); ++p)
+		;
 
 	if (*p == '\0') {
 		fprintf(stderr, "swloadconf: %s:%d: malformed line: no value\n",
@@ -140,7 +141,8 @@ static void ParseConfigLine(const char *config_file, int lineno, char *line)
 	}
 
 	*p++ = '\0';
-	for (; isspace(*p); ++p);
+	for (; isspace(*p); ++p)
+		;
 	value = p;
 
 	opt = ConfOptionByName(name);
@@ -152,28 +154,29 @@ static void ParseConfigLine(const char *config_file, int lineno, char *line)
 	}
 
 	switch (opt->type) {
-		case CONF_BOOL:
-			*opt->value.b = atoi(value) != 0;
-			break;
-		case CONF_INT:
-			if(!strcasecmp(opt->name, "conf_video_palette")) {
-				// If an invalid video palette number was loaded, use palette 0
-				if(atoi(value) >= (Vid_GetNumVideoPalettes()) ){
-					*opt->value.i = 0;
-				} else {
-					*opt->value.i = atoi(value);
-				}
+	case CONF_BOOL:
+		*opt->value.b = atoi(value) != 0;
+		break;
+	case CONF_INT:
+		if (!strcasecmp(opt->name, "conf_video_palette")) {
+			// If an invalid video palette number was loaded, use
+			// palette 0
+			if (atoi(value) >= (Vid_GetNumVideoPalettes())) {
+				*opt->value.i = 0;
 			} else {
 				*opt->value.i = atoi(value);
 			}
-			break;
-		case CONF_KEY:
-			if (sscanf(value, "%d", &key) == 1) {
-				*opt->value.i = key;
-			}
-			break;
-		default:
-			break;
+		} else {
+			*opt->value.i = atoi(value);
+		}
+		break;
+	case CONF_KEY:
+		if (sscanf(value, "%d", &key) == 1) {
+			*opt->value.i = key;
+		}
+		break;
+	default:
+		break;
 	}
 }
 

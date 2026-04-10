@@ -32,7 +32,7 @@ char *asynhost;
 
 #define SYNC_IM_PLAYER0 '?'
 #define SYNC_IM_PLAYER1 '!'
-#define TIMEOUT_LEN_MS 5000 	/* time out after 5 seconds */
+#define TIMEOUT_LEN_MS  5000 /* time out after 5 seconds */
 
 static int timeout_time;
 
@@ -79,7 +79,7 @@ static int ReadShort(void)
 
 	SetTimeout();
 
-	for (i=-1; i < 0; i = TryReadShort()) {
+	for (i = -1; i < 0; i = TryReadShort()) {
 		if (TimedOut()) {
 			ErrorExit("ReadShort: timeout on read");
 		}
@@ -148,8 +148,8 @@ static void Synchronize(void)
 		if (c >= 0) {
 			if (c == *p) {
 				++p;
-			} else if (c != SYNC_IM_PLAYER0
-			        && c != SYNC_IM_PLAYER1) {
+			} else if (c != SYNC_IM_PLAYER0 &&
+			           c != SYNC_IM_PLAYER1) {
 				ErrorExit("Synchronize: invalid protocol "
 				          "header received.");
 			}
@@ -201,7 +201,7 @@ static void AssignPlayers(bool server_side)
 		if (ctlbreak()) {
 			ErrorExit("asyninit: user aborted");
 		}
-		
+
 		c = commin();
 		if (c >= 0) {
 			if (server_side && c == SYNC_IM_PLAYER0) {
@@ -288,4 +288,3 @@ void init1asy(void)
 // 87-03-09        Microsoft compiler.
 // 85-04-03        Development
 //
-

@@ -29,51 +29,52 @@
 
 // sdh 28/10/2001: game options
 
-bool conf_missiles = 0;             // allow missiles: replaces missok
-bool conf_solidground = 0;          // draw ground solid like in sopwith 1
-bool conf_hudsplats = 0;            // splatted birds etc
-bool conf_wounded = 0;              // enable wounded planes
-bool conf_animals = 1;              // birds and oxen
-bool conf_harrykeys = 0;            // plane rotation relative to screen
+bool conf_missiles = 0;    // allow missiles: replaces missok
+bool conf_solidground = 0; // draw ground solid like in sopwith 1
+bool conf_hudsplats = 0;   // splatted birds etc
+bool conf_wounded = 0;     // enable wounded planes
+bool conf_animals = 1;     // birds and oxen
+bool conf_harrykeys = 0;   // plane rotation relative to screen
 bool conf_medals = 1;
-bool conf_big_explosions = 1;       // big oil tank explosions
+bool conf_big_explosions = 1; // big oil tank explosions
 
-int conf_video_palette = 0;			// Video palette selection (0 is the default CGA color scheme)
+// Video palette selection (0 is the default CGA color scheme):
+int conf_video_palette = 0;
 
-playmode_t playmode;		/* Mode of play */
-const GAMES *currgame;		/* Game parameters and current game */
+playmode_t playmode;   /* Mode of play */
+const GAMES *currgame; /* Game parameters and current game */
 OBJECTS *consoleplayer;
-int numtarg[NUM_FACTIONS];	/* Number of active targets by faction */
-int countmove;			/* Performance counters */
+int numtarg[NUM_FACTIONS]; /* Number of active targets by faction */
+int countmove;             /* Performance counters */
 
-int gamenum = 0;		/* Current game number */
-int gmaxspeed, gminspeed;	/* Speed range based on game number */
-int targrnge;			/* Target range based on game number */
+int gamenum = 0;          /* Current game number */
+int gmaxspeed, gminspeed; /* Speed range based on game number */
+int targrnge;             /* Target range based on game number */
 
-bool titleflg;			/* Title flag */
-bool soundflg = 0;		/* Sound flag */
+bool titleflg;     /* Title flag */
+bool soundflg = 0; /* Sound flag */
 
-int displx;			/* Display left and right */
+int displx; /* Display left and right */
 
-OBJECTS *planes[MAX_PLANES];    /* Plane objects */
+OBJECTS *planes[MAX_PLANES]; /* Plane objects */
 int num_planes;
 
-OBJECTS *objbot, *objtop,	/* Top and bottom of object list */
-*objfree,			/* Free list */
-*deltop, *delbot;		/* Newly deallocated objects */
-OBJECTS topobj, botobj;		/* Top and Bottom of obj. x list */
+OBJECTS *objbot, *objtop, /* Top and bottom of object list */
+    *objfree,             /* Free list */
+    *deltop, *delbot;     /* Newly deallocated objects */
+OBJECTS topobj, botobj;   /* Top and Bottom of obj. x list */
 
 int endcount;
-int player;			/* Pointer to player's object */
-bool plyrplane;			/* Current object is player flag */
-bool compplane;			/* Current object is a comp plane */
-unsigned int explseed;		/* random seed for explosion */
+int player;            /* Pointer to player's object */
+bool plyrplane;        /* Current object is player flag */
+bool compplane;        /* Current object is a comp plane */
+unsigned int explseed; /* random seed for explosion */
 
-int keydelay = -1;		/* Number of displays per keystroke */
-int dispcnt;			/* Displays to delay keyboard */
-int endstat;			/* End of game status for curr. move */
-int maxcrash;			/* Maximum number of crashes */
-bool restart_flag;              /* Return to main menu */
+int keydelay = -1; /* Number of displays per keystroke */
+int dispcnt;       /* Displays to delay keyboard */
+int endstat;       /* End of game status for curr. move */
+int maxcrash;      /* Maximum number of crashes */
+bool restart_flag; /* Return to main menu */
 
 /* Sine table of pi/8 increments, multiplied by 256 */
 const int sintab[ANGLES] = {0, 98,  181,  237,  256,  237,  181,  98,
@@ -105,7 +106,7 @@ static bool CanMove(void)
 
 	/* we can only advance the game if latest_player_time for all
 	 * players is > countmove. */
-	for (i=0; i<num_players; ++i) {
+	for (i = 0; i < num_players; ++i) {
 		lowtic = imin(lowtic, latest_player_time[i]);
 	}
 
@@ -172,7 +173,7 @@ int swmain(int argc, char *argv[])
 	swinit(argc, argv);
 
 restart:
-        restart_flag = false;
+	restart_flag = false;
 
 	// sdh 28/10/2001: playmode is called from here now
 	// makes for a more coherent progression through the setup process
@@ -198,8 +199,8 @@ restart:
 
 		// TODO: Replace the sync code with a PID loop like what
 		// Chocolate Doom uses.
-		if (nowtime > nexttic
-		 && latest_player_time[player] - countmove < MAX_NET_LAG) {
+		if (nowtime > nexttic &&
+		    latest_player_time[player] - countmove < MAX_NET_LAG) {
 
 			NewMove();
 
@@ -207,7 +208,7 @@ restart:
 			 * However, if a large spike occurs between tics,
 			 * catch up immediately. */
 			if (nowtime - nexttic > 1000) {
-				nexttic = nowtime + (1000/FPS);
+				nexttic = nowtime + (1000 / FPS);
 			} else {
 				nexttic += (1000 / FPS);
 			}
@@ -223,7 +224,7 @@ restart:
 		/* if we have all the tic commands we need, we can move */
 		if (CanMove()) {
 			CalculateLag();
-			//DumpCmds();
+			// DumpCmds();
 			swmove();
 			swdisp();
 			swcollsn();
@@ -242,8 +243,7 @@ void *checked_realloc(void *p, size_t len)
 {
 	void *result = realloc(p, len);
 	if (result == NULL && len > 0) {
-		fprintf(stderr, "Failed allocation of %ld bytes\n",
-		        (long) len);
+		fprintf(stderr, "Failed allocation of %ld bytes\n", (long) len);
 		abort();
 	}
 	return result;

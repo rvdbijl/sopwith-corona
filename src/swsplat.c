@@ -39,12 +39,12 @@ void swclearsplats(void)
 void swdispsplats(void)
 {
 	int i;
-	
+
 	if (oxsplatted) {
 		colorscreen(2);
 	}
 
-	for (i=0; i<num_splats; ++i) {
+	for (i = 0; i < num_splats; ++i) {
 		OBJECTS ob;
 
 		ob.ob_type = DUMMYTYPE;
@@ -82,7 +82,7 @@ static void AddSplat(struct splat *splat)
 void swsplatbird(void)
 {
 	struct splat splat;
-	
+
 	randsd();
 
 	splat.x = (unsigned int) (seed % (SCR_WDTH - 32));

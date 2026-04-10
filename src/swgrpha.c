@@ -45,8 +45,8 @@ void Notification(const char *s, ...)
 void swground(GRNDTYPE *gptr, int xstart, int w, ground_render_t render)
 {
 	if (render == GROUND_RENDER_PREF) {
-		render = conf_solidground ? GROUND_RENDER_SOLID
-		                          : GROUND_RENDER_LINE;
+		render =
+		    conf_solidground ? GROUND_RENDER_SOLID : GROUND_RENDER_LINE;
 	}
 	if (render == GROUND_RENDER_SOLID) {
 		Vid_DispGround_Solid(gptr, xstart, w);
@@ -77,7 +77,8 @@ static void PrintHelp(void)
 	char buf[64];
 	int i;
 	const struct {
-		char *name; int key;
+		char *name;
+		int key;
 	} items[] = {
 	    {"Accelerate", KEY_ACCEL}, {"Decelerate", KEY_DECEL},
 	    {"Pull Up", KEY_PULLUP},   {"Pull Down", KEY_PULLDOWN},
@@ -89,16 +90,16 @@ static void PrintHelp(void)
 	// other single player modes, we do show the help text if the
 	// player seems to be really struggling.
 	switch (playmode) {
-		case PLAYMODE_NOVICE:
-			break;
-		case PLAYMODE_SINGLE:
-		case PLAYMODE_COMPUTER:
-			if (consoleplayer->ob_crashcnt < 3) {
-				return;
-			}
-			break;
-		default:
+	case PLAYMODE_NOVICE:
+		break;
+	case PLAYMODE_SINGLE:
+	case PLAYMODE_COMPUTER:
+		if (consoleplayer->ob_crashcnt < 3) {
 			return;
+		}
+		break;
+	default:
+		return;
 	}
 
 	swcolor(2);
@@ -111,8 +112,8 @@ static void PrintHelp(void)
 
 	swcolor(3);
 	for (i = 0; i < arrlen(items); i++) {
-		snprintf(buf, sizeof(buf), "%-11s- %s",
-		        items[i].name, Vid_KeyName(keybindings[items[i].key]));
+		snprintf(buf, sizeof(buf), "%-11s- %s", items[i].name,
+		         Vid_KeyName(keybindings[items[i].key]));
 		swposcur(1, i + 3);
 		swputs(buf);
 		if (Vid_HaveController()) {
@@ -153,8 +154,8 @@ void swdisp(void)
 	// Display help text if the player is just starting off. We only
 	// show this on the first level, and stop showing it once the
 	// player demonstrates the ability to take off successfully.
-	if (consoleplayer->ob_athome && !successful_flight && gamenum == 0
-	 && consoleplayer->ob_state == FLYING) {
+	if (consoleplayer->ob_athome && !successful_flight && gamenum == 0 &&
+	    consoleplayer->ob_state == FLYING) {
 		PrintHelp();
 	}
 
@@ -170,13 +171,12 @@ void swdisp(void)
 		x = ob->ob_x;
 		y = ob->ob_y;
 
-		if (ob->ob_drwflg
-		 && in_range(displx - ob->ob_symbol->w, x,
-		             displx + SCR_WDTH - 1)) {
+		if (ob->ob_drwflg && in_range(displx - ob->ob_symbol->w, x,
+		                              displx + SCR_WDTH - 1)) {
 			swputsym(x - displx, y, ob);
 
 			if (ob->ob_soundf) {
-				(*(ob->ob_soundf)) (ob);
+				(*(ob->ob_soundf))(ob);
 			}
 		}
 	}
@@ -198,8 +198,8 @@ void colorscreen(int color)
 {
 	int x, y;
 
-	for (y=19; y<SCR_HGHT; ++y) {
-		for (x=0; x<SCR_WDTH; ++x) {
+	for (y = 19; y < SCR_HGHT; ++y) {
+		for (x = 0; x < SCR_WDTH; ++x) {
 			Vid_PlotPixel(x, y, color);
 		}
 	}

@@ -35,5 +35,5 @@ enum menu_action SubMenu(const struct menuitem *item);
 void FullscreenBackground(void *title);
 enum menu_action ToggleConfigOption(const struct menuitem *item);
 
-#define CONFIG_OPTION(label, config_name) \
+#define CONFIG_OPTION(label, config_name)                                      \
 	{'1', label, ToggleConfigOption, config_name}

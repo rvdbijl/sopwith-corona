@@ -11,15 +11,15 @@
 // System-independent video code
 //
 
-#include <string.h>
 #include <assert.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "video.h"
 
 // this should be in a header somewhere
 #define SBAR_HGHT 19
-#define VRAMSIZE (SCR_HGHT * vid_pitch)
+#define VRAMSIZE  (SCR_HGHT * vid_pitch)
 
 static const uint8_t color_mappings[][4] = {
     {0, 3, 3, 3}, // All-white                     - FACTION_NONE?
@@ -45,7 +45,8 @@ int Vid_GetGameKeys(void)
 	int i, c = 0;
 
 	// empty input buffer, get new key state
-	while (Vid_GetKey());
+	while (Vid_GetKey())
+		;
 
 	if (Vid_GetCtrlBreak()) {
 		c |= K_BREAK;
@@ -93,7 +94,7 @@ int Vid_GetGameKeys(void)
 	}
 
 	// clear bits in key array
-	for (i=0; i<NUM_KEYS; ++i) {
+	for (i = 0; i < NUM_KEYS; ++i) {
 		keysdown[i] &= ~KEYDOWN_WAS_PRESSED;
 	}
 
@@ -163,13 +164,13 @@ void Vid_DispGround_Solid(GRNDTYPE *gptr, int xstart, int w)
 	int x, y;
 	int gc;
 
-	for (x=xstart, g = gptr; x<xstart + w; ++x) {
+	for (x = xstart, g = gptr; x < xstart + w; ++x) {
 		gc = clamp_max(*g, SCR_HGHT - 1);
 		++g;
 
-		sptr = vid_vram + (SCR_HGHT-SBAR_HGHT-1) * vid_pitch + x;
+		sptr = vid_vram + (SCR_HGHT - SBAR_HGHT - 1) * vid_pitch + x;
 
-		for (y = gc-SBAR_HGHT+1; y; --y) {
+		for (y = gc - SBAR_HGHT + 1; y; --y) {
 			*sptr ^= 3;
 			sptr -= vid_pitch;
 		}
@@ -178,14 +179,14 @@ void Vid_DispGround_Solid(GRNDTYPE *gptr, int xstart, int w)
 
 void Vid_PlotPixel(int x, int y, int clr)
 {
-	uint8_t *sptr = vid_vram + (SCR_HGHT-1 - y) * vid_pitch + x;
+	uint8_t *sptr = vid_vram + (SCR_HGHT - 1 - y) * vid_pitch + x;
 
 	*sptr = clr & 3;
 }
 
 void Vid_XorPixel(int x, int y, int clr)
 {
-	uint8_t *sptr = vid_vram + (SCR_HGHT-1 - y) * vid_pitch + x;
+	uint8_t *sptr = vid_vram + (SCR_HGHT - 1 - y) * vid_pitch + x;
 
 	*sptr ^= clr & 3;
 }
@@ -203,8 +204,8 @@ int Vid_FuselageColor(faction_t f)
 void Vid_DispSymbol(int x, int y, sopsym_t *symbol, faction_t clr)
 {
 	int left_skip = x < 0 ? -x : 0;
-	uint8_t *dst = vid_vram + (SCR_HGHT-1 - y) * vid_pitch
-	             + x + left_skip;
+	uint8_t *dst =
+	    vid_vram + (SCR_HGHT - 1 - y) * vid_pitch + x + left_skip;
 	const uint8_t *src = symbol->data;
 	int x1, y1;
 	int w = symbol->w, h = symbol->h;
@@ -226,11 +227,11 @@ void Vid_DispSymbol(int x, int y, sopsym_t *symbol, faction_t clr)
 
 	assert(clr < arrlen(color_mappings));
 	color_mapping = color_mappings[clr];
-	for (y1=0; y1<h; ++y1) {
+	for (y1 = 0; y1 < h; ++y1) {
 		uint8_t *dst2 = dst;
 		const uint8_t *src2 = src + left_skip;
 
-		for (x1=left_skip; x1<w; ++x1, ++dst2) {
+		for (x1 = left_skip; x1 < w; ++x1, ++dst2) {
 			int i = *src2++;
 
 			if (i) {
@@ -245,7 +246,7 @@ void Vid_DispSymbol(int x, int y, sopsym_t *symbol, faction_t clr)
 // sdh 27/6/2002: box function for drawing filled boxes
 void Vid_Box(int x, int y, int w, int h, int c)
 {
-	uint8_t *p = vid_vram + (SCR_HGHT-1-y) * vid_pitch + x;
+	uint8_t *p = vid_vram + (SCR_HGHT - 1 - y) * vid_pitch + x;
 
 	for (; h >= 0; --h, p += vid_pitch) {
 		memset(p, c, w);

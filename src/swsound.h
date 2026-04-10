@@ -14,13 +14,13 @@
 
 #include "sw.h"
 
-#define S_TITLE         05
-#define S_EXPLOSION     10              /* Sound priorities */
-#define S_BOMB          20
-#define S_SHOT          30
-#define S_FALLING       40
-#define S_HIT           50
-#define S_PLANE         60
+#define S_TITLE     05
+#define S_EXPLOSION 10 /* Sound priorities */
+#define S_BOMB      20
+#define S_SHOT      30
+#define S_FALLING   40
+#define S_HIT       50
+#define S_PLANE     60
 
 extern void initsndt(void);
 extern void sound(int type, int parm, OBJECTS *ob);

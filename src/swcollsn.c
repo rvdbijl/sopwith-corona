@@ -12,8 +12,8 @@
 //        swcollsn -      SW collision resolution
 //
 
-#include "sw.h"
 #include "swcollsn.h"
+#include "sw.h"
 #include "swend.h"
 #include "swinit.h"
 #include "swmain.h"
@@ -25,7 +25,7 @@
 static int ComputeValour(OBJECTS *ob);
 static void tstcrash(OBJECTS *obp);
 
-static OBJECTS *killed[MAX_OBJS*2], *killer[MAX_OBJS*2];
+static OBJECTS *killed[MAX_OBJS * 2], *killer[MAX_OBJS * 2];
 static int killptr;
 
 static int collsdx[MAX_PLYR];
@@ -34,7 +34,7 @@ static OBJECTS *collsno[MAX_PLYR];
 static int collptr;
 static int collxadj, collyadj;
 
-//#define COLL_DEBUG
+// #define COLL_DEBUG
 
 bool CollisionTest(OBJECTS *ob1, OBJECTS *ob2)
 {
@@ -43,9 +43,9 @@ bool CollisionTest(OBJECTS *ob1, OBJECTS *ob2)
 	int w, h;
 	uint8_t *data1, *data2;
 
-	if ((ob1->ob_type == PLANE && ob1->ob_state >= FINISHED)
-	 || (ob2->ob_type == PLANE && ob2->ob_state >= FINISHED)
-	 || (ob1->ob_type == EXPLOSION && ob2->ob_type == EXPLOSION)) {
+	if ((ob1->ob_type == PLANE && ob1->ob_state >= FINISHED) ||
+	    (ob2->ob_type == PLANE && ob2->ob_state >= FINISHED) ||
+	    (ob1->ob_type == EXPLOSION && ob2->ob_type == EXPLOSION)) {
 		return false;
 	}
 
@@ -86,28 +86,27 @@ bool CollisionTest(OBJECTS *ob1, OBJECTS *ob2)
 	}
 
 #ifdef COLL_DEBUG
-	fprintf(stderr,
-		"collision test: (%i, %i) at (%i, %i)/(%i, %i)\n",
-		w, h, x1, y1, x2, y2);
+	fprintf(stderr, "collision test: (%i, %i) at (%i, %i)/(%i, %i)\n", w, h,
+	        x1, y1, x2, y2);
 
-	fprintf(stderr,
-		"info: (%i, %i)/(%i, %i)  (%i, %i)/(%i, %i)\n",
-		ob1->ob_x, ob1->ob_y, ob1->ob_symbol->w, ob1->ob_symbol->h,
-		ob2->ob_x, ob2->ob_y, ob2->ob_symbol->w, ob2->ob_symbol->h);
+	fprintf(stderr, "info: (%i, %i)/(%i, %i)  (%i, %i)/(%i, %i)\n",
+	        ob1->ob_x, ob1->ob_y, ob1->ob_symbol->w, ob1->ob_symbol->h,
+	        ob2->ob_x, ob2->ob_y, ob2->ob_symbol->w, ob2->ob_symbol->h);
 #endif
 
 	data1 = ob1->ob_symbol->data + ob1->ob_symbol->w * y1 + x1;
 	data2 = ob2->ob_symbol->data + ob2->ob_symbol->w * y2 + x2;
 
-	for (y=0; y<h; ++y) {
+	for (y = 0; y < h; ++y) {
 		uint8_t *d1 = data1, *d2 = data2;
 
-		for (x=0; x<w; ++x) {
+		for (x = 0; x < w; ++x) {
 			if (*d1 && *d2) {
 				return true;
 			}
 
-			++d1; ++d2;
+			++d1;
+			++d2;
 		}
 
 		data1 += ob1->ob_symbol->w;
@@ -125,8 +124,8 @@ static OBJECTS *GetScoreObject(OBJECTS *ob, int *reverse)
 
 	if (playmode != PLAYMODE_ASYNCH) {
 		retval = planes[0];
-		*reverse = ob->ob_faction == FACTION_PLAYER1
-		        || ob->ob_faction == FACTION_NONE;
+		*reverse = ob->ob_faction == FACTION_PLAYER1 ||
+		           ob->ob_faction == FACTION_NONE;
 	} else {
 		// TODO: Support more than two factions.
 		retval = planes[ob->ob_faction == FACTION_PLAYER1 ? 1 : 0];
@@ -156,8 +155,8 @@ static bool IsHumanFaction(faction_t f)
 	int i;
 
 	for (i = 0; i < MAX_PLYR; i++) {
-		if (planes[i] != NULL && planes[i]->ob_faction == f
-		 && planes[i]->ob_movef == moveplyr) {
+		if (planes[i] != NULL && planes[i]->ob_faction == f &&
+		    planes[i]->ob_movef == moveplyr) {
 			return true;
 		}
 	}
@@ -196,11 +195,10 @@ static void TargetDestroyed(OBJECTS *ob, obtype_t type)
 	int reverse;
 	OBJECTS *so = GetScoreObject(ob, &reverse);
 
-	if (!reverse
-	 && (type == BOMB || type == SHOT
-	  || type == MISSILE || type == PLANE)) {
+	if (!reverse && (type == BOMB || type == SHOT || type == MISSILE ||
+	                 type == PLANE)) {
 		so->ob_flightscore.killscore += 4;
-		so->ob_flightscore.valour += 3 * ComputeValour (ob);
+		so->ob_flightscore.valour += 3 * ComputeValour(ob);
 	}
 
 	scoretarg(ob, ob->ob_orient == TARGET_OIL_TANK ? 200 : 100);
@@ -217,13 +215,11 @@ static bool scorepenalty(obtype_t ttype, OBJECTS *ob, int score)
 	OBJECTS *obt;
 
 	obt = ob;
-	if (ttype == SHOT || ttype == BOMB || ttype == MISSILE
-	    || (ttype == PLANE
-		&& (obt->ob_state == FLYING
-		    || obt->ob_state == WOUNDED
-		    || (obt->ob_state == FALLING
-			&& obt->ob_hitcount == FALLCOUNT))
-		&& !obt->ob_athome)) {
+	if (ttype == SHOT || ttype == BOMB || ttype == MISSILE ||
+	    (ttype == PLANE &&
+	     (obt->ob_state == FLYING || obt->ob_state == WOUNDED ||
+	      (obt->ob_state == FALLING && obt->ob_hitcount == FALLCOUNT)) &&
+	     !obt->ob_athome)) {
 		scoretarg(obt, score);
 		return true;
 	}
@@ -242,7 +238,7 @@ static void crater(OBJECTS *ob)
 
 	for (x = xmin, i = 0; x <= xmax; ++x, ++i) {
 		ymax = ground[x];
-		ymin = ymax - crtdepth[i] +1;
+		ymin = ymax - crtdepth[i] + 1;
 		y = clamp_min(20, currgame->gm_ground[x] - 20);
 		if (ymin <= y) {
 			ymin = y + 1;
@@ -264,22 +260,22 @@ static void PowerupCollected(OBJECTS *powerup, OBJECTS *plane)
 
 	switch (powerup->ob_orient) {
 	case POWERUP_AMMO:
-		plane->ob_rounds = clamp_max(plane->ob_rounds + (MAXROUNDS / 2),
-		                             MAXROUNDS);
+		plane->ob_rounds =
+		    clamp_max(plane->ob_rounds + (MAXROUNDS / 2), MAXROUNDS);
 		break;
 	case POWERUP_AMMO_BIG:
 		plane->ob_rounds = MAXROUNDS;
 		break;
 	case POWERUP_FUEL:
-		plane->ob_life = clamp_max(plane->ob_life + (MAXFUEL / 2),
-		                           MAXFUEL);
+		plane->ob_life =
+		    clamp_max(plane->ob_life + (MAXFUEL / 2), MAXFUEL);
 		break;
 	case POWERUP_FUEL_BIG:
 		plane->ob_life = MAXFUEL;
 		break;
 	case POWERUP_BOMB:
-		plane->ob_bombs = clamp_max(plane->ob_bombs + (MAXBOMBS / 2),
-		                            MAXBOMBS);
+		plane->ob_bombs =
+		    clamp_max(plane->ob_bombs + (MAXBOMBS / 2), MAXBOMBS);
 		break;
 	case POWERUP_BOMB_BIG:
 		plane->ob_bombs = MAXBOMBS;
@@ -371,8 +367,8 @@ static void swkill(OBJECTS *ob1, OBJECTS *ob2)
 		ob->ob_state = FINISHED;
 		ob->ob_onmap = false;
 
-		if (ob->ob_type == POWERUP && obt->ob_movef == moveplyr
-		 && obt->ob_type == PLANE && PlaneIsFlying(obt->ob_state)) {
+		if (ob->ob_type == POWERUP && obt->ob_movef == moveplyr &&
+		    obt->ob_type == PLANE && PlaneIsFlying(obt->ob_state)) {
 			PowerupCollected(ob, obt);
 		} else {
 			initexpl(ob, 0);
@@ -387,7 +383,7 @@ static void swkill(OBJECTS *ob1, OBJECTS *ob2)
 
 		/* cr 2005-04-28: Avoid having planes hit themselves */
 		if (IsYoungShot(obt)) {
-			return;	
+			return;
 		}
 
 		if (state == CRASHED) {
@@ -403,8 +399,7 @@ static void swkill(OBJECTS *ob1, OBJECTS *ob2)
 			return;
 		}
 
-		if (ttype == STARBURST
-		    || (ttype == BIRD && ob->ob_athome)) {
+		if (ttype == STARBURST || (ttype == BIRD && ob->ob_athome)) {
 			return;
 		}
 
@@ -440,8 +435,8 @@ static void swkill(OBJECTS *ob1, OBJECTS *ob2)
 			return;
 		}
 
-		if (ttype == SHOT || ttype == BIRD
-		    || ttype == OX || ttype == FLOCK) {
+		if (ttype == SHOT || ttype == BIRD || ttype == OX ||
+		    ttype == FLOCK) {
 			if (ob == consoleplayer) {
 				if (ttype == SHOT) {
 					swwindshot();
@@ -475,12 +470,10 @@ static void swkill(OBJECTS *ob1, OBJECTS *ob2)
 			if (ttype == PLANE) {
 				collxadj = -collxadj;
 				collyadj = -collyadj;
-				collsdx[collptr]
-				    = ((ob->ob_dx + obt->ob_dx) >> 1)
-				    + collxadj;
-				collsdy[collptr]
-				    = ((ob->ob_dy + obt->ob_dy) >> 1)
-				    + collyadj;
+				collsdx[collptr] =
+				    ((ob->ob_dx + obt->ob_dx) >> 1) + collxadj;
+				collsdy[collptr] =
+				    ((ob->ob_dy + obt->ob_dy) >> 1) + collyadj;
 				collsno[collptr++] = ob;
 			}
 		}
@@ -494,8 +487,7 @@ static void swkill(OBJECTS *ob1, OBJECTS *ob2)
 		return;
 
 	case FLOCK:
-		if (ttype != FLOCK && ttype != BIRD
-		    && ob->ob_state == FLYING) {
+		if (ttype != FLOCK && ttype != BIRD && ob->ob_state == FLYING) {
 			for (i = 0; i < 8; ++i)
 				initbird(ob, i);
 			ob->ob_life = -1;
@@ -537,14 +529,13 @@ void swcollsn(void)
 		ymax = ob->ob_y;
 		ymin = ymax - ob->ob_symbol->h + 1;
 
-		for (obp = ob->ob_xnext;
-		     obp != &botobj && obp->ob_x <= xmax;
+		for (obp = ob->ob_xnext; obp != &botobj && obp->ob_x <= xmax;
 		     obp = obp->ob_xnext) {
 
-			if (obp->ob_y >= ymin
-			    && (obp->ob_y - obp->ob_symbol->h + 1) <= ymax
-			    && CollisionTest(ob, obp)
-			    && killptr < 2 * MAX_OBJS - 1) {
+			if (obp->ob_y >= ymin &&
+			    (obp->ob_y - obp->ob_symbol->h + 1) <= ymax &&
+			    CollisionTest(ob, obp) &&
+			    killptr < 2 * MAX_OBJS - 1) {
 				killed[killptr] = ob;
 				killer[killptr] = obp;
 				++killptr;
@@ -556,12 +547,11 @@ void swcollsn(void)
 
 		otype = ob->ob_type;
 
-		if ((otype == PLANE
-		     && ob->ob_state != FINISHED
-		     && ob->ob_state != WAITING
-		     && ob->ob_y < (ground[ob->ob_x + 8] + 24))
-		    || ((otype == BOMB || otype == MISSILE)
-			&& ob->ob_y < (ground[ob->ob_x + 4] + 12))) {
+		if ((otype == PLANE && ob->ob_state != FINISHED &&
+		     ob->ob_state != WAITING &&
+		     ob->ob_y < (ground[ob->ob_x + 8] + 24)) ||
+		    ((otype == BOMB || otype == MISSILE) &&
+		     ob->ob_y < (ground[ob->ob_x + 4] + 12))) {
 			tstcrash(ob);
 		}
 	}
@@ -584,7 +574,7 @@ static void tstcrash(OBJECTS *obp)
 	sopsym_t *sym = obp->ob_symbol;
 	int x, y;
 
-	for (x=0; x<sym->w; ++x) {
+	for (x = 0; x < sym->w; ++x) {
 		y = obp->ob_y - ground[x + obp->ob_x];
 
 		// out of range?
@@ -664,7 +654,7 @@ void scorepln(OBJECTS *ob, obtype_t type)
 					scobj->ob_flightscore.planekills++;
 				}
 				scobj->ob_flightscore.valour +=
-					4 * (2 + ComputeValour (ob));
+				    4 * (2 + ComputeValour(ob));
 			}
 
 			scobj->ob_flightscore.killscore += 3;
