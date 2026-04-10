@@ -17,6 +17,7 @@ DOC_FILES=            \
         PHILOSOPHY.md
 
 EXTRA_DIST = $(AUX_DIST_GEN) $(DOC_FILES) \
+             .clang-format \
              embuild.sh \
              icon.png \
              maps/README.md maps/original.sop maps/empty.sop \
@@ -29,3 +30,5 @@ MAINTAINERCLEANFILES = $(AUX_DIST_GEN)
 docdir=$(prefix)/share/doc/@PACKAGE@
 SUBDIRS=src doc pkg
 
+format:
+	clang-format -i */*.[ch]

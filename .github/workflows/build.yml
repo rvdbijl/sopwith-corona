@@ -165,7 +165,7 @@ jobs:
     - name: Check formatting
       if: '!cancelled()'
       run: |
-        clang-format -i src/*.[ch]
+        make format
         git diff > formatting-fixes.diff
         if ! grep "" formatting-fixes.diff; then
           rm -f formatting-fixes.diff
