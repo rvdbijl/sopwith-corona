@@ -31,4 +31,4 @@ docdir=$(prefix)/share/doc/@PACKAGE@
 SUBDIRS=src doc pkg
 
 format:
-	clang-format -i */*.[ch]
+	clang-format -i src/*.[ch] src/sdl/*.[ch]
