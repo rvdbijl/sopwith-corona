@@ -152,3 +152,32 @@ jobs:
       with:
         path: "pkg/win32/staging"
         name: sdl-sopwith-${{steps.version.outputs.SUFFIXED_VERSION}}
+
+  check_style_etc:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt -q install clang-format
+    - uses: actions/checkout@v4
+    - name: Check formatting
+      if: '!cancelled()'
+      run: |
+        clang-format -i src/*.[ch]
+        git diff > formatting-fixes.diff
+        if ! grep "" formatting-fixes.diff; then
+          rm -f formatting-fixes.diff
+        else
+          (echo "Formatting errors detected by clang-format. Please run" \
+                "\`make format\` or apply formatting-fixes.diff below.";
+           echo) >> $GITHUB_STEP_SUMMARY
+          false
+        fi
+    - uses: actions/upload-artifact@v4
+      if: '!cancelled()'
+      with:
+        if-no-files-found: ignore
+        name: formatting-fixes.diff
+        path: formatting-fixes.diff
