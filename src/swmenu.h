@@ -35,5 +35,9 @@ enum menu_action SubMenu(const struct menuitem *item);
 void FullscreenBackground(void *title);
 enum menu_action ToggleConfigOption(const struct menuitem *item);
 
+// TODO: clang-format is currently disabled for this one comment because of a
+// mismatch in output with the version found in Github Actions:
+// clang-format off
 #define CONFIG_OPTION(label, config_name)                                      \
 	{'1', label, ToggleConfigOption, config_name}
+// clang-format on
