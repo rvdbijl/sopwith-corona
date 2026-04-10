@@ -41,16 +41,16 @@ struct high_score {
 };
 
 struct high_score high_scores[MAX_HIGH_SCORES] = {
-	{"DLC", {6500}},  // David L. Clark
-	{"DG",  {6000}},  // Dave Growden (Ox)
-	{"JHC", {5500}},  // Jack Cole
-	{"JS",  {5000}},  // Jesse Smith
-	{"JH",  {4500}},  // Josh Horowitz
-	{"CR",  {4000}},  // Christoph Reichenbach
-	{"AMJ", {3500}},  // Andrew Jenner
-	{"HJM", {3000}},  // Harry Mason
-	{"BMB", {2500}},
-	{"SDH", {2000}},  // Simon Howard
+    {"DLC", {6500}}, // David L. Clark
+    {"DG", {6000}},  // Dave Growden (Ox)
+    {"JHC", {5500}}, // Jack Cole
+    {"JS", {5000}},  // Jesse Smith
+    {"JH", {4500}},  // Josh Horowitz
+    {"CR", {4000}},  // Christoph Reichenbach
+    {"AMJ", {3500}}, // Andrew Jenner
+    {"HJM", {3000}}, // Harry Mason
+    {"BMB", {2500}}, // BMB Compuscience
+    {"SDH", {2000}}, // Simon Howard
 };
 
 static int UnpackMedals(int input, int *medals, int max_medals)

@@ -426,10 +426,8 @@ static bool movepln(OBJECTS *ob)
 	obstate_t state, newstate;
 	int x, y, stalled;
 
-	static const signed int gravity[] = {
-		0, -1, -2, -3, -4, -3, -2, -1,
-		0, 1, 2, 3, 4, 3, 2, 1
-	};
+	static const signed int gravity[] = {0, -1, -2, -3, -4, -3, -2, -1,
+	                                     0, 1,  2,  3,  4,  3,  2,  1};
 
 	state = ob->ob_state;
 	ob->ob_soundf = PlaneSoundCallback;
@@ -879,26 +877,26 @@ static OBJECTS *FindEnemyPlane(OBJECTS *ob)
 // entry for each target type. An aggression of zero means that type never
 // fires; otherwise the lower the value, the more often it fires.
 static const int target_aggression[NUM_TARGET_TYPES] = {
-	2,  // TARGET_HANGAR
-	2,  // TARGET_FACTORY
-	2,  // TARGET_OIL_TANK
-	2,  // TARGET_TANK
-	5,  // TARGET_TRUCK
-	5,  // TARGET_TANKER_TRUCK
-	0,  // TARGET_FLAG
-	0,  // TARGET_TENT
-	2,  // TARGET_CUSTOM1
-	2,  // TARGET_CUSTOM2
-	2,  // TARGET_CUSTOM3
-	5,  // TARGET_CUSTOM4
-	5,  // TARGET_CUSTOM5
-	0,  // TARGET_CUSTOM_PASSIVE1
-	0,  // TARGET_CUSTOM_PASSIVE2
-	0,  // TARGET_CUSTOM_PASSIVE3
-	0,  // TARGET_CUSTOM_PASSIVE4
-	0,  // TARGET_CUSTOM_PASSIVE5
-	0,  // TARGET_RADIO_TOWER
-	0,  // TARGET_WATER_TOWER
+    2, // TARGET_HANGAR
+    2, // TARGET_FACTORY
+    2, // TARGET_OIL_TANK
+    2, // TARGET_TANK
+    5, // TARGET_TRUCK
+    5, // TARGET_TANKER_TRUCK
+    0, // TARGET_FLAG
+    0, // TARGET_TENT
+    2, // TARGET_CUSTOM1
+    2, // TARGET_CUSTOM2
+    2, // TARGET_CUSTOM3
+    5, // TARGET_CUSTOM4
+    5, // TARGET_CUSTOM5
+    0, // TARGET_CUSTOM_PASSIVE1
+    0, // TARGET_CUSTOM_PASSIVE2
+    0, // TARGET_CUSTOM_PASSIVE3
+    0, // TARGET_CUSTOM_PASSIVE4
+    0, // TARGET_CUSTOM_PASSIVE5
+    0, // TARGET_RADIO_TOWER
+    0, // TARGET_WATER_TOWER
 };
 
 bool movetarg(OBJECTS *ob)

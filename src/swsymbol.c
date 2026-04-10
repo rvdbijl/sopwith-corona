@@ -1378,13 +1378,9 @@ symset_t symbol_powerups[NUM_POWERUP_TYPES];  // swpowerupsym
 
 // special symbol for single pixel (bullets etc)
 
-static uint8_t pixel_data[] = { 3 };
+static uint8_t pixel_data[] = {3};
 
-sopsym_t symbol_pixel = {
-	pixel_data,
-	1,
-	1
-};
+sopsym_t symbol_pixel = {pixel_data, 1, 1};
 
 // generate array of symset_t structs from array of strings:
 #define SYMSETS_FROM_TEXT(text, out)                    \

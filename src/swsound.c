@@ -34,29 +34,29 @@
 // formats, you'll need to move all A and B notes up or down by one octave (add
 // < or > commands)
 static const int notefreq[] = {
-	523,  // c
-	554,  // c#
-	587,  // d
-	622,  // d#
-	659,  // e
-	698,  // f
-	740,  // f#
-	784,  // g
-	831,  // g#
-	880,  // a
-	932,  // a#
-	988,  // b
+    523, // c
+    554, // c#
+    587, // d
+    622, // d#
+    659, // e
+    698, // f
+    740, // f#
+    784, // g
+    831, // g#
+    880, // a
+    932, // a#
+    988, // b
 };
 
 // Maps from a-g to index in notefreq[] above:
 static const int noteindex[] = {
-	9,  // a
-	11, // b
-	0,  // c
-	2,  // d
-	4,  // e
-	5,  // f
-	7   // g
+    9,  // a
+    11, // b
+    0,  // c
+    2,  // d
+    4,  // e
+    5,  // f
+    7   // g
 };
 
 static int soundtype = 32767;		/* Current sound type */
@@ -85,19 +85,19 @@ static int exploctv;			/* Octave */
 // use C major scale as described above.
 char *expltune =
 #ifdef SOPWITH1_TUNE
-	">e4./d8/c4/d4/e4/d+4/e4/c4/d4/d4/d4/d1/"
-	"d4./c8/<b4/>c4/d4/c+4/d4/<b4/>c4/c4/c4/c1/<g4./g+8/"
-	"a4./a-8/g4./g+8/a4/a-4/g4/>d4/d4/d2./<g4./g+8/"
-	"a4./a-8/g4./g+8/a4/a-4/g4/>e4/e4/e2./"
-	"e4./d8/c4/d4/e4/d+4/e4/c4/d4/d4/d4/d2/c4/<g+4/a4/>"
-	"d2/e2/g1/";
+    ">e4./d8/c4/d4/e4/d+4/e4/c4/d4/d4/d4/d1/"
+    "d4./c8/<b4/>c4/d4/c+4/d4/<b4/>c4/c4/c4/c1/<g4./g+8/"
+    "a4./a-8/g4./g+8/a4/a-4/g4/>d4/d4/d2./<g4./g+8/"
+    "a4./a-8/g4./g+8/a4/a-4/g4/>e4/e4/e2./"
+    "e4./d8/c4/d4/e4/d+4/e4/c4/d4/d4/d4/d2/c4/<g+4/a4/>"
+    "d2/e2/g1/";
 #else
-	"<b4/>d8/d2/r16/c8/<b8/a8/b4./>c4./c+4./d4./"
-	"e4/g8/g2/r16/a8/g8/e8/d2./"
-	"<b4/>d8/d2/r16/c8/<b8/a8/b4./>c4./c+4./d4./"
-	"e4/a8/a2/r16/g8/f+8/e8/d2./"
-	"d8/g2/r16/g8/g+2/r16/g+8/a2/r16/a8/>c2/<r16/"
-	"b8/a8/g8/b4/g8/b4/g8/a4./g1/";
+    "<b4/>d8/d2/r16/c8/<b8/a8/b4./>c4./c+4./d4./"
+    "e4/g8/g2/r16/a8/g8/e8/d2./"
+    "<b4/>d8/d2/r16/c8/<b8/a8/b4./>c4./c+4./d4./"
+    "e4/a8/a2/r16/g8/f+8/e8/d2./"
+    "d8/g2/r16/g8/g+2/r16/g+8/a2/r16/a8/>c2/<r16/"
+    "b8/a8/g8/b4/g8/b4/g8/a4./g1/";
 #endif
 
 static int titlplace;		/* Place in title tune; */
@@ -113,14 +113,12 @@ static int octavefactor;
 
 // random number generator
 static const int seed[50] = {
-	0x90B9, 0xBCFB, 0x6564, 0x3313, 0x3190, 0xA980, 0xBCF0, 0x6F97,
-	0x37F4, 0x064B, 0x9FD8, 0x595B, 0x1EEE, 0x820C, 0x4201, 0x651E,
-	0x848E, 0x15D5, 0x1DE7, 0x1585, 0xA850, 0x213B, 0x3953, 0x1EB0,
-	0x97A7, 0x35DD, 0xAF2F, 0x1629, 0xBE9B, 0x243F, 0x847D, 0x313A,
-	0x3295, 0xBC11, 0x6E6D, 0x3398, 0xAD43, 0x51CE, 0x8F95, 0x507E,
-	0x499E, 0x3BC1, 0x5243, 0x2017, 0x9510, 0x9865, 0x65F6, 0x6B56,
-	0x36B9, 0x5026
-};
+    0x90B9, 0xBCFB, 0x6564, 0x3313, 0x3190, 0xA980, 0xBCF0, 0x6F97, 0x37F4,
+    0x064B, 0x9FD8, 0x595B, 0x1EEE, 0x820C, 0x4201, 0x651E, 0x848E, 0x15D5,
+    0x1DE7, 0x1585, 0xA850, 0x213B, 0x3953, 0x1EB0, 0x97A7, 0x35DD, 0xAF2F,
+    0x1629, 0xBE9B, 0x243F, 0x847D, 0x313A, 0x3295, 0xBC11, 0x6E6D, 0x3398,
+    0xAD43, 0x51CE, 0x8F95, 0x507E, 0x499E, 0x3BC1, 0x5243, 0x2017, 0x9510,
+    0x9865, 0x65F6, 0x6B56, 0x36B9, 0x5026};
 
 static unsigned int swrand(unsigned int modulo)
 {

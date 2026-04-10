@@ -22,17 +22,17 @@
 #define VRAMSIZE (SCR_HGHT * vid_pitch)
 
 static const uint8_t color_mappings[][4] = {
-	{ 0, 3, 3, 3 },  // All-white                     - FACTION_NONE?
-	{ 0, 1, 2, 3 },  // Cyan fuselage, magenta wings  - FACTION_PLAYER1
-	{ 0, 2, 1, 3 },  // Magenta fuselage, cyan wings  - FACTION_PLAYER2
-	// New colors:
-	{ 0, 1, 3, 2 },  // Cyan fuselage, white wings    - FACTION_PLAYER3
-	{ 0, 2, 3, 1 },  // Magenta fuselage, white wings - FACTION_PLAYER4
-	{ 0, 3, 1, 2 },  // White fuselage, cyan wings    - FACTION_PLAYER5
-	{ 0, 3, 2, 1 },  // White fuselage, magenta wings - FACTION_PLAYER6
-	// Now we're getting into boring territory...
-	{ 0, 1, 1, 3 },  // All-cyan                      - FACTION_PLAYER7
-	{ 0, 2, 2, 3 },  // All-magenta                   - FACTION_PLAYER8
+    {0, 3, 3, 3}, // All-white                     - FACTION_NONE?
+    {0, 1, 2, 3}, // Cyan fuselage, magenta wings  - FACTION_PLAYER1
+    {0, 2, 1, 3}, // Magenta fuselage, cyan wings  - FACTION_PLAYER2
+    // New colors:
+    {0, 1, 3, 2}, // Cyan fuselage, white wings    - FACTION_PLAYER3
+    {0, 2, 3, 1}, // Magenta fuselage, white wings - FACTION_PLAYER4
+    {0, 3, 1, 2}, // White fuselage, cyan wings    - FACTION_PLAYER5
+    {0, 3, 2, 1}, // White fuselage, magenta wings - FACTION_PLAYER6
+    // Now we're getting into boring territory...
+    {0, 1, 1, 3}, // All-cyan                      - FACTION_PLAYER7
+    {0, 2, 2, 3}, // All-magenta                   - FACTION_PLAYER8
 };
 
 uint8_t *vid_vram;

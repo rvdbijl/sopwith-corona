@@ -76,12 +76,8 @@ int maxcrash;			/* Maximum number of crashes */
 bool restart_flag;              /* Return to main menu */
 
 /* Sine table of pi/8 increments, multiplied by 256 */
-const int sintab[ANGLES] = {
-	0, 98, 181, 237,
-	256, 237, 181, 98,
-	0, -98, -181, -237,
-	-256, -237, -181, -98
-};
+const int sintab[ANGLES] = {0, 98,  181,  237,  256,  237,  181,  98,
+                            0, -98, -181, -237, -256, -237, -181, -98};
 
 /* buffer of player commands, loops round.
  * latest_player_commands[plr][latest_player_time[plr] % MAX_NET_LAG] is the

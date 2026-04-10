@@ -79,14 +79,10 @@ static void PrintHelp(void)
 	const struct {
 		char *name; int key;
 	} items[] = {
-		{ "Accelerate",  KEY_ACCEL },
-		{ "Decelerate",  KEY_DECEL },
-		{ "Pull Up",     KEY_PULLUP },
-		{ "Pull Down",   KEY_PULLDOWN },
-		{ "Flip Plane",  KEY_FLIP },
-		{ "Fire Gun",    KEY_FIRE },
-		{ "Drop Bomb",   KEY_BOMB },
-		{ "Fly Home",    KEY_HOME },
+	    {"Accelerate", KEY_ACCEL}, {"Decelerate", KEY_DECEL},
+	    {"Pull Up", KEY_PULLUP},   {"Pull Down", KEY_PULLDOWN},
+	    {"Flip Plane", KEY_FLIP},  {"Fire Gun", KEY_FIRE},
+	    {"Drop Bomb", KEY_BOMB},   {"Fly Home", KEY_HOME},
 	};
 
 	// We usually only show the help text in novice mode. However, in

@@ -75,30 +75,30 @@ struct title_element {
 };
 
 static struct title_element default_elements[] = {
-	{TITLE_GROUND, {.ground={original_ground + 367, 600}}},
-	{TITLE_TEXT, {.text={2, 20, 2, "SDL", TEXT_ALIGN_CENTER}}},
-	{TITLE_TEXT, {.text={3, 20, 4, "S O P W I T H", TEXT_ALIGN_CENTER}}},
-	{TITLE_TEXT, {.text={3, 20, 6, MAGIC_VERSION, TEXT_ALIGN_CENTER}}},
-	{TITLE_TEXT, {.text={3, 0, 9, "(c) 1984, 1985, 1987"}}},
-	{TITLE_TEXT, {.text={1, 21, 9, "BMB"}}},
-	{TITLE_TEXT, {.text={3, 25, 9, "Compuscience"}}},
-	{TITLE_TEXT, {.text={3, 0, 10, "(c) 1984-2000 David L. Clark"}}},
-	{TITLE_TEXT,
-	 {.text={3, 0, 11, "(c) 2001-2024 Simon Howard, Jesse Smith"}}},
-	{TITLE_TEXT, {.text={3, 4, 12, "Distributed under the"}}},
-	{TITLE_TEXT, {.text={1, 26, 12, "GNU"}}},
-	{TITLE_TEXT, {.text={3, 30, 12, "GPL"}}},
-	{TITLE_SYMBOL, {.sym={1, 40, 19, &symbol_plane[0].sym[0]}}},
-	{TITLE_SYMBOL, {.sym={2, 130, 119, &symbol_plane[1].sym[6]}}},
-	{TITLE_SYMBOL, {.sym={2, 23, 108, &symbol_targets[3].sym[0]}}},
-	{TITLE_SYMBOL, {.sym={1, 212, 108, &symbol_ox[0].sym[0]}}},
-	{TITLE_LINE, {.line={2, 280, 34, 280, 34}}},
-	{TITLE_LINE, {.line={2, 280, 29, 280, 29}}},
-	{TITLE_LINE, {.line={2, 280, 24, 280, 24}}},
-	{TITLE_LINE, {.line={2, 280, 19, 280, 19}}},
-	{TITLE_LINE, {.line={2, 280, 14, 280, 14}}},
-	{TITLE_LINE, {.line={2, 280, 9, 280, 9}}},
-	{TITLE_SYMBOL, {.sym={2, 270, 39, &symbol_plane_hit[0].sym[0]}}},
+    {TITLE_GROUND, {.ground = {original_ground + 367, 600}}},
+    {TITLE_TEXT, {.text = {2, 20, 2, "SDL", TEXT_ALIGN_CENTER}}},
+    {TITLE_TEXT, {.text = {3, 20, 4, "S O P W I T H", TEXT_ALIGN_CENTER}}},
+    {TITLE_TEXT, {.text = {3, 20, 6, MAGIC_VERSION, TEXT_ALIGN_CENTER}}},
+    {TITLE_TEXT, {.text = {3, 0, 9, "(c) 1984, 1985, 1987"}}},
+    {TITLE_TEXT, {.text = {1, 21, 9, "BMB"}}},
+    {TITLE_TEXT, {.text = {3, 25, 9, "Compuscience"}}},
+    {TITLE_TEXT, {.text = {3, 0, 10, "(c) 1984-2000 David L. Clark"}}},
+    {TITLE_TEXT,
+     {.text = {3, 0, 11, "(c) 2001-2024 Simon Howard, Jesse Smith"}}},
+    {TITLE_TEXT, {.text = {3, 4, 12, "Distributed under the"}}},
+    {TITLE_TEXT, {.text = {1, 26, 12, "GNU"}}},
+    {TITLE_TEXT, {.text = {3, 30, 12, "GPL"}}},
+    {TITLE_SYMBOL, {.sym = {1, 40, 19, &symbol_plane[0].sym[0]}}},
+    {TITLE_SYMBOL, {.sym = {2, 130, 119, &symbol_plane[1].sym[6]}}},
+    {TITLE_SYMBOL, {.sym = {2, 23, 108, &symbol_targets[3].sym[0]}}},
+    {TITLE_SYMBOL, {.sym = {1, 212, 108, &symbol_ox[0].sym[0]}}},
+    {TITLE_LINE, {.line = {2, 280, 34, 280, 34}}},
+    {TITLE_LINE, {.line = {2, 280, 29, 280, 29}}},
+    {TITLE_LINE, {.line = {2, 280, 24, 280, 24}}},
+    {TITLE_LINE, {.line = {2, 280, 19, 280, 19}}},
+    {TITLE_LINE, {.line = {2, 280, 14, 280, 14}}},
+    {TITLE_LINE, {.line = {2, 280, 9, 280, 9}}},
+    {TITLE_SYMBOL, {.sym = {2, 270, 39, &symbol_plane_hit[0].sym[0]}}},
 };
 
 static struct title_element *title_elements = default_elements;
@@ -356,14 +356,15 @@ static enum menu_action StartNetgameConnect(const struct menuitem *item)
 }
 
 static const struct menuitem netgame_menu_items[] = {
-	{'L', "listen for connection",  StartNetgameListen},
-	{'C', "connect to remote host", StartNetgameConnect},
-	{0, NULL},
+    {'L', "listen for connection", StartNetgameListen},
+    {'C', "connect to remote host", StartNetgameConnect},
+    {0, NULL},
 };
 
 static const struct menu netgame_menu = {
-	TitleScreenBackground, NULL,
-	netgame_menu_items,
+    TitleScreenBackground,
+    NULL,
+    netgame_menu_items,
 };
 #endif
 
@@ -380,14 +381,15 @@ static enum menu_action StartExpert(const struct menuitem *item)
 }
 
 static const struct menuitem single_player_menu_items[] = {
-	{'N', "novice player", StartNovice},
-	{'E', "expert player", StartExpert},
-	{0, NULL},
+    {'N', "novice player", StartNovice},
+    {'E', "expert player", StartExpert},
+    {0, NULL},
 };
 
 static const struct menu single_player_menu = {
-	TitleScreenBackground, NULL,
-	single_player_menu_items,
+    TitleScreenBackground,
+    NULL,
+    single_player_menu_items,
 };
 
 static enum menu_action StartVsComputer(const struct menuitem *item)
@@ -419,25 +421,26 @@ static enum menu_action QuitGame(const struct menuitem *item)
 #endif
 
 static const struct menuitem main_menu_items[] = {
-	{'S', "single player", SubMenu, &single_player_menu},
-	{'C', "single player versus computer", StartVsComputer},
+    {'S', "single player", SubMenu, &single_player_menu},
+    {'C', "single player versus computer", StartVsComputer},
 #ifdef TCPIP
-	{'N', "network game", SubMenu, &netgame_menu},
+    {'N', "network game", SubMenu, &netgame_menu},
 #endif
-	{'O', "game options", SubMenu, &options_menu},
+    {'O', "game options", SubMenu, &options_menu},
 #ifdef __EMSCRIPTEN__
-	{'M', "open manual", OpenManual},
-	{'I', "install as app", InstallApp},
+    {'M', "open manual", OpenManual},
+    {'I', "install as app", InstallApp},
 #endif
 #ifndef NO_EXIT
-	{'Q', "quit game", QuitGame},
+    {'Q', "quit game", QuitGame},
 #endif
-	{0, NULL},
+    {0, NULL},
 };
 
 static const struct menu main_menu = {
-	TitleScreenBackground, NULL,
-	main_menu_items,
+    TitleScreenBackground,
+    NULL,
+    main_menu_items,
 };
 
 void getgamemode(void)
