@@ -11,20 +11,18 @@
 // SDL Video Code
 //
 
-#include <string.h>
-#include <time.h>
 #include <SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <time.h>
 
-#include "video.h"
 #include "sw.h"
 #include "swinit.h"
 #include "swmain.h"
+#include "video.h"
 
 #define INPUT_BUFFER_LEN 32
 
@@ -40,59 +38,77 @@ struct palette {
 };
 
 static const struct palette video_palettes[] = {
-	{"CGA 1", 		// CGA black, cyan, magenta, white (Sopwith's default color scheme)
-		{{0, 0, 0}, {0, 255, 255}, {255, 0, 255}, {255, 255, 255}}},
-	{"CGA 2", 		// CGA black, red, green, yellow
-		{{0, 0, 0}, {0, 255, 0}, {255, 0, 0}, {255, 255, 0}}},
-	{"CGA 3", 		// CGA black, cyan, red, white (aka CGA mode 5)
-		{{0, 0, 0}, {0, 255, 255}, {255, 0, 0}, {255, 255, 255}}},
-	{"Mono Amber",   // Shades of amber from a monochrome CGA display
-		{{0, 0, 0}, {255, 170, 16}, {242, 125, 0}, {255, 226, 52}}},
-	{"Mono Green", 	// Shades of green from a monochrome CGA display
-		{{0, 0, 0}, {12, 238, 56}, {8, 202, 48}, {49, 253, 90}}},
-	{"Mono Grey", 	// Shades of grey from a monochrome CGA display
-		{{0, 0, 0}, {222, 222, 210}, {182, 186, 182}, {255, 255, 255}}},
-	{"Tosh LCD 1",		// Toshiba laptop with STN panel
-		{{213, 226, 138}, {150, 160, 150}, {120, 120, 160}, {0, 20, 200}}},
-	{"Tosh LCD 2",		// Toshiba laptop with STN panel, reversed
-		{{0, 20, 200}, {120, 120, 160}, {150, 160, 150}, {213, 226, 138}}},
-	{"Tosh LCD 3",		// Toshiba T1000 with no backlight
-		{{0x72, 0x88, 0x79}, {0x4b, 0x6e, 0x75},
-		 {0x42, 0x5a, 0x75}, {0x27, 0x46, 0x6d}}},
-	{"IBM LCD",  // IBM PC Convertible
-		{{0x6b, 0x85, 0x88}, {0x56, 0x6b, 0x6e},
-		 {0x42, 0x52, 0x54}, {0x2e, 0x39, 0x3b}}},
-	{"Tandy LCD", // Tandy 1100FD
-		{{0x48, 0xad, 0x68}, {0x36, 0x8c, 0x61},
-		 {0x24, 0x6c, 0x5a}, {0x13, 0x4a, 0x54}}},
-	{"Gas Plasma",
-		{{0x7d, 0x1b, 0x02}, {0xd3, 0x41, 0x00},
-		 {0xa8, 0x2e, 0x01}, {0xfe, 0x54, 0x00}}},
-	// Palette from swgrapha.c in the original source, the colors
-	// that would have appeared in the Atari port.
-	{"Atari",
-		{{0x00, 0x00, 0x00}, {0x00, 0x77, 0xff},
-		 {0xff, 0x00, 0x00}, {0xff, 0xff, 0xff}}},
-	{"Muted",
-		{{0x00, 0x00, 0x00}, {0x78, 0xc3, 0xd6},
-		 {0xc5, 0x51, 0xc5}, {0xc7, 0xc7, 0xc7}}},
+    // CGA black, cyan, magenta, white (Sopwith's default color scheme)
+    {"CGA 1", {{0, 0, 0}, {0, 255, 255}, {255, 0, 255}, {255, 255, 255}}},
+    // CGA black, red, green, yellow
+    {"CGA 2", {{0, 0, 0}, {0, 255, 0}, {255, 0, 0}, {255, 255, 0}}},
+    // CGA black, cyan, red, white (aka CGA mode 5)
+    {"CGA 3", {{0, 0, 0}, {0, 255, 255}, {255, 0, 0}, {255, 255, 255}}},
+    // Shades of amber from a monochrome CGA display
+    {"Mono Amber", {{0, 0, 0}, {255, 170, 16}, {242, 125, 0}, {255, 226, 52}}},
+    // Shades of green from a monochrome CGA display
+    {"Mono Green", {{0, 0, 0}, {12, 238, 56}, {8, 202, 48}, {49, 253, 90}}},
+    // Shades of grey from a monochrome CGA display
+    {"Mono Grey",
+     {{0, 0, 0}, {222, 222, 210}, {182, 186, 182}, {255, 255, 255}}},
+    // Toshiba laptop with STN panel
+    {"Tosh LCD 1",
+     {{213, 226, 138}, {150, 160, 150}, {120, 120, 160}, {0, 20, 200}}},
+    // Toshiba laptop with STN panel, reversed
+    {"Tosh LCD 2",
+     {{0, 20, 200}, {120, 120, 160}, {150, 160, 150}, {213, 226, 138}}},
+    // Toshiba T1000 with no backlight
+    {"Tosh LCD 3",
+     {{0x72, 0x88, 0x79},
+      {0x4b, 0x6e, 0x75},
+      {0x42, 0x5a, 0x75},
+      {0x27, 0x46, 0x6d}}},
+    // IBM PC Convertible
+    {"IBM LCD",
+     {{0x6b, 0x85, 0x88},
+      {0x56, 0x6b, 0x6e},
+      {0x42, 0x52, 0x54},
+      {0x2e, 0x39, 0x3b}}},
+    // Tandy 1100FD
+    {"Tandy LCD",
+     {{0x48, 0xad, 0x68},
+      {0x36, 0x8c, 0x61},
+      {0x24, 0x6c, 0x5a},
+      {0x13, 0x4a, 0x54}}},
+    {"Gas Plasma",
+     {{0x7d, 0x1b, 0x02},
+      {0xd3, 0x41, 0x00},
+      {0xa8, 0x2e, 0x01},
+      {0xfe, 0x54, 0x00}}},
+    // Palette from swgrapha.c in the original source, the colors
+    // that would have appeared in the Atari port.
+    {"Atari",
+     {{0x00, 0x00, 0x00},
+      {0x00, 0x77, 0xff},
+      {0xff, 0x00, 0x00},
+      {0xff, 0xff, 0xff}}},
+    {"Muted",
+     {{0x00, 0x00, 0x00},
+      {0x78, 0xc3, 0xd6},
+      {0xc5, 0x51, 0xc5},
+      {0xc7, 0xc7, 0xc7}}},
 };
 
 extern bool isNetworkGame(void);
 
 int keybindings[NUM_KEYS] = {
-	0,                    // KEY_UNKNOWN
-	SDL_SCANCODE_COMMA,   // KEY_PULLUP
-	SDL_SCANCODE_SLASH,   // KEY_PULLDOWN
-	SDL_SCANCODE_PERIOD,  // KEY_FLIP
-	SDL_SCANCODE_B,       // KEY_BOMB
-	SDL_SCANCODE_SPACE,   // KEY_FIRE
-	SDL_SCANCODE_H,       // KEY_HOME
-	SDL_SCANCODE_V,       // KEY_MISSILE
-	SDL_SCANCODE_C,       // KEY_STARBURST
-	SDL_SCANCODE_X,       // KEY_ACCEL
-	SDL_SCANCODE_Z,       // KEY_DECEL
-	SDL_SCANCODE_S,       // KEY_SOUND
+    0,                   // KEY_UNKNOWN
+    SDL_SCANCODE_COMMA,  // KEY_PULLUP
+    SDL_SCANCODE_SLASH,  // KEY_PULLDOWN
+    SDL_SCANCODE_PERIOD, // KEY_FLIP
+    SDL_SCANCODE_B,      // KEY_BOMB
+    SDL_SCANCODE_SPACE,  // KEY_FIRE
+    SDL_SCANCODE_H,      // KEY_HOME
+    SDL_SCANCODE_V,      // KEY_MISSILE
+    SDL_SCANCODE_C,      // KEY_STARBURST
+    SDL_SCANCODE_X,      // KEY_ACCEL
+    SDL_SCANCODE_Z,      // KEY_DECEL
+    SDL_SCANCODE_S,      // KEY_SOUND
 };
 
 // Button that each finger is currently pressing. We assume the user does
@@ -129,8 +145,8 @@ static SDL_Surface *SurfaceFromSopsym(sopsym_t *sym)
 {
 	const SDL_Color *pal = video_palettes[0].color;
 	SDL_Surface *surface = SDL_CreateRGBSurface(
-		0, sym->w * ICON_SCALE, sym->h * ICON_SCALE, 32,
-		0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
+	    0, sym->w * ICON_SCALE, sym->h * ICON_SCALE, 32, 0xff000000,
+	    0x00ff0000, 0x0000ff00, 0x000000ff);
 
 	uint8_t *src;
 	uint32_t *dst;
@@ -157,8 +173,8 @@ static SDL_Surface *SurfaceFromSopsym(sopsym_t *sym)
 				continue;
 			}
 			p = &pal[src[sx]];
-			dst[x] = (p->r << 24) | (p->g << 16)
-			       | (p->b << 8) | 0xff;
+			dst[x] =
+			    (p->r << 24) | (p->g << 16) | (p->b << 8) | 0xff;
 		}
 	}
 
@@ -226,14 +242,14 @@ static bool IsSpecialDay(void)
 	    // 18 January 1888, birth date of Thomas Sopwith:
 	    (t->tm_mon == 0 && t->tm_mday == 18)
 	    // 15 December 1913, founding of the Sopwith Aviation Company:
-	 || (t->tm_mon == 11 && t->tm_mday == 15)
+	    || (t->tm_mon == 11 && t->tm_mday == 15)
 	    // 22 December 1916, first flight of the Sopwith Camel:
-	 || (t->tm_mon == 11 && t->tm_mday == 22)
+	    || (t->tm_mon == 11 && t->tm_mday == 22)
 	    // 11 November 1918, Armistice Day:
-	 || (t->tm_mon == 10 && t->tm_mday == 11)
+	    || (t->tm_mon == 10 && t->tm_mday == 11)
 	    // 24 April 1984, date from the original Sopwith documentation
 	    // and assumed to be the original Sopwith release date?
-	 || (t->tm_mon == 3 && t->tm_mday == 24);
+	    || (t->tm_mon == 3 && t->tm_mday == 24);
 }
 
 static void SetIcon(void)
@@ -269,7 +285,8 @@ static void LimitTextureSize(int *w_upscale, int *h_upscale)
 	// Query renderer and limit to maximum texture dimensions of hardware:
 	if (SDL_GetRendererInfo(renderer, &rinfo) != 0) {
 		ErrorExit("CreateUpscaledTexture: SDL_GetRendererInfo() "
-		          "call failed: %s", SDL_GetError());
+		          "call failed: %s",
+		          SDL_GetError());
 	}
 
 	while (*w_upscale * SCR_WDTH > rinfo.max_texture_width) {
@@ -279,28 +296,28 @@ static void LimitTextureSize(int *w_upscale, int *h_upscale)
 		--*h_upscale;
 	}
 
-	if ((*w_upscale < 1 && rinfo.max_texture_width > 0)
-	 || (*h_upscale < 1 && rinfo.max_texture_height > 0)) {
+	if ((*w_upscale < 1 && rinfo.max_texture_width > 0) ||
+	    (*h_upscale < 1 && rinfo.max_texture_height > 0)) {
 		ErrorExit("CreateUpscaledTexture: Can't create a "
 		          "texture big enough for the whole screen! "
 		          "Maximum texture size %dx%d",
 		          rinfo.max_texture_width, rinfo.max_texture_height);
 	}
 
-	// We limit the amount of texture memory used for the intermediate buffer,
-	// since beyond a certain point there are diminishing returns. Also,
-	// depending on the hardware there may be performance problems with very
-	// huge textures, so the user can use this to reduce the maximum texture
-	// size if desired.
+	// We limit the amount of texture memory used for the intermediate
+	// buffer, since beyond a certain point there are diminishing returns.
+	// Also, depending on the hardware there may be performance problems
+	// with very huge textures, so the user can use this to reduce the
+	// maximum texture size if desired.
 	if (max_scaling_buffer_pixels < SCR_WDTH * height) {
 		ErrorExit("CreateUpscaledTexture: max_scaling_buffer_"
 		          "pixels too small to create a texture buffer:"
-		          " %d < %d", max_scaling_buffer_pixels,
-		          SCR_WDTH * height);
+		          " %d < %d",
+		          max_scaling_buffer_pixels, SCR_WDTH * height);
 	}
 
-	while (*w_upscale * *h_upscale * SCR_WDTH * height
-	       > max_scaling_buffer_pixels) {
+	while (*w_upscale * *h_upscale * SCR_WDTH * height >
+	       max_scaling_buffer_pixels) {
 		if (*w_upscale > *h_upscale) {
 			--*w_upscale;
 		} else {
@@ -352,22 +369,24 @@ static void CreateUpscaledTexture(int force)
 
 	LimitTextureSize(&w_upscale, &h_upscale);
 
-	// Create a new texture only if the upscale factors have actually changed.
-	if (h_upscale == h_upscale_old && w_upscale == w_upscale_old && !force) {
+	// Create a new texture only if the upscale factors have actually
+	// changed.
+	if (h_upscale == h_upscale_old && w_upscale == w_upscale_old &&
+	    !force) {
 		return;
 	}
 
 	h_upscale_old = h_upscale;
 	w_upscale_old = w_upscale;
 
-	// Set the scaling quality for rendering the upscaled texture to "linear",
-	// which looks much softer and smoother than "nearest" but does a better
-	// job at downscaling from the upscaled texture to screen.
+	// Set the scaling quality for rendering the upscaled texture to
+	// "linear", which looks much softer and smoother than "nearest" but
+	// does a better job at downscaling from the upscaled texture to screen.
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 
-	new_texture = SDL_CreateTexture(
-		renderer, pixel_format, SDL_TEXTUREACCESS_TARGET,
-		w_upscale*SCR_WDTH, h_upscale*height);
+	new_texture =
+	    SDL_CreateTexture(renderer, pixel_format, SDL_TEXTUREACCESS_TARGET,
+	                      w_upscale * SCR_WDTH, h_upscale * height);
 
 	old_texture = texture_upscaled;
 	texture_upscaled = new_texture;
@@ -389,8 +408,9 @@ static void GetWindowSize(int *w, int *h)
 		return;
 	}
 
-	for (factor = 1; *w * factor < (mode.w / 2)
-	              && *h * factor < (mode.h / 2); ++factor);
+	for (factor = 1;
+	     *w * factor < (mode.w / 2) && *h * factor < (mode.h / 2); ++factor)
+		;
 
 	*w *= factor;
 	*h *= factor;
@@ -419,8 +439,9 @@ static void Vid_SetMode(void)
 	}
 
 	if (window == NULL) {
-		window = SDL_CreateWindow(PACKAGE_STRING, SDL_WINDOWPOS_CENTERED,
-		                          SDL_WINDOWPOS_CENTERED, w, h, flags);
+		window =
+		    SDL_CreateWindow(PACKAGE_STRING, SDL_WINDOWPOS_CENTERED,
+		                     SDL_WINDOWPOS_CENTERED, w, h, flags);
 	} else {
 		SDL_SetWindowFullscreen(window, flags);
 #ifndef __EMSCRIPTEN__
@@ -473,14 +494,13 @@ static void Vid_SetMode(void)
 	}
 
 	if (argbbuffer == NULL) {
-		SDL_PixelFormatEnumToMasks(
-			pixel_format, &bpp, &rmask, &gmask,
-			&bmask, &amask);
+		SDL_PixelFormatEnumToMasks(pixel_format, &bpp, &rmask, &gmask,
+		                           &bmask, &amask);
 		// The texture we create is larger than the screen in height,
 		// so that we can display the touch controls if enabled.
 		argbbuffer = SDL_CreateRGBSurface(
-			0, SCR_WDTH, SCR_HGHT + TOUCH_AREA_HEIGHT, bpp,
-			rmask, gmask, bmask, amask);
+		    0, SCR_WDTH, SCR_HGHT + TOUCH_AREA_HEIGHT, bpp, rmask,
+		    gmask, bmask, amask);
 		SDL_FillRect(argbbuffer, NULL, 0);
 	}
 
@@ -497,8 +517,8 @@ static void Vid_SetMode(void)
 	// into. The SDL_TEXTUREACCESS_STREAMING flag means that this
 	// texture's content is going to change frequently.
 	texture = SDL_CreateTexture(renderer, pixel_format,
-	                            SDL_TEXTUREACCESS_STREAMING,
-	                            SCR_WDTH, SCR_HGHT + TouchAreaHeight());
+	                            SDL_TEXTUREACCESS_STREAMING, SCR_WDTH,
+	                            SCR_HGHT + TouchAreaHeight());
 
 	// Initially create the upscaled texture for rendering to screen
 	CreateUpscaledTexture(1);
@@ -532,7 +552,7 @@ void Vid_Init(void)
 	Vid_SetMode();
 
 	screenbuf = SDL_CreateRGBSurface(
-		0, SCR_WDTH, SCR_HGHT + TOUCH_AREA_HEIGHT, 8, 0, 0, 0, 0);
+	    0, SCR_WDTH, SCR_HGHT + TOUCH_AREA_HEIGHT, 8, 0, 0, 0, 0);
 	vid_vram = screenbuf->pixels;
 	vid_pitch = screenbuf->pitch;
 	SDL_SetPaletteColors(screenbuf->format->palette,
@@ -618,14 +638,15 @@ static enum gamekey TranslateScancode(int sdl_scancode)
 
 // Special keys get passed through as input events even when text input mode
 // is activated.
-static bool IsSpecialKey(SDL_Keysym *k) {
+static bool IsSpecialKey(SDL_Keysym *k)
+{
 	switch (k->sym) {
-		case SDLK_ESCAPE:
-		case SDLK_RETURN:
-		case SDLK_BACKSPACE:
-			return true;
-		default:
-			return false;
+	case SDLK_ESCAPE:
+	case SDLK_RETURN:
+	case SDLK_BACKSPACE:
+		return true;
+	default:
+		return false;
 	}
 }
 
@@ -647,8 +668,7 @@ static void CtrlKeyPress(SDL_Keycode k)
 	case SDLK_PAUSE:
 		++ctrlbreak;
 		if (ctrlbreak >= 3) {
-			fprintf(stderr,
-				"user aborted with 3 ^C's\n");
+			fprintf(stderr, "user aborted with 3 ^C's\n");
 			exit(-1);
 		}
 		break;
@@ -676,15 +696,15 @@ static void KeyDown(SDL_KeyboardEvent *event)
 	if (CtrlDown()) {
 		CtrlKeyPress(event->keysym.sym);
 		return;
-	} else if (AltDown() && (event->keysym.sym == SDLK_RETURN
-	                      || event->keysym.sym == SDLK_KP_ENTER)) {
+	} else if (AltDown() && (event->keysym.sym == SDLK_RETURN ||
+	                         event->keysym.sym == SDLK_KP_ENTER)) {
 #ifndef NO_FULLSCREEN
 		vid_fullscreen = !vid_fullscreen;
 		Vid_Reset();
 #endif
 		return;
-	} else if (event->keysym.sym == SDLK_KP_ENTER
-	        && SDL_IsTextInputActive()) {
+	} else if (event->keysym.sym == SDLK_KP_ENTER &&
+	           SDL_IsTextInputActive()) {
 		SDL_Keysym fake = {0};
 		fake.sym = '\n';
 		fake.scancode = SDL_SCANCODE_UNKNOWN;
@@ -721,8 +741,8 @@ static bool TouchCoordToPixel(float x, float y, int *px, int *py)
 static bool ValidFinger(SDL_TouchFingerEvent *ev)
 {
 	// TODO: Support more than two touch devices:
-	return ev->touchId == SDL_GetTouchDevice(0)
-	    && ev->fingerId < arrlen(pressed_buttons);
+	return ev->touchId == SDL_GetTouchDevice(0) &&
+	       ev->fingerId < arrlen(pressed_buttons);
 }
 
 static const struct touch_button *GetTouchButton(SDL_TouchFingerEvent *ev)
@@ -943,8 +963,10 @@ char *Vid_GetPrefPath(void)
 	// If SDL_GetPrefPath() fails, we can't load or save a config file,
 	// but at least we let the user play the game...
 	if (result == NULL) {
-		fprintf(stderr, "Vid_GetPrefPath: Failed to make preferences "
-		                "directory: %s\n", SDL_GetError());
+		fprintf(stderr,
+		        "Vid_GetPrefPath: Failed to make preferences "
+		        "directory: %s\n",
+		        SDL_GetError());
 	}
 
 	return result;
@@ -969,8 +991,8 @@ void ErrorExit(char *s, ...)
 	va_end(args);
 
 	if (!isatty(1)) {
-		if (SDL_ShowSimpleMessageBox(
-			SDL_MESSAGEBOX_ERROR, "Error", buf, window) == 0) {
+		if (SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", buf,
+		                             window) == 0) {
 			exit(1);
 		}
 	}

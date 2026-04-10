@@ -18,18 +18,18 @@
 #include "video.h"
 
 int controller_bindings[NUM_KEYS] = {
-	SDL_CONTROLLER_BUTTON_INVALID,        // KEY_UNKNOWN
-	SDL_CONTROLLER_BUTTON_DPAD_DOWN,      // KEY_PULLUP
-	SDL_CONTROLLER_BUTTON_DPAD_UP,        // KEY_PULLDOWN
-	SDL_CONTROLLER_BUTTON_A,              // KEY_FLIP
-	SDL_CONTROLLER_BUTTON_LEFTSHOULDER,   // KEY_BOMB
-	SDL_CONTROLLER_BUTTON_RIGHTSHOULDER,  // KEY_FIRE
-	SDL_CONTROLLER_BUTTON_START,          // KEY_HOME
-	SDL_CONTROLLER_BUTTON_INVALID,        // KEY_MISSILE
-	SDL_CONTROLLER_BUTTON_INVALID,        // KEY_STARBURST
-	SDL_CONTROLLER_BUTTON_Y,              // KEY_ACCEL
-	SDL_CONTROLLER_BUTTON_B,              // KEY_DECEL
-	SDL_CONTROLLER_BUTTON_INVALID,        // KEY_SOUND
+    SDL_CONTROLLER_BUTTON_INVALID,       // KEY_UNKNOWN
+    SDL_CONTROLLER_BUTTON_DPAD_DOWN,     // KEY_PULLUP
+    SDL_CONTROLLER_BUTTON_DPAD_UP,       // KEY_PULLDOWN
+    SDL_CONTROLLER_BUTTON_A,             // KEY_FLIP
+    SDL_CONTROLLER_BUTTON_LEFTSHOULDER,  // KEY_BOMB
+    SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, // KEY_FIRE
+    SDL_CONTROLLER_BUTTON_START,         // KEY_HOME
+    SDL_CONTROLLER_BUTTON_INVALID,       // KEY_MISSILE
+    SDL_CONTROLLER_BUTTON_INVALID,       // KEY_STARBURST
+    SDL_CONTROLLER_BUTTON_Y,             // KEY_ACCEL
+    SDL_CONTROLLER_BUTTON_B,             // KEY_DECEL
+    SDL_CONTROLLER_BUTTON_INVALID,       // KEY_SOUND
 };
 
 static int button_to_key[SDL_CONTROLLER_BUTTON_MAX];
@@ -116,8 +116,8 @@ void Vid_ControllerAdded(SDL_ControllerDeviceEvent *event)
 		return;
 	}
 	controller = SDL_GameControllerOpen(event->which);
-	controller_id = SDL_JoystickInstanceID(
-		SDL_GameControllerGetJoystick(controller));
+	controller_id =
+	    SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(controller));
 	Notification("Connected %s", SDL_GameControllerName(controller));
 }
 
@@ -152,6 +152,5 @@ bool Vid_HaveController(void)
 
 const char *Vid_ControllerButtonName(enum gamekey key)
 {
-	return SDL_GameControllerGetStringForButton(
-		controller_bindings[key]);
+	return SDL_GameControllerGetStringForButton(controller_bindings[key]);
 }

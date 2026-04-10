@@ -12,22 +12,22 @@
 //
 
 #include <SDL.h>
-#include <math.h>
 #include <assert.h>
 #include <inttypes.h>
+#include <math.h>
 
 #include "sw.h"
 #include "swsound.h"
 
-#define VOLUME 4000 /* out of 1 << 15 */
+#define VOLUME            4000 /* out of 1 << 15 */
 #define FILTER_KERNEL_LEN 51
 #define OVERSAMPLE_FACTOR 25
 
 // The following values give the cutoff range for our band-pass
 // filter. These frequencies come from a frequency analysis of
 // the LGR video "Playing Silpheed on an IBM 5150 PC".
-#define FILTER_LOW_CUTOFF_FREQ  1500 /* hz */
-#define FILTER_HI_CUTOFF_FREQ   6000 /* hz */
+#define FILTER_LOW_CUTOFF_FREQ 1500 /* hz */
+#define FILTER_HI_CUTOFF_FREQ  6000 /* hz */
 
 #define TIMER_FREQ 1193280
 
@@ -78,14 +78,12 @@ static float SincFunction(int idx, int kernel_len, float freq)
 // https://en.wikipedia.org/wiki/Window_function#Blackman_window
 static float BlackmanFunction(int idx, int kernel_len)
 {
-	return 0.42
-	     - 0.5 * cos(2 * M_PI * idx / (kernel_len - 1))
-	     + 0.08 * cos(4 * M_PI * idx / (kernel_len - 1));
+	return 0.42 - 0.5 * cos(2 * M_PI * idx / (kernel_len - 1)) +
+	       0.08 * cos(4 * M_PI * idx / (kernel_len - 1));
 }
 
 // Initialize f as a lowpass filter.
-static void MakeLowPassFilter(struct filter *f, float sample_rate,
-                              float cutoff)
+static void MakeLowPassFilter(struct filter *f, float sample_rate, float cutoff)
 {
 	int i;
 
@@ -104,8 +102,8 @@ static void MakeLowPassFilter(struct filter *f, float sample_rate,
 		// everything below the cutoff frequency. Frequency
 		// is expressed as a ratio of the sample rate, so will
 		// always be in the range 0.0-0.5.
-		f->kernel[i] = SincFunction(i, f->kernel_len,
-		                            cutoff / sample_rate);
+		f->kernel[i] =
+		    SincFunction(i, f->kernel_len, cutoff / sample_rate);
 		// It is impossible to realise an ideal lowpass filter
 		// in practice, and trying to do so produces a
 		// frequency response with ringing around the cutoff
@@ -200,7 +198,7 @@ static void SoundCallback(void *userdata, Uint8 *stream8, int len)
 	float sample;
 	int i;
 
-	len /= 2;  // 2 bytes per sample
+	len /= 2; // 2 bytes per sample
 
 	swsndupdate();
 
@@ -315,7 +313,7 @@ void Speaker_Init(void)
 	                                SDL_AUDIO_ALLOW_FREQUENCY_CHANGE);
 	if (audio_dev == 0) {
 		fprintf(stderr, "Failed to initialize sound: %s\n",
-			SDL_GetError());
+		        SDL_GetError());
 		return;
 	}
 

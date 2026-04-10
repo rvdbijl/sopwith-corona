@@ -15,8 +15,8 @@
 // want drop in other code to run without SDL.
 //
 
-#include <SDL.h>
 #include "sw.h"
+#include <SDL.h>
 
 int Timer_GetMS(void)
 {
