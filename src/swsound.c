@@ -76,29 +76,17 @@ static unsigned int expltone;		/* Current explosion tone */
 static int explticks;			/* Ticks until note change */
 static int exploctv;			/* Octave */
 
-//#define SOPWITH1_TUNE
-
-// Tunes found in Sopwith 1 and Sopwith 2. The Sopwith 1 tune is "Merrily We
-// Roll Along" and is only found in that one version, although David Clark
-// doesn't remember the game ever having this tune - a mystery!
-// Note: the tune strings here have been changed from the original versions, to
-// use C major scale as described above.
 char *expltune =
-#ifdef SOPWITH1_TUNE
-    ">e4./d8/c4/d4/e4/d+4/e4/c4/d4/d4/d4/d1/"
-    "d4./c8/<b4/>c4/d4/c+4/d4/<b4/>c4/c4/c4/c1/<g4./g+8/"
-    "a4./a-8/g4./g+8/a4/a-4/g4/>d4/d4/d2./<g4./g+8/"
-    "a4./a-8/g4./g+8/a4/a-4/g4/>e4/e4/e2./"
-    "e4./d8/c4/d4/e4/d+4/e4/c4/d4/d4/d4/d2/c4/<g+4/a4/>"
-    "d2/e2/g1/";
-#else
+    // "Wild Blue Yonder", the anthem of the US Air Force (earlier versions of
+    // Sopwith used "Merrily We Roll Along"). Note: the tune strings here have
+    // been changed from the original versions, to use C major scale as
+    // described above.
     "<b4/>d8/d2/r16/c8/<b8/a8/b4./>c4./c+4./d4./"
     "e4/g8/g2/r16/a8/g8/e8/d2./"
     "<b4/>d8/d2/r16/c8/<b8/a8/b4./>c4./c+4./d4./"
     "e4/a8/a2/r16/g8/f+8/e8/d2./"
     "d8/g2/r16/g8/g+2/r16/g+8/a2/r16/a8/>c2/<r16/"
     "b8/a8/g8/b4/g8/b4/g8/a4./g1/";
-#endif
 
 static int titlplace;		/* Place in title tune; */
 static unsigned int titltone;	/* Current title tone */
