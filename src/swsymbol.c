@@ -770,8 +770,10 @@ static const char *swpowerupsym[] = {
     "    * * * * * * * * * * * * *   \n"
     "        #               #       \n"
     "    * * * * * * * * * * * * *   \n",
+};
 
-    // POWERUP_COLLECTED:
+static const char powerup_collected_small[] =
+    // -------------------------------
     "                                \n"
     "                                \n"
     "                                \n"
@@ -787,9 +789,10 @@ static const char *swpowerupsym[] = {
     "                                \n"
     "                                \n"
     "                                \n"
-    "        * * * * * * * * *       \n",
+    "        * * * * * * * * *       \n";
 
-    // POWERUP_COLLECTED_BIG:
+static const char powerup_collected_big[] =
+    // -------------------------------
     "                                \n"
     "                                \n"
     "                                \n"
@@ -805,7 +808,16 @@ static const char *swpowerupsym[] = {
     "                                \n"
     "                                \n"
     "                                \n"
-    "    * * * * * * * * * * * * *   \n",
+    "    * * * * * * * * * * * * *   \n";
+
+// Powerups after they've been collected:
+static const char *swpowercollsym[] = {
+    powerup_collected_small, // POWERUP_AMMO
+    powerup_collected_small, // POWERUP_BOMB
+    powerup_collected_small, // POWERUP_FUEL
+    powerup_collected_big,   // POWERUP_AMMO_BIG
+    powerup_collected_big,   // POWERUP_BOMB_BIG
+    powerup_collected_big,   // POWERUP_FUEL_BIG
 };
 
 static const char *swballoonsym[] = {
@@ -1362,24 +1374,25 @@ static void InitSymset(symset_t *s, const char *name, int frame)
 
 // converted symbols:
 
-symset_t symbol_bomb[2];                      // swbmbsym
-symset_t symbol_targets[NUM_TARGET_TYPES];    // swtrgsym
-symset_t symbol_target_hit[NUM_TARGET_TYPES]; // swhtrsym
-symset_t symbol_debris[8];                    // swexpsym
-symset_t symbol_flock[2];                     // swflksym
-symset_t symbol_bird[2];                      // swbrdsym
-symset_t symbol_ox[2];                        // swoxsym
-symset_t symbol_shotwin[1];                   // swshtsym
-symset_t symbol_birdsplat[1];                 // swsplsym
-symset_t symbol_missile[4];                   // swmscsym
-symset_t symbol_burst[2];                     // swbstsym
-symset_t symbol_plane[4];                     // swplnsym
-symset_t symbol_plane_hit[4];                 // swhitsym
-symset_t symbol_plane_win[4];                 // swwinsym
-symset_t symbol_medal[3];                     // swmedalsym
-symset_t symbol_ribbon[6];                    // swribbonsym
-symset_t symbol_balloon[6];                   // swballoonsym
-symset_t symbol_powerups[NUM_POWERUP_TYPES];  // swpowerupsym
+symset_t symbol_bomb[2];                              // swbmbsym
+symset_t symbol_targets[NUM_TARGET_TYPES];            // swtrgsym
+symset_t symbol_target_hit[NUM_TARGET_TYPES];         // swhtrsym
+symset_t symbol_debris[8];                            // swexpsym
+symset_t symbol_flock[2];                             // swflksym
+symset_t symbol_bird[2];                              // swbrdsym
+symset_t symbol_ox[2];                                // swoxsym
+symset_t symbol_shotwin[1];                           // swshtsym
+symset_t symbol_birdsplat[1];                         // swsplsym
+symset_t symbol_missile[4];                           // swmscsym
+symset_t symbol_burst[2];                             // swbstsym
+symset_t symbol_plane[4];                             // swplnsym
+symset_t symbol_plane_hit[4];                         // swhitsym
+symset_t symbol_plane_win[4];                         // swwinsym
+symset_t symbol_medal[3];                             // swmedalsym
+symset_t symbol_ribbon[6];                            // swribbonsym
+symset_t symbol_balloon[6];                           // swballoonsym
+symset_t symbol_powerups[NUM_POWERUP_TYPES];          // swpowerupsym
+symset_t symbol_powerup_collected[NUM_POWERUP_TYPES]; // swpowercollsym
 
 // special symbol for single pixel (bullets etc)
 
@@ -1417,6 +1430,7 @@ void GenerateSymbols(void)
 	SYMSETS_FROM_TEXT(swsplsym, symbol_birdsplat);
 	SYMSETS_FROM_TEXT(swballoonsym, symbol_balloon);
 	SYMSETS_FROM_TEXT(swpowerupsym, symbol_powerups);
+	SYMSETS_FROM_TEXT(swpowercollsym, symbol_powerup_collected);
 }
 
 //

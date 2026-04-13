@@ -37,24 +37,25 @@ struct symset_s {
 
 extern symset_t *all_symsets;
 
-extern symset_t symbol_bomb[2];                      // swbmbsym
-extern symset_t symbol_targets[NUM_TARGET_TYPES];    // swtrgsym
-extern symset_t symbol_target_hit[NUM_TARGET_TYPES]; // swhtrsym
-extern symset_t symbol_debris[8];                    // swexpsym
-extern symset_t symbol_flock[2];                     // swflksym
-extern symset_t symbol_bird[2];                      // swbrdsym
-extern symset_t symbol_ox[2];                        // swoxsym
-extern symset_t symbol_shotwin[1];                   // swshtsym
-extern symset_t symbol_birdsplat[1];                 // swsplsym
-extern symset_t symbol_missile[4];                   // swmscsym
-extern symset_t symbol_burst[2];                     // swbstsym
-extern symset_t symbol_plane[4];                     // swplnsym
-extern symset_t symbol_plane_hit[4];                 // swhitsym
-extern symset_t symbol_plane_win[4];                 // swwinsym
-extern symset_t symbol_medal[3];                     // swmedalsym
-extern symset_t symbol_ribbon[6];                    // swribbonsym
-extern symset_t symbol_balloon[6];                   // swballoonsym
-extern symset_t symbol_powerups[NUM_POWERUP_TYPES];  // swpowerupsym
+extern symset_t symbol_bomb[2];                              // swbmbsym
+extern symset_t symbol_targets[NUM_TARGET_TYPES];            // swtrgsym
+extern symset_t symbol_target_hit[NUM_TARGET_TYPES];         // swhtrsym
+extern symset_t symbol_debris[8];                            // swexpsym
+extern symset_t symbol_flock[2];                             // swflksym
+extern symset_t symbol_bird[2];                              // swbrdsym
+extern symset_t symbol_ox[2];                                // swoxsym
+extern symset_t symbol_shotwin[1];                           // swshtsym
+extern symset_t symbol_birdsplat[1];                         // swsplsym
+extern symset_t symbol_missile[4];                           // swmscsym
+extern symset_t symbol_burst[2];                             // swbstsym
+extern symset_t symbol_plane[4];                             // swplnsym
+extern symset_t symbol_plane_hit[4];                         // swhitsym
+extern symset_t symbol_plane_win[4];                         // swwinsym
+extern symset_t symbol_medal[3];                             // swmedalsym
+extern symset_t symbol_ribbon[6];                            // swribbonsym
+extern symset_t symbol_balloon[6];                           // swballoonsym
+extern symset_t symbol_powerups[NUM_POWERUP_TYPES];          // swpowerupsym
+extern symset_t symbol_powerup_collected[NUM_POWERUP_TYPES]; // swpowercollsym
 
 extern sopsym_t symbol_pixel;
 

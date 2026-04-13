@@ -304,6 +304,10 @@ Starburst (flare). There are two frames of animation.
 Power-up items. There is one frame for each type of power-up. See \fBPOWER-UP
 TYPES\fR below.
 .TP
+\fBswpowercollsym\fR (16x16)
+Left-over base of power-up item after the power-up is collected or destroyed.
+There is one frame for each type of power-up. See \fBPOWER-UP TYPES\fR below.
+.TP
 \fBswexpsym\fR (8x8)
 Debris after an explosion. There are eight frames for different types of
 debris.
@@ -378,12 +382,6 @@ Bombs, large (full restock)
 .TP
 5
 Fuel tank, large (full refuel)
-.TP
-6
-Empty platform after power-up is collected (small)
-.TP
-7
-Empty platform after power-up is collected (large)
 .SH SOUNDS SECTION
 The \fBsounds\fR section allows the in-game music to be replaced. There is
 only one property at present, named \fBtitle_tune\fR; its value is a string
