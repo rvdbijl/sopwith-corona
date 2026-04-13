@@ -16,14 +16,23 @@ DOC_FILES=            \
         README.md     \
         PHILOSOPHY.md
 
+missionsdir = $(docdir)/examples
+missions_DATA =               \
+        maps/README.md        \
+        maps/bogey.sop        \
+        maps/doghouse.sop     \
+        maps/empty.sop        \
+        maps/new_targets.sop  \
+        maps/original.sop     \
+        maps/sopwith1.sop     \
+        maps/tank_strike.sop  \
+        maps/title.sop        \
+        maps/triplane.sop
+
 EXTRA_DIST = $(AUX_DIST_GEN) $(DOC_FILES) \
              .clang-format \
              embuild.sh \
-             icon.png \
-             maps/README.md maps/original.sop maps/empty.sop \
-             maps/tank_strike.sop maps/triplane.sop maps/bogey.sop \
-             maps/new_targets.sop maps/doghouse.sop maps/title.sop \
-             maps/sopwith1.sop
+             icon.png
 
 MAINTAINERCLEANFILES = $(AUX_DIST_GEN)
 
