@@ -29,7 +29,7 @@ missions_DATA =               \
         maps/title.sop        \
         maps/triplane.sop
 
-EXTRA_DIST = $(AUX_DIST_GEN) $(DOC_FILES) \
+EXTRA_DIST = $(AUX_DIST_GEN) $(DOC_FILES) $(missions_DATA) \
              .clang-format \
              embuild.sh \
              icon.png
