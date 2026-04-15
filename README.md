@@ -7,11 +7,11 @@ Features:
 
 * Uses LibSDL, so will run on most modern operating systems, and also
   the web (via emscripten)
-* Support for loading custom levels
+* Support for loading custom mission files (new levels)
 * TCP/IP multiplayer
 * PC speaker emulation
 * Multiple palettes that emulate a selection of old monitors
-* Medals feature
+* Medals and high score table
 
 ## More Info
 
@@ -31,7 +31,5 @@ You can find lots more information about the original Sopwith here:
 
 ## Feedback
 
-If you like SDL Sopwith, email me and let me know!
-
-Simon Howard <fraggle@gmail.com>
-
+If you like SDL Sopwith, [join the Discord community](https://discord.gg/S2P5wUUzNU)
+where you can chat with other fans of the game!

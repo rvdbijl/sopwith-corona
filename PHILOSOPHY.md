@@ -31,13 +31,12 @@ This is intended as a guiding document for the project.
   added arbitrarily and thoughtlessly.
 
 * Custom levels are the perfect opportunity to introduce new features without
-  changing the original game. Some hypothetical examples might be:
+  changing the original game. Some examples are:
 
-  - New levels might feature new items that weren't present in the original
-    level, like artillery or observation balloons.
-  - In the original level, the enemy planes all have separate territories.
-    Perhaps in a new level, enemy planes that share a territory know to fly in
-    formation.
+  - New levels can feature new items that weren't present in the original
+    level, including tents and observation balloons.
+  - In the original level, the enemy planes all have separate territories. In
+    new levels, enemy planes that share a territory know to fly in formation.
 
 * Multiplayer is also a perfect opportunity for new features and gameplay
   expansions, since the multiplayer functionality in the original game only

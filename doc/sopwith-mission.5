@@ -5,12 +5,11 @@
 .
 .SH DESCRIPTION
 The Sopwith mission format allows \fBsopwith\fR(6) to load custom user-defined
-levels and other modifications to the game. The files should be UTF-8 encoded
-and use
+levels and other modifications to the game. The files use
 .UR https://github.com/fragglet/yocton
 Yocton
 .UE
-as their basic format.
+as their basic format and should be UTF-8 encoded.
 .PP
 Each \.sop file can contain three different sections:
 .TP
@@ -606,5 +605,5 @@ basic level editor that allowed people to make their own maps, although the
 changes that can be made using this technique are inherently limited.
 .PP
 Full support for custom maps did not appear until 2024, with SDL Sopwith's v2.4
-release. There will likely be further future extensions to this format to allow
-people to share more elaborate modifications to the game.
+release. Subsequent versions have extended the format and there will likely be
+further such extensions in the future.
