@@ -81,12 +81,9 @@ Specifies the faction to which the object belongs. See \fBFACTIONS\fR below.
 .TP
 \fBtransform\fR
 For ground targets, this specifies a "transformation" to apply to the symbol.
-Eight different transformations are supported: 0 (no transformation); 1 (rotate
-90 degrees counterclockwise); 2 (rotate upside-down); 3 (rotate 90 degrees
-clockwise); 4 (flip vertically); 5 (mirror, then rotate 90 degrees
-counterclockwise); 6 (mirror); 7 (mirror and then rotate 90 degrees clockwise).
 If you want to see an Ox do a headstand, this is the property to use, although
 it's more likely you'll want to use it to make tanks face the right direction.
+See \fBTRANSFORMATIONS\fR below for values.
 .TP
 \fBterritory_l\fR
 For planes, the left boundary of the range of the level the plane defends.
@@ -144,6 +141,35 @@ contains a flat ground with no objects other than the player's plane:
     }
   }
 .EE
+.SH TRANSFORMATIONS
+Transformations can be applied to objects in a level by setting the
+\fBtransform\fR property to one of the following names or number:
+.TP
+\fBNONE\fR (or \fB0\fR)
+No transformation (original sprite). Default if no transform is specified
+.TP
+\fBROTATE90\fR (or \fB1\fR)
+Rotate 90 degrees counterclockwise
+.TP
+\fBROTATE180\fR (or \fB2\fR)
+Rotate 180 degrees
+.TP
+\fBROTATE270\fR (or \fB3\fR)
+Rotate 270 degrees counterclockwise (equivalent to rotating 90 degrees
+clockwise)
+.TP
+\fBFLIP\fR (or \fB4\fR)
+Flip vertically
+.TP
+\fBFLIP_ROTATE90\fR (or \fB5\fR)
+Flip vertically, then rotate 90 degrees clockwise
+.TP
+\fBMIRROR\fR (or \fB6\fR)
+Mirror horizontally
+.TP
+\fBMIRROR_ROTATE90\fR (or \fB7\fR)
+Mirror horizontally, then rotate 90 degrees clockwise
+.
 .SH OBJECT TYPES
 The following object types can appear in a level:
 .TP
@@ -510,8 +536,7 @@ used, which is the top-left of the screen. The screen is 320x200 pixels.
 .TP
 \fBtransform\fR
 Applies rotation or mirroring transforms to the sprite. If not specified, no
-transforms are applied. Valid values are the same as described in the
-\fBLEVEL SECTION\fR section above.
+transform is applied. See \fBTRANSFORMATIONS\fR above for values.
 .TP
 \fBfaction\fR
 Applies a palette swap to the colors of the sprite. If not specified, the
