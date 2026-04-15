@@ -462,7 +462,7 @@ static void ProcessTitleSymbol(struct yocton_object *obj)
 		YOCTON_VAR_INT(p, "x", int, x);
 		YOCTON_VAR_INT(p, "y", int, y);
 		YOCTON_VAR_INT(p, "frame", int, frame);
-		YOCTON_VAR_INT(p, "transform", int, transform);
+		YOCTON_VAR_ENUM(p, "transform", transform, transform_names);
 		YOCTON_VAR_ENUM(p, "faction", faction, faction_names);
 	}
 
