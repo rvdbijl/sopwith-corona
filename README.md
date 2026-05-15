@@ -1,4 +1,15 @@
 
+## Corona PPC-21 Port Work
+
+This fork is starting an experimental native DOS port for the
+Corona/Cordata PPC-21 proprietary 640 x 325 monochrome graphics mode.
+The early hardware work lives in `dos-corona/`, based on the GPL-released
+DOS Sopwith source rather than the SDL renderer.
+
+The first pass redirects visible drawing away from CGA `B800:` memory and
+into Corona graphics page 7 at `3800:0000`, using the PPC-21's observed
+`SCREEN 105` framebuffer layout. It is not yet a finished playable build.
+
 SDL Sopwith is a port of the game "Sopwith", which was originally
 by BMB Compuscience Canada. The original author David L. Clark
 has kindly released the source code under the GNU GPL.
