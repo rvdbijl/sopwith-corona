@@ -22,6 +22,14 @@ The initial Corona patch is intentionally simple:
 This is a proof-oriented first pass. It favors clarity over speed and still
 needs real hardware testing.
 
+Build instructions are in [BUILDING.MD](BUILDING.MD). A DOS batch wrapper is
+provided as `BUILD.BAT`; it calls the historical `SW.MAK` file.
+
 The original archive referenced `mixed.inc` and `sw.lnk` but did not include
 them in the copy inspected for this port. Minimal replacements are included
 here so the historical `SW.MAK` has a complete file set to start from.
+
+Credit: Sopwith was originally created by BMB Compuscience Canada. David L.
+Clark released the source under the GNU GPL. This port work uses that DOS
+source and references Simon Howard's SDL Sopwith project:
+https://github.com/fragglet/sdl-sopwith

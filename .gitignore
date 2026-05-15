@@ -23,3 +23,11 @@ stamp-h1
 tags
 TAGS
 emscripten_cache
+
+# DOS/Corona build products
+dos-corona/*.[Oo][Bb][Jj]
+dos-corona/*.[Mm][Aa][Pp]
+dos-corona/*.[Ll][Ss][Tt]
+dos-corona/*.[Ee][Rr][Rr]
+dos-corona/SOPWITH.EXE
+dos-corona/sopwith.exe
