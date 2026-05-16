@@ -61,6 +61,7 @@ unsigned multaddr = 0;			/* Multiple user controller number  */
 
 int	multtick;			/* Multiple user tick delay	    */
 BOOL	hires;				/* High res flag		    */
+BOOL	coronatxt;			/* Corona graphics uses 80-col text */
 BOOL	disppos;			/* Display position flag	    */
 BOOL	titleflg;			/* Title flag			    */
 int	dispdbg;			/* Debug value to display	    */

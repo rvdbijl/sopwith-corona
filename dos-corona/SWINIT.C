@@ -52,6 +52,7 @@ extern	GRNDTYPE orground[];		/* Original ground height by pixel  */
 extern	MULTIO	*multbuff;		/* Communications buffer	    */
 
 extern	BOOL	hires;			/* High res flag		    */
+extern	BOOL	coronatxt;		/* Corona graphics text overlay	    */
 extern	BOOL	titleflg;		/* Title flag			    */
 extern	BOOL	disppos;		/* Display position flag	    */
 extern	int	keydelay;		/*  Number of displays per keystroke*/
@@ -292,9 +293,21 @@ char	*device   = "\0              ";
 
 	initgdep();
 
+#ifdef	IBMPC
+	if ( coronatxt ) {
+		sound( 0, 0, NULL );
+		swsound();
+		soundflg = FALSE;
+		ibmkeybd = FALSE;
+	}
+#endif
+
 	intsoff();
 	_intsetup( PRINTINT, swshfprt, csseg(), dsseg() );
-	koveride = _intsetup( KEYINT, swkeyint, csseg(), dsseg() );
+	if ( ibmkeybd )
+		koveride = _intsetup( KEYINT, swkeyint, csseg(), dsseg() );
+	else
+		koveride = -1;
 	inplay = TRUE;
 	intson();
 }
@@ -313,6 +326,19 @@ register char	**h;
 		puts( "\r\n" );
 	}
 }
+
+
+
+#ifdef	IBMPC
+static coronamark( mark )
+int	mark;
+{
+	if ( !coronatxt )
+		return;
+
+	swcoronamark( mark );
+}
+#endif
 
 
 
@@ -412,7 +438,7 @@ struct	regval	reg;
 		swposcur( 0, 20 + i );
 		reg.axr = 0x0A20;
 		reg.bxr = 0;
-		reg.cxr = hires ? 80 : 40;
+		reg.cxr = ( hires || coronatxt ) ? 80 : 40;
 		sysint( 0x10, &reg, &reg );
 	}
 	swposcur( 0, 20 );
@@ -568,21 +594,48 @@ initdisp( reset )
 BOOL	reset;
 {
 register OBJECTS *ob;
-OBJECTS 	 ghostob;
-extern	 char	 swghtsym[];
+	OBJECTS 	 ghostob;
+	extern	 char	 swghtsym[];
 
+#ifdef	IBMPC
+	coronamark( 1 );
+#endif
 	splatox = oxsplatted = 0;
 	if ( !reset ) {
 		clrdispa();
+#ifdef	IBMPC
+		coronamark( 2 );
+#endif
 		setadisp();
+#ifdef	IBMPC
+		coronamark( 3 );
+#endif
 		dispworld();
+#ifdef	IBMPC
+		coronamark( 4 );
+#endif
 		swtitlf();
+#ifdef	IBMPC
+		coronamark( 5 );
+#endif
 		ghost = FALSE;
 	}
 	movedisp();
+#ifdef	IBMPC
+	coronamark( 6 );
+#endif
 	setvdisp();
+#ifdef	IBMPC
+	coronamark( 7 );
+#endif
 	initwobj();
+#ifdef	IBMPC
+	coronamark( 8 );
+#endif
 	initscore();
+#ifdef	IBMPC
+	coronamark( 9 );
+#endif
 
 	ob = &nobjects[player];
 	if ( ghost ) {
@@ -591,15 +644,39 @@ extern	 char	 swghtsym[];
 		ghostob.ob_clr = ob->ob_clr;
 		ghostob.ob_newsym = swghtsym;
 		swputsym( GHOSTX, 12, &ghostob );
+#ifdef	IBMPC
+		coronamark( 10 );
+#endif
 	} else {
 		dispfgge( ob );
+#ifdef	IBMPC
+		coronamark( 10 );
+#endif
 		dispbgge( ob );
+#ifdef	IBMPC
+		coronamark( 11 );
+#endif
 		dispmgge( ob );
+#ifdef	IBMPC
+		coronamark( 12 );
+#endif
 		dispsbgge( ob );
+#ifdef	IBMPC
+		coronamark( 13 );
+#endif
 		dispsgge( ob );
+#ifdef	IBMPC
+		coronamark( 14 );
+#endif
 		dispcgge( ob );
+#ifdef	IBMPC
+		coronamark( 15 );
+#endif
 	}
 	dispinit = TRUE;
+#ifdef	IBMPC
+	coronamark( 16 );
+#endif
 }
 
 
@@ -958,13 +1035,13 @@ register OBJECTS *ob, *obo;
 int	 nangle, nspeed, dx, dy, r, bspeed, x, y;
 
 
+	obo = obop;
 	if ( ( !targ ) && ( !compplane ) && ( !obo->ob_rounds ))
 		return;
 
 	if ( !( ob = allocobj() ) )
 		return;
 
-	obo = obop;
 	if ( playmode != NOVICE )
 		--obo->ob_rounds;
 

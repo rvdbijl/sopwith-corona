@@ -29,6 +29,7 @@
 
 extern	int		savemode;		/* Saved PC video mode	  */
 extern	BOOL		hires;			/* High res debug flag	  */
+extern	BOOL		coronatxt;		/* Corona text overlay	  */
 extern	BOOL		titleflg;		/* Title flag		  */
 extern	int		tickmode;		/* Tick action to be done */
 extern	int		counttick, countmove;	/* Performance counters   */
@@ -150,6 +151,7 @@ register int	 i, h;
 
 swtitlf()
 {
+struct	regval	reg;
 
 	if ( titleflg )
 		return;
@@ -157,6 +159,17 @@ swtitlf()
 	sound( 0, 0, NULL );
 	swsound();
 	tickmode = 0;
+
+#ifdef	IBMPC
+	if ( coronatxt ) {
+		reg.axr = 0x0600;
+		reg.bxr = 0x0007;
+		reg.cxr = 0x0000;
+		reg.dxr = 0x184F;
+		sysint( 0x10, &reg, &reg );
+		swposcur( 0, 0 );
+	}
+#endif
 }
 
 

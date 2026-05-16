@@ -32,9 +32,12 @@
 	include segments.h
 	include sw.ha
 
-CORONA_SEG	equ	03800H
+CORONA_SEG_DEFAULT equ	03800H
 CORONA_MODE	equ	0A9H
 CORONA_YOFF	equ	62
+CORONA_PAGE_STEP equ	0800H
+CORONA_ALLOC_PARAS equ	1000H
+CORONA_PAGE_MASK equ	0F800H
 
 	public	swdisp
 	public	swground
@@ -48,6 +51,7 @@ CORONA_YOFF	equ	62
 	public	setvdisp
 	public	setadisp
 	public	swcoronaclear
+	public	swcoronamark
 
 	extrn	dispoxsplat:near
 
@@ -512,8 +516,15 @@ swpntcol:
 	mov	SI,4[BP]		; load point x ccord
 	mov	DI,6[BP]		;      point y coord
 	mov	BP,8[BP]		;      point color
+	cmp	byte ptr coronadisp,1
+	jne	pcol_cga
+	call	corona_drawpntc
+	jmp	pcolret
+
+pcol_cga:
 	call	drawpntc		; display point
 
+pcolret:
 	pop	ES			; restore registers
 	pop	DI
 	pop	SI
@@ -955,6 +966,10 @@ set_type:
 	call	corona_enter
 	jmp	st_ret
 st_bios:
+	push	AX
+	call	corona_release
+	pop	AX
+	mov	word ptr coronatxt,0
 	xor	AH,AH			; set video mode function
 	int	10H			; do it
 st_ret:
@@ -973,7 +988,8 @@ st_ret:
 
 
 setvdisp:
-	mov	word ptr dispseg,CORONA_SEG
+	mov	AX,coronaseg
+	mov	dispseg,AX
 	mov	word ptr dispoff,0
 	mov	word ptr disproff,0
 	mov	byte ptr coronadisp,1
@@ -1004,10 +1020,14 @@ setadisp:
 
 corona_enter:
 	push	AX
+	push	BX
 	push	CX
 	push	DX
 	push	DI
 	push	ES
+
+	call	corona_alloc_page
+	mov	word ptr coronatxt,1
 
 	mov	AX,0007H		; start from MDA-compatible text mode
 	int	10H
@@ -1016,11 +1036,11 @@ corona_enter:
 	mov	AL,CORONA_MODE
 	out	DX,AL
 
-	mov	DX,03B4H		; CRTC start address high = 38h
+	mov	DX,03B4H		; CRTC start address high
 	mov	AL,0CH
 	out	DX,AL
 	inc	DX
-	mov	AL,38H
+	mov	AL,coronacrtc
 	out	DX,AL
 	dec	DX
 	mov	AL,0DH			; CRTC start address low = 00h
@@ -1035,6 +1055,7 @@ corona_enter:
 	pop	DI
 	pop	DX
 	pop	CX
+	pop	BX
 	pop	AX
 	ret
 
@@ -1045,7 +1066,7 @@ swcoronaclear:
 	push	DI
 	push	ES
 
-	mov	AX,CORONA_SEG		; clear the whole 32 KiB page
+	mov	AX,coronaseg		; clear the whole 32 KiB page
 	mov	ES,AX
 	xor	DI,DI
 	xor	AX,AX
@@ -1056,6 +1077,75 @@ swcoronaclear:
 	pop	DI
 	pop	CX
 	pop	AX
+	ret
+
+
+swcoronamark:
+	push	BP
+	mov	BP,SP
+	push	AX
+	push	BX
+	push	CX
+	push	DX
+	push	SI
+	push	DI
+	push	BP
+	push	ES
+
+	mov	BX,4[BP]		; marker count, 1..16
+	cmp	BX,16
+	jbe	scm_count_ok
+	mov	BX,16
+scm_count_ok:
+
+	xor	DX,DX			; clear marker strip
+scm_clear_x:
+	cmp	DX,64
+	jae	scm_draw
+	mov	CX,0
+scm_clear_y:
+	mov	SI,DX
+	mov	DI,190
+	add	DI,CX
+	xor	BP,BP
+	call	corona_drawpnt
+	inc	CX
+	cmp	CX,6
+	jb	scm_clear_y
+	inc	DX
+	jmp	scm_clear_x
+
+scm_draw:
+	xor	DX,DX
+scm_bar_loop:
+	cmp	DX,BX
+	jae	scm_ret
+	mov	CX,0
+scm_bar_y:
+	mov	SI,DX
+	shl	SI,1
+	shl	SI,1
+	add	SI,2
+	mov	DI,190
+	add	DI,CX
+	mov	BP,1
+	call	corona_drawpnt
+	inc	CX
+	cmp	CX,6
+	jb	scm_bar_y
+	inc	DX
+	jmp	scm_bar_loop
+
+scm_ret:
+	pop	ES
+	pop	BP
+	pop	DI
+	pop	SI
+	pop	DX
+	pop	CX
+	pop	BX
+	pop	AX
+	pop	BP
 	ret
 
 
@@ -1106,13 +1196,72 @@ corona_calc:
 	shl	CL,1
 	shl	DH,CL
 
-	mov	AX,CORONA_SEG
+	mov	AX,coronaseg
 	mov	ES,AX
 	clc
 	ret
 
 cc_bad:
 	stc
+	ret
+
+
+corona_alloc_page:
+;	Reserve a DOS memory block for the Corona framebuffer.  The display
+;	start must be 32 KiB aligned, so allocate 64 KiB and use the next
+;	aligned 32 KiB page inside the block.
+
+	push	AX
+	push	BX
+	push	CX
+	push	DX
+
+	mov	AX,coronablock
+	or	AX,AX
+	jnz	cap_have_block
+
+	mov	AH,48H			; DOS allocate memory
+	mov	BX,CORONA_ALLOC_PARAS
+	int	21H
+	jc	cap_fallback
+	mov	coronablock,AX
+
+cap_have_block:
+	mov	AX,coronablock
+	add	AX,( CORONA_PAGE_STEP - 1 )
+	and	AX,CORONA_PAGE_MASK
+	jmp	cap_use
+
+cap_fallback:
+	mov	AX,CORONA_SEG_DEFAULT
+
+cap_use:
+	mov	coronaseg,AX
+	mov	coronacrtc,AH		; page segment 3800h -> CRTC high 38h
+
+	pop	DX
+	pop	CX
+	pop	BX
+	pop	AX
+	ret
+
+
+corona_release:
+	push	AX
+	push	ES
+
+	mov	AX,coronablock
+	or	AX,AX
+	jz	cr_done
+
+	mov	ES,AX
+	mov	AH,49H			; DOS free memory
+	int	21H
+	mov	word ptr coronablock,0
+
+cr_done:
+	pop	ES
+	pop	AX
 	ret
 
 
@@ -1155,6 +1304,48 @@ cdp_clear:
 cdp_xor:
 	xor	ES:[BX],AL
 cdp_ret:
+	ret
+
+
+corona_drawpntc:
+	call	corona_calc
+	jc	cdpc_bad
+
+	mov	DL,DH			; save Corona bit pair mask
+	mov	AL,ES:[BX]		; old monochrome pixel -> CGA-ish color
+	and	AL,DL
+	jz	cdpc_old_zero
+	mov	AH,03H
+	jmp	cdpc_have_old
+
+cdpc_old_zero:
+	xor	AH,AH
+
+cdpc_have_old:
+	mov	CX,BP
+	test	CL,80H
+	jnz	cdpc_xor
+	and	CL,03H
+	jz	cdpc_clear
+	or	ES:[BX],DL
+	jmp	cdpc_ret
+
+cdpc_clear:
+	mov	AL,DL
+	not	AL
+	and	ES:[BX],AL
+	jmp	cdpc_ret
+
+cdpc_xor:
+	xor	ES:[BX],DL
+
+cdpc_ret:
+	mov	AL,AH
+	xor	AH,AH
+	ret
+
+cdpc_bad:
+	xor	AX,AX
 	ret
 
 
@@ -1325,6 +1516,9 @@ dispseg  dw	?			; Display segment
 dispoff  dw	?			;	  offset
 disproff dw	?			;	  inter bank offset
 coronadisp db	0			; drawing visible Corona page?
+coronaseg dw	CORONA_SEG_DEFAULT	; selected Corona graphics page
+coronacrtc db	38H			; selected CRTC start high byte
+coronablock dw	0			; DOS block containing graphics page
 corx	  dw	?
 cory	  dw	?
 curx	  dw	?
@@ -1341,6 +1535,7 @@ corbyte   db	?
 	extrn	ground:byte		; Ground height by pixel
 	extrn	dispinit:word		; Initialized display flag
 	extrn	forcdisp:word		; Force display flag
+	extrn	coronatxt:word		; Corona text overlay is 80 columns
 	extrn	objtop:word		; First object in object list
 	extrn	deltop:word		; First object in deleted object list
 	extrn	splatox:word		; display splatted ox

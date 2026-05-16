@@ -482,8 +482,9 @@ swpc1:	mov	BL,textclr		; set colour and page
 	mov	AH,0EH			; output character
 	int	10H			;
 
-	cmp	word ptr hires,1	; hi resolution screen?
-	jne	swpc2			;   NO - skip
+	mov	AX,hires		; hi res or Corona 80-column overlay?
+	or	AX,coronatxt
+	jz	swpc2			;   NO - skip
 	cmp	byte ptr 4[BP],' '      ;   YES- control character?
 	jb	swpc2			;	   YES- skip
 	mov	AX,0E20H		;	   NO - output blank
@@ -505,8 +506,9 @@ swposcur:
 	mov	DL,4[BP]		; x coordinate
 	xor	BH,BH			; page 0
 
-	cmp	word ptr hires,1	; hi resolution screen?
-	jne	swpos1			;   NO - skip
+	mov	AX,hires		; hi res or Corona 80-column overlay?
+	or	AX,coronatxt
+	jz	swpos1			;   NO - skip
 	shl	DL,1			;   YES- double x coordinate
 swpos1: mov	AH,02H			; position cursor
 	int	10H			;
@@ -767,6 +769,7 @@ csseg:
 	extrn	printflg:word		; print screen requested
 	extrn	soundflg:word		; sound flag
 	extrn	hires:word		; hi resolution flag
+	extrn	coronatxt:word		; Corona text overlay is 80 columns
 
 ctlbflag dw	0			; control break flag
 textclr db	3			; current text colour
