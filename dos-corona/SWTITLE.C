@@ -59,8 +59,10 @@ register int	 i, h;
 
 	tickmode = 1;
 
-	sound( S_TITLE, 0, NULL );
-	swsound();
+	if ( !coronatxt ) {
+		sound( S_TITLE, 0, NULL );
+		swsound();
+	}
 
 /*---------------- Original BMB Version---------------
 
@@ -144,6 +146,7 @@ register int	 i, h;
 	h = 150;
 	for ( i = 9; i; --i )
 		swputsym( 30, h += 5, &ob );
+
 }
 
 

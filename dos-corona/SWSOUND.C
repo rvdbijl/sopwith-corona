@@ -30,6 +30,7 @@
 
 extern	int	soundflg;		/*  Sound flag			    */
 extern	int	dispdbg;		/*  Debug value to be displayed   */
+extern	int	coronatxt;		/*  Corona native graphics active */
 
 
 static	int	 soundtype = 32767;	 /*  Current sound type and	     */
@@ -38,6 +39,7 @@ static	OBJECTS  *soundobj =  NULL;	 /*  Object making sound	     */
 static	unsigned lastfreq  = 0; 	 /*  Last frequency used	     */
 static	OBJECTS  *lastobj   = NULL;	 /*  Previous object making sound    */
 static	int	 ( *toneadj ) () = NULL; /*  Tone adjustment on clock tick   */
+static	int	 shotflip  = 0; 	 /*  Corona frame-time shot toggle   */
 
 static	TONETAB  tonetab[SNDSIZE];	 /*  Continuous tone table	     */
 static	TONETAB  *frsttone, *freetone;	 /*  Tone list and free list	     */
@@ -139,7 +141,10 @@ register TONETAB  *tt;
 			break;
 
 		case S_PLANE:
-			if ( soundparm == 0 )
+			if ( coronatxt )
+				tone( soundparm ? 0x3000 + soundparm * 0x0400
+						: 0x3000 );
+			else if ( soundparm == 0 )
 				tone( 0xF000 );
 			else
 				tone( 0xD000 + soundparm * 0x1000 );
@@ -176,8 +181,14 @@ register TONETAB  *tt;
 			break;
 
 		case S_SHOT:
-			tone( 0x1000 );
-			toneadj = adjshot;
+			if ( coronatxt ) {
+				shotflip = !shotflip;
+				tone( shotflip ? 0x1000 : 0xF000 );
+				toneadj = NULL;
+			} else {
+				tone( 0x1000 );
+				toneadj = adjshot;
+			}
 			lastobj = NULL;
 			break;
 
@@ -432,12 +443,7 @@ unsigned freq;
 		return;
 
 #ifdef IBMPC
-	if ( !lastfreq )
-		outportb( TIMER + 3, 0xB6 );
-	outportb( TIMER + 2, freq & 0x00FF );
-	outportb( TIMER + 2, freq >> 8 );
-	if ( !lastfreq )
-		outportb( PORTB, 0x03 | inportb( PORTB ) );
+	swtoneio( freq );
 #endif
 
 	lastfreq = freq;
@@ -451,7 +457,7 @@ soundoff()
 {
 	if ( lastfreq ) {
 #ifdef IBMPC
-		outportb( PORTB, 0xFC & inportb( PORTB ) );
+		swsoundoffio();
 #endif
 		lastfreq = 0;
 		dispdbg = 0;

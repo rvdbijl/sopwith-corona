@@ -34,10 +34,14 @@
 
 CORONA_SEG_DEFAULT equ	03800H
 CORONA_MODE	equ	0A9H
+CORONA_YMAX	equ	324
 CORONA_YOFF	equ	62
 CORONA_PAGE_STEP equ	0800H
 CORONA_ALLOC_PARAS equ	1000H
 CORONA_PAGE_MASK equ	0F800H
+CORCACHE_ENTRIES equ	12
+CORCACHE_WORDS	equ	64
+CORCACHE_BYTES	equ	(CORCACHE_WORDS*2)
 
 	public	swdisp
 	public	swground
@@ -52,8 +56,11 @@ CORONA_PAGE_MASK equ	0F800H
 	public	setadisp
 	public	swcoronaclear
 	public	swcoronamark
+	public	swcoronatick
+	public	swcoronasoundtick
 
 	extrn	dispoxsplat:near
+	extrn	soundadj:near
 
 
 
@@ -1027,6 +1034,9 @@ corona_enter:
 	push	ES
 
 	call	corona_alloc_page
+	call	corona_init_ytab
+	call	corona_init_masktab
+	call	corona_init_symcache
 	mov	word ptr coronatxt,1
 
 	mov	AX,0007H		; start from MDA-compatible text mode
@@ -1089,54 +1099,157 @@ swcoronamark:
 	push	DX
 	push	SI
 	push	DI
-	push	BP
 	push	ES
 
-	mov	BX,4[BP]		; marker count, 1..16
-	cmp	BX,16
+	mov	BX,4[BP]		; marker count, 1..40
+	cmp	BX,40
 	jbe	scm_count_ok
-	mov	BX,16
+	mov	BX,40
 scm_count_ok:
 
-	xor	DX,DX			; clear marker strip
-scm_clear_x:
-	cmp	DX,64
-	jae	scm_draw
-	mov	CX,0
-scm_clear_y:
-	mov	SI,DX
-	mov	DI,190
-	add	DI,CX
-	xor	BP,BP
-	call	corona_drawpnt
-	inc	CX
-	cmp	CX,6
-	jb	scm_clear_y
-	inc	DX
-	jmp	scm_clear_x
-
-scm_draw:
+	mov	AX,coronaseg		; draw in the physical top margin
+	mov	ES,AX			; y = 26..33, x = 32..351
 	xor	DX,DX
+scm_row_loop:
+	mov	DI,160+4		; y / 13 = 2, x / 8 = 4
+	mov	AX,DX
+	mov	CL,11
+	shl	AX,CL			; (y % 13) * 2048
+	add	DI,AX
+
+	xor	AL,AL			; clear the full marker strip
+	mov	CX,80
+	push	DI
+	rep	stosb
+	pop	DI
+
+	mov	CX,BX			; draw one byte-wide bar per mark
+	or	CX,CX
+	jz	scm_next_row
+	mov	AL,0FFH
 scm_bar_loop:
-	cmp	DX,BX
-	jae	scm_ret
-	mov	CX,0
-scm_bar_y:
-	mov	SI,DX
-	shl	SI,1
-	shl	SI,1
-	add	SI,2
-	mov	DI,190
-	add	DI,CX
-	mov	BP,1
-	call	corona_drawpnt
-	inc	CX
-	cmp	CX,6
-	jb	scm_bar_y
+	stosb
+	inc	DI			; one-byte gap between bars
+	loop	scm_bar_loop
+
+scm_next_row:
 	inc	DX
-	jmp	scm_bar_loop
+	cmp	DX,8
+	jb	scm_row_loop
 
 scm_ret:
+	pop	ES
+	pop	DI
+	pop	SI
+	pop	DX
+	pop	CX
+	pop	BX
+	pop	AX
+	pop	BP
+	ret
+
+
+swcoronatick:
+	push	AX
+	push	BX
+	push	CX
+	push	DX
+	push	ES
+
+	mov	AX,0040H		; BIOS data area timer tick
+	mov	ES,AX
+	mov	AX,ES:[006CH]
+	mov	BX,corlasttick
+	mov	corlasttick,AX
+	cmp	BX,0FFFFH
+	je	sct_first
+	sub	AX,BX
+	je	sct_spin
+	cmp	AX,4			; avoid huge catch-up bursts
+	jbe	sct_count
+	mov	AX,4
+	jmp	sct_count
+
+sct_first:
+	mov	AX,1
+
+sct_count:
+	mov	word ptr cortickspin,0
+	mov	CX,AX
+	mov	BX,AX
+	shl	BX,1			; BX = elapsed * 2
+	shl	AX,1
+	shl	AX,1
+	shl	AX,1			; AX = elapsed * 8
+	add	AX,BX			; AX = elapsed * 10
+	add	word ptr movetick,AX
+
+sct_sound:
+	push	CX
+	call	soundadj
+	pop	CX
+	loop	sct_sound
+
+sct_ret:
+	pop	ES
+	pop	DX
+	pop	CX
+	pop	BX
+	pop	AX
+	ret
+
+sct_spin:
+	inc	word ptr cortickspin	; do not let the frame wait wedge if
+	cmp	word ptr cortickspin,2048 ; the BIOS tick path stalls unexpectedly
+	jb	sct_ret
+	mov	word ptr cortickspin,0
+	mov	AX,1
+	jmp	sct_count
+
+
+swcoronasoundtick:
+	push	AX
+	push	BX
+	push	CX
+	push	DX
+	push	SI
+	push	DI
+	push	BP
+	push	ES
+	push	DS
+
+	cmp	word ptr coronatxt,0
+	je	scst_ret
+
+	inc	word ptr corsndspin	; fallback for machines where the
+	cmp	word ptr corsndspin,96	; BIOS tick path does not advance sound
+	jb	scst_bios
+	mov	word ptr corsndspin,0
+	call	soundadj
+
+scst_bios:
+	mov	AX,0040H		; BIOS data area timer tick
+	mov	ES,AX
+	mov	AX,ES:[006CH]
+	mov	BX,corsndtick
+	mov	corsndtick,AX
+	cmp	BX,0FFFFH
+	je	scst_ret
+	sub	AX,BX
+	jz	scst_ret
+	cmp	AX,4			; bound catch-up after long redraws
+	jbe	scst_count
+	mov	AX,4
+scst_count:
+	mov	CX,AX
+scst_loop:
+	push	CX
+	call	soundadj
+	pop	CX
+	loop	scst_loop
+
+scst_ret:
+	pop	DS
 	pop	ES
 	pop	BP
 	pop	DI
@@ -1145,7 +1258,6 @@ scm_ret:
 	pop	CX
 	pop	BX
 	pop	AX
-	pop	BP
 	ret
 
 
@@ -1161,29 +1273,9 @@ corona_calc:
 	cmp	DI,SCR_HGHT
 	jae	cc_bad
 
-	mov	AX,(SCR_HGHT-1)
-	sub	AX,DI
-	add	AX,CORONA_YOFF
-
-	mov	BL,13
-	div	BL			; AL = y / 13, AH = y mod 13
-
-	mov	DL,AH			; save remainder
-	xor	AH,AH			; AX = quotient
-	mov	BX,AX
-	shl	AX,1			; quotient * 16
-	shl	AX,1
-	shl	AX,1
-	shl	AX,1
-	mov	CL,6
-	shl	BX,CL			; quotient * 64
-	add	BX,AX			; quotient * 80
-
-	mov	AL,DL
-	xor	AH,AH
-	mov	CL,11
-	shl	AX,CL			; remainder * 2048
-	add	BX,AX
+	mov	BX,DI
+	shl	BX,1
+	mov	BX,corytab[BX]
 
 	mov	AX,SI
 	shr	AX,1			; doubled X byte offset = X / 4
@@ -1202,6 +1294,29 @@ corona_calc:
 	ret
 
 cc_bad:
+	stc
+	ret
+
+
+corona_dup_addr:
+;	Input:	SI = Sopwith X coordinate, DI = Sopwith Y coordinate
+;	Output:	ES:BX = duplicate Corona row address, CF set if no duplicate row.
+
+	mov	BX,DI
+	cmp	byte ptr cordup[BX],0
+	je	cda_bad
+	shl	BX,1
+	mov	BX,corytab2[BX]
+
+	mov	AX,SI
+	shr	AX,1
+	shr	AX,1
+	add	BX,AX
+
+	clc
+	ret
+
+cda_bad:
 	stc
 	ret
 
@@ -1265,15 +1380,260 @@ cr_done:
 	ret
 
 
+corona_init_ytab:
+	push	AX
+	push	BX
+	push	CX
+	push	DX
+	push	SI
+	push	DI
+
+	xor	DI,DI			; logical Sopwith Y
+
+ciy_loop:
+	mov	AX,(SCR_HGHT-1)
+	sub	AX,DI
+	add	AX,CORONA_YOFF
+
+	mov	corphys,AX
+	call	corona_yoffset
+
+	mov	SI,DI
+	shl	SI,1
+	mov	corytab[SI],BX
+	mov	corytab2[SI],BX
+	mov	byte ptr cordup[DI],0
+
+	inc	DI
+	cmp	DI,SCR_HGHT
+	jb	ciy_loop
+
+	pop	DI
+	pop	SI
+	pop	DX
+	pop	CX
+	pop	BX
+	pop	AX
+	ret
+
+
+corona_yoffset:
+;	Input:	AX = physical Corona Y, 0..324
+;	Output:	BX = byte offset for X byte column zero on that Y.
+
+	mov	BL,13
+	div	BL			; AL = y / 13, AH = y mod 13
+
+	mov	DL,AH
+	xor	AH,AH
+	mov	BX,AX
+	shl	AX,1			; quotient * 16
+	shl	AX,1
+	shl	AX,1
+	shl	AX,1
+	mov	CL,6
+	shl	BX,CL			; quotient * 64
+	add	BX,AX			; quotient * 80
+
+	mov	AL,DL
+	xor	AH,AH
+	mov	CL,11
+	shl	AX,CL			; remainder * 2048
+	add	BX,AX
+	ret
+
+
+corona_init_masktab:
+;	Build source-byte/x-phase -> Corona word-mask table.  Each CGA symbol
+;	byte contains four two-bit pixels; Corona draws any nonzero CGA color as
+;	a doubled monochrome pixel.  Precomputing this removes branchy mask
+;	assembly from the runtime symbol loop.
+
+	push	AX
+	push	BX
+	push	CX
+	push	DX
+	push	SI
+	push	DI
+	push	ES
+
+	mov	AX,DS
+	mov	ES,AX
+	lea	DI,cormtab
+	xor	SI,SI
+	cld
+
+cim_src_loop:
+	mov	AX,SI
+	xor	BX,BX
+	test	AL,0C0H
+	jz	cim_mask1
+	or	BL,03H
+cim_mask1:
+	test	AL,030H
+	jz	cim_mask2
+	or	BL,0CH
+cim_mask2:
+	test	AL,00CH
+	jz	cim_mask3
+	or	BL,30H
+cim_mask3:
+	test	AL,003H
+	jz	cim_mask_done
+	or	BL,0C0H
+cim_mask_done:
+	mov	DX,BX
+	xor	CX,CX
+
+cim_phase_loop:
+	mov	AX,DX
+	push	CX
+	shl	CL,1
+	shl	AX,CL
+	pop	CX
+	stosw
+	inc	CX
+	cmp	CX,4
+	jb	cim_phase_loop
+
+	inc	SI
+	cmp	SI,256
+	jb	cim_src_loop
+
+	pop	ES
+	pop	DI
+	pop	SI
+	pop	DX
+	pop	CX
+	pop	BX
+	pop	AX
+	ret
+
+
+corona_init_symcache:
+	push	AX
+	push	CX
+	push	DI
+	push	ES
+
+	mov	AX,DS
+	mov	ES,AX
+	xor	AX,AX
+	mov	CX,CORCACHE_ENTRIES
+	lea	DI,corcache_sym
+	cld
+	rep	stosw
+	mov	word ptr corcache_next,0
+
+	pop	ES
+	pop	DI
+	pop	CX
+	pop	AX
+	ret
+
+
+corona_getcache:
+;	Input:	BP = source symbol, corphase = x phase, corcachecnt = source byte count.
+;	Output:	AX = cache data offset containing word masks for this symbol/phase.
+
+	push	BX
+	push	CX
+	push	DX
+	push	SI
+	push	DI
+	push	BP
+	push	ES
+
+	xor	SI,SI
+	mov	CX,CORCACHE_ENTRIES
+
+cgc_find:
+	cmp	corcache_sym[SI],BP
+	jne	cgc_next
+	mov	AX,corphase
+	cmp	corcache_phase[SI],AX
+	je	cgc_found
+
+cgc_next:
+	add	SI,2
+	loop	cgc_find
+
+	mov	SI,corcache_next
+	inc	word ptr corcache_next
+	cmp	word ptr corcache_next,CORCACHE_ENTRIES
+	jb	cgc_slot_ok
+	mov	word ptr corcache_next,0
+cgc_slot_ok:
+	mov	DI,SI
+	shl	DI,1
+	mov	corcache_sym[DI],BP
+	mov	AX,corphase
+	mov	corcache_phase[DI],AX
+	jmp	cgc_build
+
+cgc_build:
+	mov	AX,SI
+	mov	CL,7
+	shl	AX,CL
+	mov	BX,AX
+	lea	DI,corcache_data[BX]
+	mov	DX,DI			; return cache base
+	mov	AX,DS
+	mov	ES,AX
+	mov	SI,BP
+	mov	CX,corcachecnt
+	cld
+
+cgc_build_loop:
+	lodsb
+	mov	BL,AL
+	xor	BH,BH
+	shl	BX,1
+	shl	BX,1
+	shl	BX,1
+	add	BX,corphase
+	mov	AX,cormtab[BX]
+	stosw
+	loop	cgc_build_loop
+
+	mov	AX,DX
+	jmp	cgc_ret
+
+cgc_found:
+	mov	AX,SI
+	shr	AX,1
+	mov	CL,7
+	shl	AX,CL
+	mov	BX,AX
+	lea	AX,corcache_data[BX]
+
+cgc_ret:
+	pop	ES
+	pop	BP
+	pop	DI
+	pop	SI
+	pop	DX
+	pop	CX
+	pop	BX
+	ret
+
+
 corona_xor_point:
 	push	AX
 	push	BX
 	push	CX
 	push	DX
 	push	ES
+
 	call	corona_calc
 	jc	cxp_ret
 	xor	ES:[BX],DH
+	mov	AL,DH
+	push	AX
+	call	corona_dup_addr
+	pop	AX
+	jc	cxp_ret
+	xor	ES:[BX],AL
 cxp_ret:
 	pop	ES
 	pop	DX
@@ -1294,14 +1654,29 @@ corona_drawpnt:
 	and	CL,03H
 	jz	cdp_clear
 	or	ES:[BX],AL
+	push	AX
+	call	corona_dup_addr
+	pop	AX
+	jc	cdp_ret
+	or	ES:[BX],AL
 	ret
 
 cdp_clear:
 	not	AL
 	and	ES:[BX],AL
+	push	AX
+	call	corona_dup_addr
+	pop	AX
+	jc	cdp_ret
+	and	ES:[BX],AL
 	ret
 
 cdp_xor:
+	xor	ES:[BX],AL
+	push	AX
+	call	corona_dup_addr
+	pop	AX
+	jc	cdp_ret
 	xor	ES:[BX],AL
 cdp_ret:
 	ret
@@ -1328,16 +1703,33 @@ cdpc_have_old:
 	and	CL,03H
 	jz	cdpc_clear
 	or	ES:[BX],DL
+	mov	AL,DL
+	push	AX
+	call	corona_dup_addr
+	pop	AX
+	jc	cdpc_ret
+	or	ES:[BX],AL
 	jmp	cdpc_ret
 
 cdpc_clear:
 	mov	AL,DL
 	not	AL
 	and	ES:[BX],AL
+	push	AX
+	call	corona_dup_addr
+	pop	AX
+	jc	cdpc_ret
+	and	ES:[BX],AL
 	jmp	cdpc_ret
 
 cdpc_xor:
 	xor	ES:[BX],DL
+	mov	AL,DL
+	push	AX
+	call	corona_dup_addr
+	pop	AX
+	jc	cdpc_ret
+	xor	ES:[BX],AL
 
 cdpc_ret:
 	mov	AL,AH
@@ -1357,6 +1749,8 @@ corona_drawsym:
 	push	DI
 	push	BP
 	push	ES
+
+	mov	corclr,AX
 
 	cmp	word ptr OB_SYMHGT[BX],1
 	jne	cds_symbol
@@ -1383,7 +1777,40 @@ cds_rows_ok:
 	shr	AX,1
 	shr	AX,1
 	mov	corbytes,AX
+	mov	byte ptr corcacheuse,0
 
+	mov	AX,corx
+	and	AX,3
+	shl	AX,1
+	mov	corphase,AX
+
+	mov	AX,corx			; use cached expanded masks only for
+	cmp	AX,SCR_WDTH		; fully visible common-size sprites
+	jae	cds_no_cache
+	add	AX,OB_SYMWDT[BX]
+	cmp	AX,SCR_WDTH
+	ja	cds_no_cache
+	mov	AX,corbytes
+	mul	word ptr OB_SYMHGT[BX]
+	cmp	AX,CORCACHE_WORDS
+	ja	cds_no_cache
+	mov	corcachecnt,AX
+	call	corona_getcache
+	mov	corcachebase,AX
+	mov	byte ptr corcacheuse,1
+
+cds_no_cache:
+
+	mov	AX,coronaseg
+	mov	ES,AX
+
+	cmp	byte ptr corcacheuse,0
+	jz	cds_src_ptr
+	mov	BP,corcachebase
+	jmp	cds_have_ptr
+cds_src_ptr:
+	mov	BP,corsym
+cds_have_ptr:
 	xor	DX,DX			; row index
 cds_row_loop:
 	cmp	DX,corrows
@@ -1392,27 +1819,95 @@ cds_row_loop:
 	mov	AX,cory
 	sub	AX,DX
 	mov	cury,AX
+	mov	BX,AX
+	mov	AL,cordup[BX]
+	mov	corduprow,AL
+	shl	BX,1
+	mov	AX,corytab[BX]
+	mov	corrow1,AX
+	mov	AX,corytab2[BX]
+	mov	corrow2,AX
 
-	mov	BP,corsym
-	mov	AX,corbytes
-	push	DX
-	mul	DX
-	add	BP,AX
-	pop	DX
-
+	mov	AX,corx
+	mov	curx,AX
+	shr	AX,1
+	shr	AX,1
+	mov	corxbyte,AX
 	xor	CX,CX			; byte index
 cds_byte_loop:
 	cmp	CX,corbytes
 	jae	cds_next_row
+	cmp	byte ptr corcacheuse,0
+	jne	cds_cached_byte
 
 	mov	AL,[BP]
 	mov	corbyte,AL
 
-	mov	AX,CX
-	shl	AX,1
-	shl	AX,1
-	add	AX,corx
-	mov	curx,AX
+	mov	AX,curx
+	cmp	AX,SCR_WDTH
+	jae	cds_advance
+	cmp	AX,(SCR_WDTH-4)
+	ja	cds_clip_byte
+
+	mov	DI,corrow1
+	add	DI,corxbyte
+
+	mov	BL,corbyte
+	xor	BH,BH
+	shl	BX,1
+	shl	BX,1
+	shl	BX,1
+	add	BX,corphase
+	mov	AX,cormtab[BX]
+	or	AX,AX
+	jz	cds_advance
+
+	push	CX
+	mov	cormask,AX
+	xor	ES:[DI],AL
+	or	AH,AH
+	jz	cds_emit_done
+	xor	ES:1[DI],AH
+cds_emit_done:
+	cmp	byte ptr corduprow,0
+	jz	cds_emit_pop
+	mov	DI,corrow2
+	add	DI,corxbyte
+	mov	AX,cormask
+	xor	ES:[DI],AL
+	or	AH,AH
+	jz	cds_emit_pop
+	xor	ES:1[DI],AH
+cds_emit_pop:
+	pop	CX
+	jmp	cds_advance
+
+cds_cached_byte:
+	mov	DI,corrow1
+	add	DI,corxbyte
+
+	mov	AX,[BP]
+	or	AX,AX
+	jz	cds_advance_cached
+
+	mov	cormask,AX
+	xor	ES:[DI],AL
+	or	AH,AH
+	jz	cds_cached_done
+	xor	ES:1[DI],AH
+cds_cached_done:
+	cmp	byte ptr corduprow,0
+	jz	cds_advance_cached
+	mov	DI,corrow2
+	add	DI,corxbyte
+	mov	AX,cormask
+	xor	ES:[DI],AL
+	or	AH,AH
+	jz	cds_advance_cached
+	xor	ES:1[DI],AH
+	jmp	cds_advance_cached
+
+cds_clip_byte:
 
 	mov	AL,corbyte
 	and	AL,0C0H
@@ -1451,6 +1946,15 @@ cds_pix3:
 cds_advance:
 	inc	BP
 	inc	CX
+	add	word ptr curx,4
+	inc	word ptr corxbyte
+	jmp	cds_byte_loop
+
+cds_advance_cached:
+	add	BP,2
+	inc	CX
+	add	word ptr curx,4
+	inc	word ptr corxbyte
 	jmp	cds_byte_loop
 
 cds_next_row:
@@ -1470,6 +1974,7 @@ cds_done:
 
 corona_dispg:
 	push	AX
+	push	BX
 	push	CX
 	push	DX
 	push	SI
@@ -1478,19 +1983,82 @@ corona_dispg:
 	push	ES
 
 	mov	BP,SI
-	xor	CX,CX
+	mov	AX,coronaseg
+	mov	ES,AX
+	xor	SI,SI			; Corona byte column, four game pixels
 cdg_loop:
-	cmp	CX,SCR_WDTH
+	cmp	SI,(SCR_WDTH/4)
 	jae	cdg_done
 
-	mov	SI,CX
 	mov	AL,[BP]
 	xor	AH,AH
-	mov	DI,AX
-	call	corona_xor_point
-
+	mov	BX,AX
+	mov	DI,BX
+	shl	DI,1
+	mov	DI,corytab[DI]
+	add	DI,SI
+	xor	byte ptr ES:[DI],03H
+	cmp	byte ptr cordup[BX],0
+	je	cdg_pix2
+	shl	BX,1
+	mov	DI,corytab2[BX]
+	add	DI,SI
+	xor	byte ptr ES:[DI],03H
+cdg_pix2:
 	inc	BP
-	inc	CX
+
+	mov	AL,[BP]
+	xor	AH,AH
+	mov	BX,AX
+	mov	DI,BX
+	shl	DI,1
+	mov	DI,corytab[DI]
+	add	DI,SI
+	xor	byte ptr ES:[DI],0CH
+	cmp	byte ptr cordup[BX],0
+	je	cdg_pix3
+	shl	BX,1
+	mov	DI,corytab2[BX]
+	add	DI,SI
+	xor	byte ptr ES:[DI],0CH
+cdg_pix3:
+	inc	BP
+
+	mov	AL,[BP]
+	xor	AH,AH
+	mov	BX,AX
+	mov	DI,BX
+	shl	DI,1
+	mov	DI,corytab[DI]
+	add	DI,SI
+	xor	byte ptr ES:[DI],30H
+	cmp	byte ptr cordup[BX],0
+	je	cdg_pix4
+	shl	BX,1
+	mov	DI,corytab2[BX]
+	add	DI,SI
+	xor	byte ptr ES:[DI],30H
+cdg_pix4:
+	inc	BP
+
+	mov	AL,[BP]
+	xor	AH,AH
+	mov	BX,AX
+	mov	DI,BX
+	shl	DI,1
+	mov	DI,corytab[DI]
+	add	DI,SI
+	xor	byte ptr ES:[DI],0C0H
+	cmp	byte ptr cordup[BX],0
+	je	cdg_next
+	shl	BX,1
+	mov	DI,corytab2[BX]
+	add	DI,SI
+	xor	byte ptr ES:[DI],0C0H
+cdg_next:
+	inc	BP
+
+	inc	SI
 	jmp	cdg_loop
 
 cdg_done:
@@ -1500,6 +2068,7 @@ cdg_done:
 	pop	SI
 	pop	DX
 	pop	CX
+	pop	BX
 	pop	AX
 	ret
 
@@ -1519,6 +2088,25 @@ coronadisp db	0			; drawing visible Corona page?
 coronaseg dw	CORONA_SEG_DEFAULT	; selected Corona graphics page
 coronacrtc db	38H			; selected CRTC start high byte
 coronablock dw	0			; DOS block containing graphics page
+corlasttick dw	0FFFFH			; last BIOS tick used for polling
+cortickspin dw	0			; fallback frame poll divider
+corsndtick dw	0FFFFH			; last BIOS tick used for sound poll
+corsndspin dw	0			; fallback sound poll divider
+corytab   dw	SCR_HGHT dup (?)	; logical Y to Corona byte offset
+corytab2  dw	SCR_HGHT dup (?)	; optional duplicate physical row
+cordup	  db	SCR_HGHT dup (?)	; nonzero if corytab2 is active
+cormtab   dw	1024 dup (?)		; CGA byte/phase to Corona mask
+corcache_sym dw CORCACHE_ENTRIES dup (?) ; cached source symbol offsets
+corcache_phase dw CORCACHE_ENTRIES dup (?) ; cached x phases
+corcache_data dw (CORCACHE_ENTRIES*CORCACHE_WORDS) dup (?)
+corcache_next dw 0			; next FIFO cache slot
+corcachecnt dw	?			; source bytes to cache
+corcachebase dw ?			; active expanded symbol data
+corcacheuse db	?			; nonzero if current symbol is cached
+corclr	  dw	3			; current CGA color for dithering
+corphys   dw	?			; current physical Y during setup
+corprevphys dw	?			; previous physical Y during setup
+corphase  dw	?			; current symbol x phase table offset
 corx	  dw	?
 cory	  dw	?
 curx	  dw	?
@@ -1527,10 +2115,16 @@ corsym	  dw	?
 corrows   dw	?
 corbytes  dw	?
 corbyte   db	?
+corduprow db	?
+corxbyte  dw	?
+corrow1   dw	?
+corrow2   dw	?
+cormask   dw	?
 
 	extrn	displx:word		; Display left and right bounds
 	extrn	disprx:word
 	extrn	dispdx:word		; Display shift
+	extrn	movetick:word		; Move synchronization counter
 	extrn	auxdisp:byte		; auxiliary display buffer
 	extrn	ground:byte		; Ground height by pixel
 	extrn	dispinit:word		; Initialized display flag

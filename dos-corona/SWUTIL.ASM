@@ -42,12 +42,17 @@
 	public	swputc
 	public	swflush
 	public	swkeyint
+	public	swtoneio
+	public	swsoundoffio
 	public	swposcur
 	public	swcolour
 	public	swshfprt
 	public	swprint
 	public	swsetblk
 	public	swtick
+	public	swsndint
+	public	swsndset
+	public	swsndrst
 	public	movexy
 	public	setdxdy
 	public	soundmul
@@ -60,6 +65,8 @@
 	extrn	history:near
 	extrn	swsound:near
 	extrn	sound:near
+	extrn	soundadj:near
+	extrn	swcoronasoundtick:near
 
 
 
@@ -133,7 +140,43 @@ ki0:	cmp	BL,55			; print screen key?
 	int	5			;  YES- perform print screen int
 	jmp	kiret			;	leave
 
-ki1:	cmp	BL,99H			; release of P key ( pause )
+ki1:	cmp	BL,1DH			; Ctrl make?
+	jne	ki1a
+	mov	byte ptr ctrlheld,1
+	jmp	kiret
+
+ki1a:	cmp	BL,9DH			; Ctrl break?
+	jne	ki1b
+	mov	byte ptr ctrlheld,0
+	jmp	kiret
+
+ki1b:	cmp	BL,38H			; Alt make?
+	jne	ki1c
+	mov	byte ptr altheld,1
+	jmp	kiret
+
+ki1c:	cmp	BL,0B8H 		; Alt break?
+	jne	ki1d
+	mov	byte ptr altheld,0
+	jmp	kiret
+
+ki1d:	cmp	BL,53H			; Del make?
+	jne	ki1e
+	cmp	byte ptr ctrlheld,0
+	je	ki1e
+	cmp	byte ptr altheld,0
+	je	ki1e
+	mov	AX,0040H		; warm reboot on Ctrl-Alt-Del
+	mov	ES,AX
+	mov	word ptr ES:[0072H],1234H
+	db	0EAH
+	dw	0000H
+	dw	0FFFFH
+
+ki1e:	cmp	word ptr coronatxt,0	; Corona uses IRQ key state only
+	jne	ki15			;   so avoid the old pause spin loop
+
+	cmp	BL,99H			; release of P key ( pause )
 	jne	ki15			;  NO - continue
 	mov	byte ptr paused,1	;  YES- flag in pause mode
 	cmp	_systype,PCDOS		;	running under DOS on PC?
@@ -223,6 +266,10 @@ ki5:	pop	DI			; restore registers
 ;
 
 swgetc:
+	cmp	word ptr coronatxt,0
+	je	getc0
+	call	swcoronasoundtick
+getc0:
 	cmp	word ptr inplay,0	; Currently in play?
 	jnz	getc2			;   YES- jump to new keyboard code
 	call	getbio			;   NO - perform BIOS get character
@@ -450,6 +497,42 @@ flush1:
 	jmp	swflp			; loop back until nothing left
 
 
+;	swtoneio( freq )
+;
+;	Program PC speaker tone using the same PIT channel 2 method used by
+;	the standalone Corona sound test.
+;
+
+swtoneio:
+	push	BP
+	mov	BP,SP
+
+	mov	AL,0B6H
+	out	43H,AL
+	mov	AX,[BP+4]
+	out	42H,AL
+	mov	AL,AH
+	out	42H,AL
+	in	AL,61H
+	or	AL,03H
+	out	61H,AL
+
+	pop	BP
+	ret
+
+
+;	swsoundoffio()
+;
+;	Disable PC speaker gate.
+;
+
+swsoundoffio:
+	in	AL,61H
+	and	AL,0FCH
+	out	61H,AL
+	ret
+
+
 
 
 ;	swputc( c )
@@ -597,6 +680,132 @@ swtck1: pop	BP			; restore registers
 
 	add	SP,2			; skip swtick DS on stack
 	iret				; transfer to old tick routine
+
+
+swsndint:
+	push	DS
+	push	ES
+	push	AX
+	push	BX
+	push	CX
+	push	DX
+	push	SI
+	push	DI
+	push	BP
+
+	mov	BP,SP			; setup DS,ES from DS on stack
+	mov	BX,[BP+18]
+	mov	DS,BX
+	mov	ES,BX
+
+	cmp	byte ptr paused,1	; currently paused?
+	je	swsndi1 		;   YES - skip
+	call	soundadj		;   NO	- advance sound only
+
+swsndi1: pop	BP			; restore registers
+	pop	DI
+	pop	SI
+	pop	DX
+	pop	CX
+	pop	BX
+	pop	AX
+	pop	ES
+	pop	DS
+
+	add	SP,2			; skip swsndint DS on stack
+	iret				; transfer to old tick routine
+
+
+swsndset:
+	push	AX
+	push	BX
+	push	DX
+	push	DS
+	push	ES
+
+	cmp	byte ptr CS:sndactive,0
+	jne	swsnds_ret
+
+	mov	AX,DS
+	mov	CS:sndds,AX
+
+	mov	AX,351CH		; get old INT 1Ch vector
+	int	21H
+	mov	CS:sndoldip,BX
+	mov	CS:sndoldcs,ES
+
+	push	CS			; install direct sound tick hook
+	pop	DS
+	mov	DX,offset swsndraw
+	mov	AX,251CH
+	int	21H
+
+	mov	byte ptr CS:sndactive,1
+
+swsnds_ret:
+	pop	ES
+	pop	DS
+	pop	DX
+	pop	BX
+	pop	AX
+	ret
+
+
+swsndrst:
+	push	AX
+	push	DX
+	push	DS
+	push	ES
+
+	cmp	byte ptr CS:sndactive,0
+	je	swsndr_ret
+
+	mov	DX,CS:sndoldip
+	mov	AX,CS:sndoldcs
+	mov	DS,AX
+	mov	AX,251CH		; restore old INT 1Ch vector
+	int	21H
+
+	mov	byte ptr CS:sndactive,0
+
+swsndr_ret:
+	pop	ES
+	pop	DS
+	pop	DX
+	pop	AX
+	ret
+
+
+swsndraw:
+	push	AX
+	push	BX
+	push	CX
+	push	DX
+	push	SI
+	push	DI
+	push	BP
+	push	DS
+	push	ES
+
+	mov	AX,CS:sndds
+	mov	DS,AX
+	mov	ES,AX
+
+	cmp	byte ptr paused,1
+	je	swsndw_ret
+	call	soundadj
+
+swsndw_ret:
+	pop	ES
+	pop	DS
+	pop	BP
+	pop	DI
+	pop	SI
+	pop	DX
+	pop	CX
+	pop	BX
+	pop	AX
+	jmp	dword ptr CS:sndoldip
 
 
 ;------------------------------------------------------------------------------
@@ -756,6 +965,12 @@ csseg:
 	ret
 
 
+sndoldip dw	0			; direct Corona sound hook vector
+sndoldcs dw	0
+sndds	 dw	0
+sndactive db	0
+
+
 
 ;------------------------------------------------------------------------------
 
@@ -781,6 +996,8 @@ currjoy dw	0			; current joystick return word
 nextjoy dw	0			; next joystick return word
 keyflag db	0			; keyboard interrupt has occured
 paused	db	0			; paused mode flag
+ctrlheld db	0			; Ctrl key is down
+altheld db	0			; Alt key is down
 
 scantable db	45,44,51,53,52,57,48,35,31,70,47,46	; scan code table
 scanmasks dw	K_ACCEL,K_DEACC,K_FLAPU,K_FLAPD,K_FLIP	; scan mask table

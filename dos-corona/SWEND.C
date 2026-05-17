@@ -48,6 +48,8 @@ BOOL	update;
 {
 register char	*closmsg = NULL;
 char		*multclos(), *asynclos();
+extern	int	coronatxt;
+extern	int	swsndrst();
 
 
 	set_type( savemode );
@@ -65,6 +67,8 @@ char		*multclos(), *asynclos();
 		closmsg = asynclos();
 
 	intsoff();
+	if ( coronatxt )
+		swsndrst();
 	_intterm();
 	intson();
 	histend();

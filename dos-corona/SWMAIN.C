@@ -127,12 +127,38 @@ jmp_buf envrestart;			/* Restart environment for restart  */
 					/*  long jump.			    */
 
 extern	int	 swkeyint();		/* Keyboard interrupt server	    */
-
+extern	int	 swcoronatick();	/* Corona polled frame tick	    */
+extern	int	 swcoronasoundtick();	/* Corona sound tick fallback	    */
 #ifdef	IBMPC				/* System type			    */
 extern	int	 _systype;
 #endif
 #ifdef	ATARI
 	int	_systype;
+#endif
+
+
+#ifdef	IBMPC
+static getjoyif()
+{
+	if ( !coronatxt )
+		swgetjoy();
+}
+
+static coronasoundif()
+{
+	if ( coronatxt )
+		swcoronasoundtick();
+}
+
+static coronawait()
+{
+	while ( movetick < movemax )
+		swcoronatick();
+}
+
+#else
+#define getjoyif()	swgetjoy()
+#define coronasoundif()
 #endif
 
 
@@ -148,22 +174,25 @@ char	*malloc();
 	swinit( argc, argv );
 	setjmp( envrestart );
 	FOREVER {
-
 		/*----- DLC 96/12/27 ------
 		while ( movetick < 2  );
 		movetick = 0;
 		-------------------------*/
-		while ( movetick < movemax );
+#ifdef	IBMPC
+		if ( coronatxt )
+			coronawait();
+		else
+#endif
+			while ( movetick < movemax );
 		intsoff();
 		movetick -= movemax;
 		intson();
-
 		swmove();
-		swgetjoy();
+		getjoyif();
 		swdisp();
-		swgetjoy();
+		getjoyif();
 		swcollsn();
-		swgetjoy();
+		getjoyif();
 		intsoff();
 		if ( printflg ) {
 			printflg = FALSE;
@@ -175,6 +204,7 @@ char	*malloc();
 					      csseg(), dsseg() );
 		}
 		intson();
+		coronasoundif();
 		swsound();
 	}
 }

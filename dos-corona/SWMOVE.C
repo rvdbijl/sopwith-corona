@@ -77,10 +77,35 @@ extern	int	gmaxspeed,gminspeed;	/* Speed range based on game number */
 extern	int	targrnge;		/* Target range based on game number*/
 extern	int	dispcnt;		/* Displays to delay keyboard	    */
 extern	int	endstat;		/* End of game status for curr. move*/
+extern	BOOL	coronatxt;		/* Corona graphics/text mode active */
+extern	BOOL	ibmkeybd;		/* IBM-like IRQ keyboard active     */
 
 extern	int	missok; 		/* Missiles supported		    */
 
 static	BOOL	quit;
+static	int	heldkey;
+static	int	heldcnt;
+
+
+
+static	int getplyrkey()
+{
+register int	key;
+
+	key = swgetc();
+
+	if ( coronatxt && !ibmkeybd ) {
+		if ( key ) {
+			heldkey = key & ~( K_SOUND | K_BREAK );
+			heldcnt = 5;
+		} else if ( heldcnt > 0 ) {
+			key = heldkey;
+			--heldcnt;
+		}
+	}
+
+	return( key );
+}
 
 
 
@@ -147,8 +172,9 @@ register oldx;
 		else if ( playmode == ASYNCH )
 			multkey = asynget( ob );
 		else {
-			multkey = swgetc();
-			swflush();
+			multkey = getplyrkey();
+			if ( !coronatxt || ibmkeybd )
+				swflush();
 		}
 		interpret( ob, multkey );
 	} else {

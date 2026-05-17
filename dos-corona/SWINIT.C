@@ -115,7 +115,7 @@ extern	int	dispcomp(),		/*  Display and move functions	    */
 
 extern	OBJECTS *allocobj();
 
-extern	int	 swbreak(), swtick(), swshfprt(), swkeyint();
+extern	int	 swbreak(), swtick(), swsndset(), swshfprt(), swkeyint();
 extern	int	 counttick, countmove;	 /* Performance counters   */
 
 
@@ -141,6 +141,7 @@ extern	int	 ctlbflag;		/* Control break has been pressed */
 
 static	int	 savescore;		/* save players score on restart  */
 static	BOOL	 ghost; 		/* ghost display flag		  */
+static	int	 clockover = -1;	/* Clock override index number	  */
 
 static	char	 *helptxt[] = { 	/* Help text			  */
 "",
@@ -237,10 +238,22 @@ char	*device   = "\0              ";
 	initsndt();
 	intsoff();
 	_intsetup( BREAKINT, swbreak, csseg(), dsseg() );
-	_intsetup( CLOCKINT, swtick, csseg(), dsseg() );
+	clockover = _intsetup( CLOCKINT, swtick, csseg(), dsseg() );
 	initgrnd();
 	swtitln();
+#ifdef	IBMPC
+	if ( coronatxt && ( clockover >= 0 ) ) {
+		_intreset( clockover );
+		clockover = -1;
+	}
+#endif
 	intson();
+#ifdef	IBMPC
+	if ( coronatxt ) {
+		sound( S_TITLE, 0, NULL );
+		swsound();
+	}
+#endif
 
 	if ( modeset )
 		playmode = n ? NOVICE
@@ -290,15 +303,11 @@ char	*device   = "\0              ";
 
 	initflck();
 	initoxen();
-
 	initgdep();
-
 #ifdef	IBMPC
 	if ( coronatxt ) {
-		sound( 0, 0, NULL );
-		swsound();
-		soundflg = FALSE;
-		ibmkeybd = FALSE;
+		ibmkeybd = TRUE;
+		joystick = FALSE;
 	}
 #endif
 
@@ -326,21 +335,6 @@ register char	**h;
 		puts( "\r\n" );
 	}
 }
-
-
-
-#ifdef	IBMPC
-static coronamark( mark )
-int	mark;
-{
-	if ( !coronatxt )
-		return;
-
-	swcoronamark( mark );
-}
-#endif
-
-
 
 
 
@@ -597,46 +591,18 @@ register OBJECTS *ob;
 	OBJECTS 	 ghostob;
 	extern	 char	 swghtsym[];
 
-#ifdef	IBMPC
-	coronamark( 1 );
-#endif
 	splatox = oxsplatted = 0;
 	if ( !reset ) {
 		clrdispa();
-#ifdef	IBMPC
-		coronamark( 2 );
-#endif
 		setadisp();
-#ifdef	IBMPC
-		coronamark( 3 );
-#endif
 		dispworld();
-#ifdef	IBMPC
-		coronamark( 4 );
-#endif
 		swtitlf();
-#ifdef	IBMPC
-		coronamark( 5 );
-#endif
 		ghost = FALSE;
 	}
 	movedisp();
-#ifdef	IBMPC
-	coronamark( 6 );
-#endif
 	setvdisp();
-#ifdef	IBMPC
-	coronamark( 7 );
-#endif
 	initwobj();
-#ifdef	IBMPC
-	coronamark( 8 );
-#endif
 	initscore();
-#ifdef	IBMPC
-	coronamark( 9 );
-#endif
-
 	ob = &nobjects[player];
 	if ( ghost ) {
 		ghostob.ob_type = DUMMYTYPE;
@@ -644,39 +610,15 @@ register OBJECTS *ob;
 		ghostob.ob_clr = ob->ob_clr;
 		ghostob.ob_newsym = swghtsym;
 		swputsym( GHOSTX, 12, &ghostob );
-#ifdef	IBMPC
-		coronamark( 10 );
-#endif
 	} else {
 		dispfgge( ob );
-#ifdef	IBMPC
-		coronamark( 10 );
-#endif
 		dispbgge( ob );
-#ifdef	IBMPC
-		coronamark( 11 );
-#endif
 		dispmgge( ob );
-#ifdef	IBMPC
-		coronamark( 12 );
-#endif
 		dispsbgge( ob );
-#ifdef	IBMPC
-		coronamark( 13 );
-#endif
 		dispsgge( ob );
-#ifdef	IBMPC
-		coronamark( 14 );
-#endif
 		dispcgge( ob );
-#ifdef	IBMPC
-		coronamark( 15 );
-#endif
 	}
 	dispinit = TRUE;
-#ifdef	IBMPC
-	coronamark( 16 );
-#endif
 }
 
 
@@ -1322,10 +1264,10 @@ int	 orient;
 
 	if ( ( ( obotype = obo->ob_type ) == TARGET )
 		&& ( obo->ob_orient == 2 ) ) {
-		ic = 1;
+		ic = coronatxt ? 3 : 1;
 		speed = gminspeed;
 	} else {
-		ic = small ? 6 : 2;
+		ic = coronatxt ? ( small ? 8 : 4 ) : ( small ? 6 : 2 );
 		speed = gminspeed >> ( ( explseed & 7 ) != 7 );
 	}
 	mansym = ( obotype == PLANE ) && ( ( obo->ob_state == FLYING )
