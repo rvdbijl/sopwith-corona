@@ -4,8 +4,11 @@ This directory is an experimental native DOS build of Sopwith for the
 Corona/Cordata PPC-21 graphics mode. It is based on the GPL-released DOS
 Sopwith source and still uses the historical Microsoft C + MASM build style.
 
-The build has not yet been confirmed on real hardware. Expect one or two
-toolchain fixes before the first successful `SOPWITH.EXE`.
+The build has been confirmed on real Corona/Cordata PPC-21 hardware. The
+current executable starts, shows the title screen, plays sound, enters
+gameplay, and does not show the earlier hard-freeze behavior. It is not yet
+performance-complete: gameplay is still too slow on a 4.77 MHz 8088 and sound
+can lag during heavy redraws.
 
 ## Required Toolchain
 
@@ -77,6 +80,30 @@ SOPWITH.EXE
 SOPWITH.MAP
 ```
 
+## Current Linux Build Environment
+
+For the current development machine, the working build pipeline is outside
+this repository:
+
+```sh
+/home/robbert/Documents/GitHub/sopwith-corona-build-env/build-openwatcom.sh
+```
+
+The script builds a copy of `dos-corona` in the external workspace and writes:
+
+```text
+/home/robbert/Documents/GitHub/sopwith-corona-build-env/work/dos-corona/sopwith.exe
+/home/robbert/Documents/GitHub/sopwith-corona-build-env/work/dos-corona/sopwith.map
+```
+
+Copy test builds to the mounted transfer directory used by the PPC-21:
+
+```sh
+cp /home/robbert/Documents/GitHub/sopwith-corona-build-env/work/dos-corona/sopwith.exe /mnt/xt/corona/sopwith.exe
+```
+
+Do not add the external build environment or generated binaries to this repo.
+
 ## Clean
 
 To remove build products:
@@ -111,12 +138,10 @@ compiler's `LIB` directory.
 
 ## Current Corona Graphics Assumptions
 
-The first Corona patch assumes:
+The current Corona renderer assumes:
 
-* Corona graphics page 7 starts at `3800:0000`
-* the display page must stay below physical `40000h`
+* the graphics page is 32 KiB aligned and must stay below physical `40000h`
 * mode setup is BIOS mode 7, then port `3B8h = A9h`
-* CRTC start address high/low is `38h:00h`
 * pixel layout is:
 
 ```text
@@ -125,8 +150,39 @@ mask   = 01h << (x & 7)
 ```
 
 Sopwith remains a 320 x 200 game internally. Visible output is currently
-drawn as doubled-width monochrome pixels centered vertically on the 640 x 325
-Corona display.
+drawn as doubled-width monochrome pixels on the 640 x 325 Corona display.
+
+The renderer now precomputes Y offsets and CGA-byte-to-Corona masks. It also
+has an experimental small FIFO sprite cache for common fully visible sprites.
+Partially clipped sprites and larger shapes still fall back to the safer
+uncached path.
+
+## Current Runtime Status
+
+Hardware-tested behavior at this checkpoint:
+
+* title screen renders correctly
+* title sound plays normally
+* menus work
+* gameplay starts and runs
+* Ctrl-Alt-Del works
+
+Known problems:
+
+* gameplay is much too slow during terrain scrolling
+* explosions cause large frame drops
+* sound can be delayed relative to gameplay events
+* CGA color dithering is not implemented
+* native 325-line gameplay would require deeper game-coordinate changes
+
+Useful context for future debugging:
+
+* `swcoronatick` is the Corona gameplay tick path; it polls the BIOS tick and
+  has a fallback so the frame wait cannot wedge forever
+* `swcoronasoundtick` keeps title/menu sound advancing while polling for keys
+* `swkeyint` contains the Corona keyboard path and Ctrl-Alt-Del handling
+* `corona_getcache` builds cached expanded sprite masks keyed by source symbol
+  pointer and x phase
 
 ## Source Credit
 

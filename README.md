@@ -14,16 +14,37 @@ removed because they are not used by the `dos-corona/SW.MAK` build.
 
 Current Corona work:
 
-* redirects visible drawing away from CGA `B800:` memory and into Corona
-  graphics page 7 at `3800:0000`
+* redirects visible drawing away from CGA `B800:` memory and into a Corona
+  graphics page
 * uses the PPC-21's observed `SCREEN 105` framebuffer layout
 * maps Sopwith's 320 x 200 logical display into doubled-width 640-pixel
-  monochrome output, vertically centered on the 640 x 325 Corona display
+  monochrome output on the 640 x 325 Corona display
 * keeps collision/off-screen drawing in the original CGA-style auxiliary
   buffer for now
+* installs a Corona-safe IBM keyboard interrupt path, including
+  Ctrl-Alt-Del handling
+* drives PC speaker sound through direct PIT/speaker ports that work on the
+  PPC-21
+* uses polled BIOS-tick timing for Corona gameplay and title/menu sound
+* includes an experimental Corona sprite mask cache for common fully visible
+  sprites
 
-This is not yet a finished playable build. It is the first hardware-testable
-source pass.
+## Current Hardware Status
+
+As of the current checkpoint, the build has been tested on a Corona/Cordata
+PPC-21. The title screen works, title sprites render correctly, and the title
+music plays. The game starts and runs without the earlier hard freezes.
+
+Known remaining issues:
+
+* gameplay is much too slow on the 4.77 MHz 8088, especially while scrolling
+  terrain or drawing explosions
+* sound can still lag behind gameplay events during heavy redraws
+* the Corona renderer is monochrome-only; CGA color dithering is still not
+  implemented
+* the game simulation is still 320 x 200 internally, not native 640 x 325
+* the sprite cache is intentionally conservative and only covers common
+  fully visible sprite cases
 
 Build notes are in [`dos-corona/BUILDING.MD`](dos-corona/BUILDING.MD). The
 short version is:
@@ -35,6 +56,21 @@ BUILD
 
 with Microsoft C, MASM, LINK, and NMAKE installed and configured in `PATH`,
 `INCLUDE`, and `LIB`.
+
+On the Linux Mint development machine used for this port, an external build
+environment lives outside this repository at:
+
+```sh
+/home/robbert/Documents/GitHub/sopwith-corona-build-env/build-openwatcom.sh
+```
+
+That external build pipeline is intentionally not part of this repository.
+It produces `sopwith.exe` under the external build workspace, and the tested
+hardware drop is copied to:
+
+```sh
+/mnt/xt/corona/sopwith.exe
+```
 
 ## Credits and References
 
